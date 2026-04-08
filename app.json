@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Beauty Up",
+    "slug": "beauty-up",
+    "scheme": "beautyup",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF8F7"
+      }
+    }
+  }
+}
