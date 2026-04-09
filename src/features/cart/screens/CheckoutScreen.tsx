@@ -4,6 +4,8 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -19,6 +21,13 @@ export function CheckoutScreen() {
       <AppHeader
         title="Checkout"
         subtitle="Mock PromptPay Dynamic QR and payment summary for the demo."
+      />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigateToHome(navigation) },
+          { label: "Cart", onPress: () => navigation.navigate("Cart") },
+          { label: "Checkout" },
+        ]}
       />
 
       <View style={styles.qrCard}>

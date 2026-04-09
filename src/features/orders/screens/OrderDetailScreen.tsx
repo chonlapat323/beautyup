@@ -1,15 +1,19 @@
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { ProductArtwork } from "@/components/ui/BeautyVisuals";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { CommerceImage } from "@/components/ui/CommerceImage";
 import { products } from "@/mock/catalog";
+import { navigateToHome, navigateToOrderHistory } from "@/navigation/helpers";
 import { useAppStore } from "@/store/useAppStore";
 import type { OrderStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function OrderDetailScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<OrderStackParamList>>();
   const route = useRoute<RouteProp<OrderStackParamList, "OrderDetail">>();
   const order = useAppStore((state) =>
     state.orders.find((entry) => entry.id === route.params.orderId),
@@ -19,6 +23,13 @@ export function OrderDetailScreen() {
     return (
       <Screen contentContainerStyle={styles.content}>
         <AppHeader title="Order details" subtitle="We couldn't find this mock order." />
+        <Breadcrumbs
+          items={[
+            { label: "Home", onPress: () => navigateToHome(navigation) },
+            { label: "Orders", onPress: () => navigateToOrderHistory(navigation) },
+            { label: "Order Detail" },
+          ]}
+        />
       </Screen>
     );
   }
@@ -28,6 +39,13 @@ export function OrderDetailScreen() {
   return (
     <Screen contentContainerStyle={styles.content}>
       <AppHeader title={order.id} subtitle={`Placed on ${order.placedAt}`} />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigateToHome(navigation) },
+          { label: "Orders", onPress: () => navigateToOrderHistory(navigation) },
+          { label: order.id },
+        ]}
+      />
 
       <View style={styles.heroCard}>
         <View>
@@ -51,7 +69,7 @@ export function OrderDetailScreen() {
 
           return (
             <View key={`${order.id}-${item.productId}`} style={styles.itemCard}>
-              <ProductArtwork product={product} style={styles.itemArtwork} />
+              <CommerceImage style={styles.itemArtwork} uri={product.imageUrl} />
               <View style={styles.itemCopy}>
                 <Text style={styles.itemName}>{item.name}</Text>
                 <Text style={styles.itemMeta}>Qty {item.quantity}</Text>

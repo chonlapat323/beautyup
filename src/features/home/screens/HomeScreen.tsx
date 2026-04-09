@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
-import { CategoryArtwork, ProductArtwork, RitualArtwork } from "@/components/ui/BeautyVisuals";
+import { CommerceImage, CommerceImageBackground } from "@/components/ui/CommerceImage";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { categories, products } from "@/mock/catalog";
 import type { ShopStackParamList } from "@/navigation/types";
@@ -19,6 +19,7 @@ import { colors, radius, spacing, typography } from "@/theme";
 export function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const featuredProducts = products.slice(0, 4);
+  const heroProduct = products.find((item) => item.id === "ceramide-mask") ?? featuredProducts[0];
 
   function openCategory(categoryId: string, requiresShadeSelection: boolean) {
     if (requiresShadeSelection) {
@@ -69,7 +70,11 @@ export function HomeScreen() {
           </Pressable>
         </View>
 
-        <RitualArtwork style={styles.heroVisual} />
+        <CommerceImageBackground
+          imageStyle={styles.heroVisualImage}
+          style={styles.heroVisual}
+          uri={heroProduct?.imageUrl}
+        />
       </View>
 
       <View style={styles.trustStrip}>
@@ -90,7 +95,10 @@ export function HomeScreen() {
               <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
             </View>
 
-            <CategoryArtwork categoryId={category.id} style={styles.categoryImageFrame} />
+            <CommerceImage
+              style={styles.categoryImageFrame}
+              uri={category.imageUrl}
+            />
           </Pressable>
         ))}
       </View>
@@ -108,7 +116,7 @@ export function HomeScreen() {
             onPress={() => navigation.navigate("ProductDetail", { productId: product.id })}
             style={styles.productCard}
           >
-            <ProductArtwork product={product} style={styles.productImage} />
+            <CommerceImage style={styles.productImage} uri={product.imageUrl} />
             <Text style={styles.productMeta}>{product.subtitle}</Text>
             <Text style={styles.productName}>{product.name}</Text>
             <Text numberOfLines={1} style={styles.productPrice}>
@@ -232,6 +240,9 @@ const styles = StyleSheet.create({
   heroVisual: {
     width: 128,
   },
+  heroVisualImage: {
+    borderRadius: radius.lg,
+  },
   trustStrip: {
     marginHorizontal: spacing["2xl"],
     marginBottom: spacing["3xl"],
@@ -286,6 +297,7 @@ const styles = StyleSheet.create({
   categoryImageFrame: {
     width: 132,
     alignSelf: "stretch",
+    backgroundColor: colors.surfaceMuted,
   },
   productRow: {
     flexDirection: "row",

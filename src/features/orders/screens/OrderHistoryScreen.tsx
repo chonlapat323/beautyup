@@ -4,9 +4,23 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { useAppStore } from "@/store/useAppStore";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { navigateToHome } from "@/navigation/helpers";
 import type { OrderStackParamList } from "@/navigation/types";
+import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
+
+const statusToneMap = {
+  Paid: {
+    backgroundColor: "#F5E7EA",
+  },
+  Preparing: {
+    backgroundColor: "#F5EEE5",
+  },
+  Delivered: {
+    backgroundColor: "#EAF2E8",
+  },
+} as const;
 
 export function OrderHistoryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<OrderStackParamList>>();
@@ -14,20 +28,32 @@ export function OrderHistoryScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
-      <AppHeader
-        title="Order history"
-        subtitle="Mock order updates for the presentation flow."
+      <AppHeader title="Order history" subtitle="Mock order updates for the presentation flow." />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigateToHome(navigation) },
+          { label: "Orders" },
+        ]}
       />
 
       <View style={styles.list}>
         {orders.map((order) => (
-          <View key={order.id} style={styles.card}>
-            <Text style={styles.orderId}>{order.id}</Text>
+          <Pressable
+            key={order.id}
+            onPress={() => navigation.navigate("OrderDetail", { orderId: order.id })}
+            style={styles.card}
+          >
+            <View style={styles.row}>
+              <Text style={styles.orderId}>{order.id}</Text>
+              <View style={[styles.statusPill, statusToneMap[order.status]]}>
+                <Text style={styles.status}>{order.status}</Text>
+              </View>
+            </View>
             <Text style={styles.meta}>
-              {order.itemCount} items • THB {order.total.toFixed(2)}
+              {order.itemCount} items | THB {order.total.toFixed(0)}
             </Text>
-            <Text style={styles.status}>{order.status}</Text>
-          </View>
+            <Text style={styles.date}>{order.placedAt}</Text>
+          </Pressable>
         ))}
       </View>
     </Screen>
@@ -50,6 +76,12 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.sm,
   },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: spacing.md,
+  },
   orderId: {
     color: colors.textPrimary,
     ...typography.title,
@@ -58,8 +90,17 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     ...typography.body,
   },
+  date: {
+    color: colors.textMuted,
+    ...typography.caption,
+  },
+  statusPill: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.pill,
+  },
   status: {
-    color: colors.primary,
+    color: colors.primaryStrong,
     ...typography.caption,
   },
 });

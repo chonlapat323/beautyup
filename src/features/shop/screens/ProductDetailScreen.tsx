@@ -4,7 +4,8 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { ProductArtwork } from "@/components/ui/BeautyVisuals";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { CommerceImage } from "@/components/ui/CommerceImage";
 import { products } from "@/mock/catalog";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -23,8 +24,23 @@ export function ProductDetailScreen() {
   return (
     <Screen contentContainerStyle={styles.content}>
       <AppHeader title={product.name} subtitle={product.subtitle} />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigation.navigate("Home") },
+          { label: "Categories", onPress: () => navigation.navigate("Categories") },
+          {
+            label: "Products",
+            onPress: () =>
+              navigation.navigate("ProductList", {
+                categoryId: product.categoryId,
+                shadeId: product.shadeId,
+              }),
+          },
+          { label: product.name },
+        ]}
+      />
 
-      <ProductArtwork product={product} style={styles.preview} />
+      <CommerceImage style={styles.preview} uri={product.imageUrl} />
 
       <View style={styles.body}>
         <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>

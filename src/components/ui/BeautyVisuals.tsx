@@ -104,19 +104,29 @@ export function ProductArtwork({ product, style }: ProductArtworkProps) {
 }
 
 export function ShadeArtwork({ children, shade, style }: ShadeArtworkProps) {
-  const bands = [0.92, 0.8, 0.7, 0.56, 0.4, 0.28];
+  const strands = Array.from({ length: 18 }, (_, index) => ({
+    top: -8 + index * 12,
+    left: -40 + (index % 4) * 10,
+    opacity: 0.18 + (index % 5) * 0.12,
+    height: 12 + (index % 3) * 2,
+    rotate: -14 + (index % 6) * 3,
+  }));
 
   return (
     <View style={[styles.shadeShell, { backgroundColor: soften(shade.swatch) }, style]}>
-      {bands.map((opacity, index) => (
-        <Fragment key={opacity}>
+      <View style={[styles.shadeHighlight, { backgroundColor: `${shade.swatch}55` }]} />
+      {strands.map((strand, index) => (
+        <Fragment key={`${shade.id}-${index}`}>
           <View
             style={[
-              styles.shadeBand,
+              styles.shadeStrand,
               {
                 backgroundColor: shade.swatch,
-                opacity,
-                top: 18 + index * 22,
+                opacity: strand.opacity,
+                top: strand.top,
+                left: strand.left,
+                height: strand.height,
+                transform: [{ rotate: `${strand.rotate}deg` }],
               },
             ]}
           />
@@ -361,12 +371,19 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
   },
-  shadeBand: {
+  shadeHighlight: {
     position: "absolute",
-    left: -22,
-    right: -22,
-    height: 18,
+    top: -10,
+    right: 12,
+    width: 82,
+    height: "110%",
     borderRadius: radius.pill,
-    transform: [{ rotate: "-12deg" }],
+    opacity: 0.55,
+    transform: [{ rotate: "14deg" }],
+  },
+  shadeStrand: {
+    position: "absolute",
+    width: "145%",
+    borderRadius: radius.pill,
   },
 });

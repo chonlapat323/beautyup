@@ -1,11 +1,15 @@
+import { useNavigation } from "@react-navigation/native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { navigateToHome } from "@/navigation/helpers";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function ProfileScreen() {
+  const navigation = useNavigation();
   const signOut = useAppStore((state) => state.signOut);
 
   return (
@@ -13,6 +17,12 @@ export function ProfileScreen() {
       <AppHeader
         title="Profile"
         subtitle="A clean account hub for the Beauty Up mock experience."
+      />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigateToHome(navigation as never) },
+          { label: "Profile" },
+        ]}
       />
 
       <View style={styles.card}>

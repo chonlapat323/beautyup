@@ -4,7 +4,8 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { CategoryArtwork } from "@/components/ui/BeautyVisuals";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { CommerceImage } from "@/components/ui/CommerceImage";
 import { categories } from "@/mock/catalog";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -17,6 +18,12 @@ export function CategoriesScreen() {
       <AppHeader
         title="Curated collections"
         subtitle="Choose a category to start shopping through the Beauty Up demo flow."
+      />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigation.navigate("Home") },
+          { label: "Categories" },
+        ]}
       />
 
       <View style={styles.list}>
@@ -34,7 +41,7 @@ export function CategoriesScreen() {
               <Text style={styles.title}>{category.title}</Text>
               <Text style={styles.subtitle}>{category.subtitle}</Text>
             </View>
-            <CategoryArtwork categoryId={category.id} style={styles.preview} />
+            <CommerceImage style={styles.preview} uri={category.imageUrl} />
           </Pressable>
         ))}
       </View>
@@ -86,5 +93,6 @@ const styles = StyleSheet.create({
   preview: {
     width: 132,
     alignSelf: "stretch",
+    backgroundColor: colors.surfaceMuted,
   },
 });

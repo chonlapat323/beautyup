@@ -4,8 +4,10 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { ProductArtwork } from "@/components/ui/BeautyVisuals";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { CommerceImage } from "@/components/ui/CommerceImage";
 import { products } from "@/mock/catalog";
+import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -19,6 +21,12 @@ export function CartScreen() {
   return (
     <Screen contentContainerStyle={styles.content}>
       <AppHeader title="Your cart" subtitle="Review your mock basket before checkout." />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigateToHome(navigation) },
+          { label: "Cart" },
+        ]}
+      />
 
       <View style={styles.list}>
         {cart.length === 0 ? (
@@ -34,7 +42,7 @@ export function CartScreen() {
 
             return (
               <View key={item.productId} style={styles.itemCard}>
-                <ProductArtwork product={product} style={styles.swatch} />
+                <CommerceImage style={styles.swatch} uri={product.imageUrl} />
                 <View style={styles.itemCopy}>
                   <Text style={styles.itemName}>{product.name}</Text>
                   <Text style={styles.itemPrice}>THB {product.price.toFixed(0)}</Text>

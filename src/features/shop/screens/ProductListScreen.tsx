@@ -4,7 +4,8 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { ProductArtwork } from "@/components/ui/BeautyVisuals";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { CommerceImage } from "@/components/ui/CommerceImage";
 import { categories, products, shades } from "@/mock/catalog";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -28,6 +29,34 @@ export function ProductListScreen() {
           selectedShade ? `Selected shade: ${selectedShade.name}` : "Mock products ready to browse."
         }
       />
+      <Breadcrumbs
+        items={
+          selectedShade
+            ? [
+                { label: "Home", onPress: () => navigation.navigate("Home") },
+                { label: "Categories", onPress: () => navigation.navigate("Categories") },
+                {
+                  label: category?.title ?? "Products",
+                  onPress: () => navigation.navigate("Categories"),
+                },
+                {
+                  label: selectedShade.name,
+                  onPress: () =>
+                    navigation.navigate("ShadeSelection", { categoryId: route.params.categoryId }),
+                },
+                { label: "Products" },
+              ]
+            : [
+                { label: "Home", onPress: () => navigation.navigate("Home") },
+                { label: "Categories", onPress: () => navigation.navigate("Categories") },
+                {
+                  label: category?.title ?? "Products",
+                  onPress: () => navigation.navigate("Categories"),
+                },
+                { label: "Products" },
+              ]
+        }
+      />
 
       {selectedShade ? (
         <View style={styles.filterPill}>
@@ -43,7 +72,7 @@ export function ProductListScreen() {
             onPress={() => navigation.navigate("ProductDetail", { productId: product.id })}
             style={styles.card}
           >
-            <ProductArtwork product={product} style={styles.preview} />
+            <CommerceImage style={styles.preview} uri={product.imageUrl} />
             <Text style={styles.meta}>{product.subtitle}</Text>
             <Text style={styles.name}>{product.name}</Text>
             <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>

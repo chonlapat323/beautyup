@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -12,6 +14,14 @@ export function OrderSuccessScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigateToHome(navigation) },
+          { label: "Cart", onPress: () => navigation.navigate("Cart") },
+          { label: "Checkout", onPress: () => navigation.navigate("Checkout") },
+          { label: "Success" },
+        ]}
+      />
       <View style={styles.hero}>
         <Text style={styles.label}>Order confirmed</Text>
         <Text style={styles.title}>Thank you for your order</Text>
@@ -20,7 +30,7 @@ export function OrderSuccessScreen() {
       </View>
 
       <View style={styles.actions}>
-        <Pressable onPress={() => navigation.navigate("Home")} style={styles.primaryButton}>
+        <Pressable onPress={() => navigateToHome(navigation)} style={styles.primaryButton}>
           <Text style={styles.primaryText}>Back to home</Text>
         </Pressable>
         <Pressable

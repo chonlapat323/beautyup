@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { useAppStore } from "@/store/useAppStore";
 import type { OrderStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -27,6 +28,12 @@ export function OrderHistoryListScreen() {
   return (
     <Screen contentContainerStyle={styles.content}>
       <AppHeader title="Order history" subtitle="Mock order updates for the presentation flow." />
+      <Breadcrumbs
+        items={[
+          { label: "Home", onPress: () => navigation.getParent()?.navigate("Discover") },
+          { label: "Orders" },
+        ]}
+      />
 
       <View style={styles.list}>
         {orders.map((order) => (
