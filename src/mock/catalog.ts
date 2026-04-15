@@ -2,16 +2,20 @@ import type { Category, Order, Product, Shade } from "@/types/domain";
 
 const milbonOrdeveImage =
   "https://milbon.com.sg/wp-content/uploads/2023/07/Ordeve-1.webp";
-const milbonOrdeveAddicthyImage =
-  "https://milbon.com.sg/wp-content/uploads/2023/11/Ordeve-Addicthy.jpg";
-const milbonOrdeveCrystalImage =
-  "https://milbon.com.sg/wp-content/uploads/2023/07/Ordeve-Crystal-High-Bright-1.webp";
 const milbonShampooImage =
   "https://milbon.com.sg/wp-content/uploads/2023/06/milbon_smooth_smoothingshampoo-600x600.webp";
 const milbonLeaveInImage =
   "https://milbon.com.sg/wp-content/uploads/2024/01/sun-protect-emulsion-600x644-1-300x300-1.jpg";
 const milbonBleachCareImage =
   "https://milbon.com.sg/wp-content/uploads/2023/11/bleach-care-gel-600x644-1.jpg";
+const wellaKolestonPerfectImage =
+  "https://wella.bynder.com/transform/2f8cc431-0710-41af-accc-1dff5686fcd4/Wella-Professionals_Wella-com_Revamp_FY25-Wella_PLP-Hero_Colour-Line_Koleston-Perfect_2500x2500?io=transform%3Afit%2Cwidth%3A3840&quality=85";
+const wellaIlluminaColorImage =
+  "https://wella.bynder.com/transform/0507d350-0626-4bf7-b915-c24030ce5afe/Wella-Professionals_Wella-com_Revamp_FY25-Wella_PLP-Hero_Colour-Line_Illumina-Color_2500x2500?io=transform%3Afit%2Cwidth%3A3840&quality=85";
+const wellaColorTouchImage =
+  "https://wella.bynder.com/transform/49992a44-ce95-454a-a1db-2925d2d85ea3/Wella-Professionals_Wella-com_Revamp_FY25-Wella_PLP-Hero_Colour-Line_Color-Touch_2500x2500?io=transform%3Afit%2Cwidth%3A3840&quality=85";
+const wellaShinefinityImage =
+  "https://wella.bynder.com/transform/750d2d9e-0f1a-41f0-afe1-45250cc31f4b/Wella-Professionals_Wella-com_Revamp_FY25-Wella_PLP-Hero_Colour-Line_Shinefinity_2500x2500?io=transform%3Afit%2Cwidth%3A3840&quality=85";
 
 export const categories: Category[] = [
   {
@@ -148,24 +152,48 @@ const curatedProducts: Product[] = [
     imageUrl: milbonShampooImage,
   },
   {
-    id: "developer-cream",
+    id: "ordeve-13-nb-color-cream",
     categoryId: "color-bleach",
-    name: "Color Developer Cream",
-    subtitle: "Salon support base",
-    price: 31,
-    description: "A mock developer essential shown alongside shade-led color products in the demo flow.",
-    accentColor: "#A48D79",
-    imageUrl: milbonOrdeveCrystalImage,
+    shadeId: "13-NB",
+    name: "Koleston Perfect",
+    subtitle: "13-NB inspired beige",
+    price: 49,
+    description: "A professional permanent hair color option used here to represent the selected 13-NB beige direction.",
+    accentColor: "#F3E5DA",
+    imageUrl: wellaKolestonPerfectImage,
   },
   {
-    id: "post-color-treatment",
+    id: "illumina-color-13-nb",
     categoryId: "color-bleach",
-    name: "Post Color Treatment",
-    subtitle: "After-color care",
-    price: 33,
-    description: "A soft after-color treatment to support tone longevity and a smooth salon finish.",
-    accentColor: "#8E6B61",
-    imageUrl: milbonOrdeveAddicthyImage,
+    shadeId: "13-NB",
+    name: "Illumina Color",
+    subtitle: "Soft luminous beige",
+    price: 45,
+    description: "A luminous professional color line selected to support the premium beige tone story of 13-NB.",
+    accentColor: "#EED8C8",
+    imageUrl: wellaIlluminaColorImage,
+  },
+  {
+    id: "color-touch-13-nb",
+    categoryId: "color-bleach",
+    shadeId: "13-NB",
+    name: "Color Touch",
+    subtitle: "Glossy demi color",
+    price: 43,
+    description: "A demi-permanent color option chosen for the 13-NB presentation flow to show a softer beige result.",
+    accentColor: "#DFC2AB",
+    imageUrl: wellaColorTouchImage,
+  },
+  {
+    id: "shinefinity-13-nb",
+    categoryId: "color-bleach",
+    shadeId: "13-NB",
+    name: "Shinefinity",
+    subtitle: "Zero-lift glaze finish",
+    price: 41,
+    description: "A shine-focused glaze option included to round out the 13-NB color product set with a premium finish.",
+    accentColor: "#CFA787",
+    imageUrl: wellaShinefinityImage,
   },
   {
     id: "espresso-color-cream",
@@ -187,7 +215,7 @@ const curatedProducts: Product[] = [
     price: 54,
     description: "A brightening color essential created for soft golden blonde outcomes.",
     accentColor: "#D4AC67",
-    imageUrl: milbonOrdeveAddicthyImage,
+    imageUrl: wellaIlluminaColorImage,
   },
   {
     id: "rose-gold-toner",
@@ -198,7 +226,7 @@ const curatedProducts: Product[] = [
     price: 52,
     description: "A tone-refining formula for pastel warmth with a premium glossy finish.",
     accentColor: "#D79A96",
-    imageUrl: milbonOrdeveCrystalImage,
+    imageUrl: wellaColorTouchImage,
   },
   {
     id: "chestnut-bleach-care",
@@ -233,7 +261,7 @@ const curatedProducts: Product[] = [
   },
 ];
 
-const featuredColorShadeIds = new Set(["8-NB", "9-CB", "11-10", "8-55"]);
+const featuredColorShadeIds = new Set(["13-NB", "8-NB", "9-CB", "11-10", "8-55"]);
 
 const generatedColorProducts: Product[] = shades
   .filter((shade) => !featuredColorShadeIds.has(shade.id))
@@ -250,7 +278,7 @@ const generatedColorProducts: Product[] = shades
       price: 44 + (index % 8),
       description: `Mock salon color SKU aligned to the Milbon ${shade.name} tone family for presentation and browsing.`,
       accentColor: shade.swatch,
-      imageUrl: lightTone ? milbonOrdeveAddicthyImage : milbonOrdeveImage,
+      imageUrl: lightTone ? wellaIlluminaColorImage : wellaKolestonPerfectImage,
     };
   });
 

@@ -1,16 +1,20 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useState } from "react";
 import {
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
-import { CommerceImage, CommerceImageBackground } from "@/components/ui/CommerceImage";
+import { BrandLockup } from "@/components/ui/BrandLockup";
+import { CommerceImage } from "@/components/ui/CommerceImage";
+import { HeroSlide } from "@/components/ui/HeroSlide";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { categories, products } from "@/mock/catalog";
 import type { ShopStackParamList } from "@/navigation/types";
@@ -18,8 +22,40 @@ import { colors, radius, spacing, typography } from "@/theme";
 
 export function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
+  const { width } = useWindowDimensions();
+  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const featuredProducts = products.slice(0, 4);
-  const heroProduct = products.find((item) => item.id === "ceramide-mask") ?? featuredProducts[0];
+  const slideWidth = width - spacing["2xl"] * 2;
+
+  const heroSlides = [
+    {
+      id: "spring-ritual",
+      eyebrow: "Spring Ritual",
+      title: "Care That Feels Premium",
+      body: "Professional beauty essentials curated for soft shine, healthy texture, and everyday confidence.",
+      buttonLabel: "Shop Now",
+      imageUrl: featuredProducts[0]?.imageUrl,
+      onPress: () => navigation.navigate("Categories"),
+    },
+    {
+      id: "shade-first",
+      eyebrow: "Color Ritual",
+      title: "Find Your Shade First",
+      body: "Explore the curated color journey through shade-led discovery before browsing the right products.",
+      buttonLabel: "Select Shade",
+      imageUrl: products.find((item) => item.shadeId === "13-NB")?.imageUrl,
+      onPress: () => navigation.navigate("ShadeSelection", { categoryId: "color-bleach" }),
+    },
+    {
+      id: "daily-shine",
+      eyebrow: "Daily Essentials",
+      title: "Soft Finish, Everyday Glow",
+      body: "Discover leave-in and salon care favorites designed to keep hair polished, light, and touchable.",
+      buttonLabel: "View Ritual",
+      imageUrl: products.find((item) => item.categoryId === "leave-in")?.imageUrl,
+      onPress: () => navigation.navigate("ProductList", { categoryId: "leave-in" }),
+    },
+  ];
 
   function openCategory(categoryId: string, requiresShadeSelection: boolean) {
     if (requiresShadeSelection) {
@@ -33,13 +69,7 @@ export function HomeScreen() {
   return (
     <Screen contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <View style={styles.brandRow}>
-          <MaterialIcons color={colors.primary} name="spa" size={20} />
-          <View>
-            <Text style={styles.brandName}>Beauty Up</Text>
-            <Text style={styles.brandTag}>Beauty Ritual</Text>
-          </View>
-        </View>
+        <BrandLockup />
 
         <Pressable
           accessibilityLabel="Open profile"
@@ -51,30 +81,53 @@ export function HomeScreen() {
       </View>
 
       <View style={styles.introBlock}>
-        <Text style={styles.introTitle}>For your daily beauty ritual</Text>
+        {/* <Text style={styles.introTitle}>For your daily beauty ritual</Text> */}
         <Text style={styles.introBody}>
           Curated haircare and color essentials with a soft, premium retail experience.
         </Text>
       </View>
 
-      <View style={styles.heroCard}>
-        <View style={styles.heroCopy}>
-          <Text style={styles.eyebrow}>Spring Ritual</Text>
-          <Text style={styles.heroTitle}>Care That Feels Premium</Text>
-          <Text style={styles.heroBody}>
-            Professional beauty essentials curated for soft shine, healthy texture, and everyday
-            confidence.
-          </Text>
-          <Pressable style={styles.heroButton} onPress={() => navigation.navigate("Categories")}>
-            <Text style={styles.heroButtonText}>Shop Now</Text>
-          </Pressable>
-        </View>
+      <View style={styles.heroSliderSection}>
+        <ScrollView
+          contentContainerStyle={styles.heroSliderContent}
+          decelerationRate="fast"
+          disableIntervalMomentum
+          horizontal
+          onMomentumScrollEnd={(event) => {
+            const nextIndex = Math.round(
+              event.nativeEvent.contentOffset.x / (slideWidth + spacing.md),
+            );
+            setActiveHeroIndex(nextIndex);
+          }}
+          showsHorizontalScrollIndicator={false}
+          snapToAlignment="start"
+          snapToInterval={slideWidth + spacing.md}
+        >
+          {heroSlides.map((slide) => (
+            <View key={slide.id} style={[styles.heroSlideWrap, { width: slideWidth }]}>
+              <HeroSlide
+                body={slide.body}
+                buttonLabel={slide.buttonLabel}
+                eyebrow={slide.eyebrow}
+                imageUrl={slide.imageUrl}
+                onPress={slide.onPress}
+                title={slide.title}
+              />
+            </View>
+          ))}
+        </ScrollView>
 
-        <CommerceImageBackground
-          imageStyle={styles.heroVisualImage}
-          style={styles.heroVisual}
-          uri={heroProduct?.imageUrl}
-        />
+        <View style={styles.heroPagination}>
+          {heroSlides.map((slide, index) => (
+            <View
+              key={slide.id}
+              style={[
+                styles.heroDot,
+                index === activeHeroIndex ? styles.heroDotActive : undefined,
+              ]}
+            />
+          ))}
+        </View>
       </View>
 
       <View style={styles.trustStrip}>
@@ -148,22 +201,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  brandRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  brandName: {
-    color: colors.primary,
-    fontSize: 30,
-    lineHeight: 32,
-    fontWeight: "600",
-  },
-  brandTag: {
-    color: colors.primary,
-    textTransform: "uppercase",
-    ...typography.eyebrow,
-  },
   profileButton: {
     width: 44,
     height: 44,
@@ -192,56 +229,31 @@ const styles = StyleSheet.create({
     maxWidth: 270,
     ...typography.body,
   },
-  heroCard: {
-    marginHorizontal: spacing["2xl"],
+  heroSliderSection: {
     marginBottom: spacing.xl,
-    padding: spacing["2xl"],
-    borderRadius: radius.xl,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
-    flexDirection: "row",
-    overflow: "hidden",
-    ...cardShadow,
   },
-  heroCopy: {
-    flex: 1,
-    paddingRight: spacing.lg,
+  heroSliderContent: {
+    paddingHorizontal: spacing["2xl"],
     gap: spacing.md,
   },
-  eyebrow: {
-    color: colors.primary,
-    textTransform: "uppercase",
-    ...typography.eyebrow,
+  heroSlideWrap: {
+    width: "100%",
   },
-  heroTitle: {
-    color: colors.textPrimary,
-    maxWidth: 180,
-    fontSize: 26,
-    lineHeight: 32,
-    fontWeight: "600",
+  heroPagination: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: spacing.xs,
+    marginTop: spacing.md,
   },
-  heroBody: {
-    color: colors.textSecondary,
-    ...typography.body,
-  },
-  heroButton: {
-    alignSelf: "flex-start",
-    marginTop: spacing.sm,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
+  heroDot: {
+    width: 8,
+    height: 8,
     borderRadius: radius.pill,
+    backgroundColor: colors.borderSoft,
+  },
+  heroDotActive: {
+    width: 24,
     backgroundColor: colors.primary,
-  },
-  heroButtonText: {
-    color: "#FFFFFF",
-    ...typography.caption,
-  },
-  heroVisual: {
-    width: 128,
-  },
-  heroVisualImage: {
-    borderRadius: radius.lg,
   },
   trustStrip: {
     marginHorizontal: spacing["2xl"],

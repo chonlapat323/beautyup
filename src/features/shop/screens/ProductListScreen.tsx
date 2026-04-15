@@ -18,7 +18,10 @@ export function ProductListScreen() {
   const filteredProducts = products.filter(
     (item) =>
       item.categoryId === route.params.categoryId &&
-      (!route.params.shadeId || item.shadeId === route.params.shadeId || !item.shadeId),
+      (!route.params.shadeId ||
+        (route.params.categoryId === "color-bleach"
+          ? item.shadeId === route.params.shadeId
+          : item.shadeId === route.params.shadeId || !item.shadeId)),
   );
 
   return (

@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
+import { BRAND_NAME } from "@/brand";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
@@ -17,7 +18,7 @@ export function CategoriesScreen() {
     <Screen contentContainerStyle={styles.content}>
       <AppHeader
         title="Curated collections"
-        subtitle="Choose a category to start shopping through the Beauty Up demo flow."
+        subtitle={`Choose a category to start shopping through the ${BRAND_NAME} demo flow.`}
       />
       <Breadcrumbs
         items={[

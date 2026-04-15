@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { BrandLockup } from "@/components/ui/BrandLockup";
 import { colors, spacing, typography } from "@/theme";
 
 type AppHeaderProps = {
@@ -10,7 +11,7 @@ type AppHeaderProps = {
 export function AppHeader({ title, subtitle }: AppHeaderProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.brand}>Beauty Up</Text>
+      <BrandLockup compact />
       <Text style={styles.title}>{title}</Text>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
     </View>
@@ -23,11 +24,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingBottom: spacing.xl,
     gap: spacing.sm,
-  },
-  brand: {
-    color: colors.primary,
-    textTransform: "uppercase",
-    ...typography.eyebrow,
   },
   title: {
     color: colors.textPrimary,

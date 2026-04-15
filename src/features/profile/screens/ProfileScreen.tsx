@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
+import { BRAND_ACCOUNT_LABEL, BRAND_EXPERIENCE_LABEL } from "@/brand";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { navigateToHome } from "@/navigation/helpers";
@@ -16,7 +17,7 @@ export function ProfileScreen() {
     <Screen contentContainerStyle={styles.content}>
       <AppHeader
         title="Profile"
-        subtitle="A clean account hub for the Beauty Up mock experience."
+        subtitle={`A clean account hub for the ${BRAND_EXPERIENCE_LABEL}.`}
       />
       <Breadcrumbs
         items={[
@@ -27,7 +28,7 @@ export function ProfileScreen() {
 
       <View style={styles.card}>
         <Text style={styles.name}>Pao Chonlapat</Text>
-        <Text style={styles.meta}>Beauty Up Demo Account</Text>
+        <Text style={styles.meta}>{BRAND_ACCOUNT_LABEL}</Text>
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>3</Text>

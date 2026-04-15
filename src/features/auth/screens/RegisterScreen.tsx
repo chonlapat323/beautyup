@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
+import { BrandLockup } from "@/components/ui/BrandLockup";
 import type { AuthStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -23,10 +24,7 @@ export function RegisterScreen() {
         <Pressable accessibilityLabel="Back to login" onPress={() => navigation.goBack()}>
           <MaterialIcons color={colors.primary} name="arrow-back" size={22} />
         </Pressable>
-        <View style={styles.brandRow}>
-          <MaterialIcons color={colors.primary} name="spa" size={18} />
-          <Text style={styles.brandName}>Beauty Up</Text>
-        </View>
+        <BrandLockup compact />
       </View>
 
       <View style={styles.copyBlock}>
@@ -95,17 +93,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-  },
-  brandRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  brandName: {
-    color: colors.primary,
-    fontSize: 24,
-    lineHeight: 28,
-    fontWeight: "600",
   },
   copyBlock: {
     paddingHorizontal: spacing["2xl"],

@@ -1,11 +1,10 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
-import { RitualArtwork } from "@/components/ui/BeautyVisuals";
+import { BrandLockup } from "@/components/ui/BrandLockup";
 import type { AuthStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -19,22 +18,12 @@ export function LoginScreen() {
   return (
     <Screen contentContainerStyle={styles.content}>
       <View style={styles.brandBlock}>
-        <View style={styles.brandRow}>
-          <MaterialIcons color={colors.primary} name="spa" size={22} />
-          <View>
-            <Text style={styles.brandName}>Beauty Up</Text>
-            <Text style={styles.brandTag}>Beauty Ritual</Text>
-          </View>
-        </View>
+        <BrandLockup size="hero" />
 
-        <Text style={styles.title}>Your beauty ritual begins here</Text>
+        <Text style={styles.title}>Beauty begins with Beauty Up</Text>
         <Text style={styles.subtitle}>
-          A calm, premium login experience for your daily care essentials.
+          A refined haircare experience for your daily ritual.
         </Text>
-      </View>
-
-      <View style={styles.heroImage}>
-        <RitualArtwork style={styles.ritualArtwork} />
       </View>
 
       <View style={styles.card}>
@@ -82,48 +71,22 @@ const styles = StyleSheet.create({
   brandBlock: {
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing["3xl"],
-    gap: spacing.md,
-  },
-  brandRow: {
-    flexDirection: "row",
     alignItems: "center",
-    gap: spacing.sm,
-  },
-  brandName: {
-    color: colors.primary,
-    fontSize: 28,
-    lineHeight: 30,
-    fontWeight: "600",
-  },
-  brandTag: {
-    color: colors.primary,
-    textTransform: "uppercase",
-    ...typography.eyebrow,
+    gap: spacing.md,
   },
   title: {
     color: colors.textPrimary,
-    maxWidth: 260,
-    fontSize: 34,
+    maxWidth: 300,
+    fontSize: 18,
     lineHeight: 40,
     fontWeight: "600",
+    textAlign: "center",
   },
   subtitle: {
     color: colors.textSecondary,
-    maxWidth: 270,
+    maxWidth: 300,
+    textAlign: "center",
     ...typography.body,
-  },
-  heroImage: {
-    height: 220,
-    marginHorizontal: spacing["2xl"],
-    marginTop: spacing.xl,
-    borderRadius: radius.xl,
-    overflow: "hidden",
-    backgroundColor: colors.surfaceMuted,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  ritualArtwork: {
-    transform: [{ scale: 0.92 }],
   },
   card: {
     marginHorizontal: spacing["2xl"],
