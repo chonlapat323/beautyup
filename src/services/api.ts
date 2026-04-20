@@ -1,4 +1,4 @@
-import type { Category, Product } from "@/types/domain";
+import type { Category, Product, Shade } from "@/types/domain";
 
 const API_BASE =
   (process.env.EXPO_PUBLIC_API_URL as string | undefined) ?? "http://localhost:3000/api";
@@ -8,8 +8,9 @@ type ApiCategory = {
   name: string;
   slug: string;
   description?: string | null;
-  isActive: boolean;
   imageUrl?: string | null;
+  requiresShadeSelection: boolean;
+  isActive: boolean;
 };
 
 type ApiProduct = {
@@ -25,15 +26,25 @@ type ApiProduct = {
   images?: { id: string; url: string; sortOrder: number }[];
 };
 
+type ApiShade = {
+  id: string;
+  categoryId: string;
+  name: string;
+  code: string;
+  swatch: string;
+  imageUrl?: string | null;
+  sortOrder: number;
+  isActive: boolean;
+};
+
 function mapCategory(c: ApiCategory): Category {
-  const slug = c.slug.toLowerCase();
-  const requiresShadeSelection = slug.includes("color") || slug.includes("bleach");
   return {
     id: c.id,
     title: c.name,
     subtitle: c.description ?? "",
-    requiresShadeSelection,
+    requiresShadeSelection: c.requiresShadeSelection,
     slug: c.slug,
+    imageUrl: c.imageUrl ?? undefined,
   };
 }
 
@@ -50,12 +61,22 @@ function mapProduct(p: ApiProduct): Product {
   };
 }
 
+function mapShade(s: ApiShade): Shade {
+  return {
+    id: s.id,
+    name: s.name,
+    tone: s.code,
+    swatch: s.swatch,
+    imageUrl: s.imageUrl ?? undefined,
+  };
+}
+
 export async function fetchCategories(): Promise<Category[]> {
   const res = await fetch(`${API_BASE}/categories?status=active&pageSize=100`, {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error(`Categories fetch failed: ${res.status}`);
-  const data = await res.json() as { items: ApiCategory[] };
+  const data = (await res.json()) as { items: ApiCategory[] };
   return data.items.filter((c) => c.isActive).map(mapCategory);
 }
 
@@ -64,8 +85,17 @@ export async function fetchProducts(): Promise<Product[]> {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error(`Products fetch failed: ${res.status}`);
-  const data = await res.json() as { items: ApiProduct[] };
+  const data = (await res.json()) as { items: ApiProduct[] };
   return data.items.filter((p) => p.status === "ACTIVE").map(mapProduct);
+}
+
+export async function fetchShades(categoryId: string): Promise<Shade[]> {
+  const res = await fetch(`${API_BASE}/categories/${categoryId}/shades`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`Shades fetch failed: ${res.status}`);
+  const data = (await res.json()) as ApiShade[];
+  return data.filter((s) => s.isActive).map(mapShade);
 }
 
 export async function loadCatalogFromApi(): Promise<{
@@ -75,4 +105,3 @@ export async function loadCatalogFromApi(): Promise<{
   const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
   return { categories, products };
 }
-
