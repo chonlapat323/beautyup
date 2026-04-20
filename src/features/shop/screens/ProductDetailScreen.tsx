@@ -6,16 +6,17 @@ import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { products } from "@/mock/catalog";
-import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
+import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function ProductDetailScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const route = useRoute<RouteProp<ShopStackParamList, "ProductDetail">>();
   const addToCart = useAppStore((state) => state.addToCart);
-  const product = products.find((item) => item.id === route.params.productId);
+  const product = useAppStore((state) =>
+    state.products.find((item) => item.id === route.params.productId),
+  );
 
   if (!product) {
     return null;
@@ -31,10 +32,7 @@ export function ProductDetailScreen() {
           {
             label: "Products",
             onPress: () =>
-              navigation.navigate("ProductList", {
-                categoryId: product.categoryId,
-                shadeId: product.shadeId,
-              }),
+              navigation.navigate("ProductList", { categoryId: product.categoryId }),
           },
           { label: product.name },
         ]}
@@ -47,19 +45,13 @@ export function ProductDetailScreen() {
         <Text style={styles.description}>{product.description}</Text>
         <View style={styles.infoRow}>
           <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Mock stock status</Text>
-            <Text style={styles.infoValue}>Ready to ship</Text>
+            <Text style={styles.infoLabel}>สถานะสินค้า</Text>
+            <Text style={styles.infoValue}>พร้อมส่ง</Text>
           </View>
           <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Finish</Text>
-            <Text style={styles.infoValue}>Soft salon glow</Text>
+            <Text style={styles.infoLabel}>ประเภท</Text>
+            <Text style={styles.infoValue}>Professional</Text>
           </View>
-        </View>
-        <View style={styles.notesCard}>
-          <Text style={styles.notesTitle}>Why it belongs in your ritual</Text>
-          <Text style={styles.notesBody}>
-            Designed for a polished demo flow with premium styling, calm browsing, and easy add-to-cart action.
-          </Text>
         </View>
         <Pressable
           onPress={() => {
@@ -68,7 +60,7 @@ export function ProductDetailScreen() {
           }}
           style={styles.button}
         >
-          <Text style={styles.buttonText}>Add to cart</Text>
+          <Text style={styles.buttonText}>เพิ่มลงตะกร้า</Text>
         </Pressable>
       </View>
     </Screen>
@@ -118,22 +110,6 @@ const styles = StyleSheet.create({
   infoValue: {
     color: colors.textPrimary,
     ...typography.title,
-  },
-  notesCard: {
-    borderRadius: radius.lg,
-    backgroundColor: colors.surfaceMuted,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
-    padding: spacing.xl,
-    gap: spacing.sm,
-  },
-  notesTitle: {
-    color: colors.textPrimary,
-    ...typography.title,
-  },
-  notesBody: {
-    color: colors.textSecondary,
-    ...typography.body,
   },
   button: {
     borderRadius: radius.pill,

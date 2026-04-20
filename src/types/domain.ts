@@ -1,10 +1,11 @@
-export type CategoryId = "color-bleach" | "shampoo-mask" | "leave-in";
+export type CategoryId = string;
 
 export type Category = {
-  id: CategoryId;
+  id: string;
   title: string;
   subtitle: string;
   requiresShadeSelection: boolean;
+  slug: string;
   imageUrl?: string;
 };
 
@@ -18,7 +19,7 @@ export type Shade = {
 
 export type Product = {
   id: string;
-  categoryId: CategoryId;
+  categoryId: string;
   shadeId?: string;
   name: string;
   subtitle: string;

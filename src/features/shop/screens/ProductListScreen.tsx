@@ -1,36 +1,32 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { categories, products, shades } from "@/mock/catalog";
+import { shades } from "@/mock/catalog";
+import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function ProductListScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const route = useRoute<RouteProp<ShopStackParamList, "ProductList">>();
+  const categories = useAppStore((state) => state.categories);
+  const products = useAppStore((state) => state.products);
+
+  const isLoading = useAppStore((state) => state.isLoadingCatalog);
   const category = categories.find((item) => item.id === route.params.categoryId);
   const selectedShade = shades.find((item) => item.id === route.params.shadeId);
-  const filteredProducts = products.filter(
-    (item) =>
-      item.categoryId === route.params.categoryId &&
-      (!route.params.shadeId ||
-        (route.params.categoryId === "color-bleach"
-          ? item.shadeId === route.params.shadeId
-          : item.shadeId === route.params.shadeId || !item.shadeId)),
-  );
+  const filteredProducts = products.filter((item) => item.categoryId === route.params.categoryId);
 
   return (
     <Screen contentContainerStyle={styles.content}>
       <AppHeader
         title={category?.title ?? "Products"}
-        subtitle={
-          selectedShade ? `Selected shade: ${selectedShade.name}` : "Mock products ready to browse."
-        }
+        subtitle={selectedShade ? `Selected shade: ${selectedShade.name}` : "Browse products"}
       />
       <Breadcrumbs
         items={
@@ -65,6 +61,14 @@ export function ProductListScreen() {
         <View style={styles.filterPill}>
           <View style={[styles.filterSwatch, { backgroundColor: selectedShade.swatch }]} />
           <Text style={styles.filterText}>{selectedShade.name}</Text>
+        </View>
+      ) : null}
+
+      {isLoading ? (
+        <ActivityIndicator color={colors.primary} style={{ marginTop: spacing["3xl"] }} />
+      ) : filteredProducts.length === 0 ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>ไม่พบสินค้าในหมวดหมู่นี้</Text>
         </View>
       ) : null}
 
@@ -112,6 +116,14 @@ const styles = StyleSheet.create({
   filterText: {
     color: colors.primaryStrong,
     ...typography.caption,
+  },
+  empty: {
+    alignItems: "center",
+    paddingTop: spacing["3xl"],
+  },
+  emptyText: {
+    color: colors.textMuted,
+    fontSize: 14,
   },
   grid: {
     flexDirection: "row",

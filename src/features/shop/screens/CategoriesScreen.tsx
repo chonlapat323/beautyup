@@ -7,12 +7,14 @@ import { BRAND_NAME } from "@/brand";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { categories } from "@/mock/catalog";
+import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function CategoriesScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
+  const categories = useAppStore((state) => state.categories);
+  const isLoading = useAppStore((state) => state.isLoadingCatalog);
 
   return (
     <Screen contentContainerStyle={styles.content}>
@@ -26,6 +28,16 @@ export function CategoriesScreen() {
           { label: "Categories" },
         ]}
       />
+
+      {isLoading ? (
+        <View style={styles.center}>
+          <Text style={styles.muted}>กำลังโหลด...</Text>
+        </View>
+      ) : categories.length === 0 ? (
+        <View style={styles.center}>
+          <Text style={styles.muted}>ไม่พบหมวดหมู่สินค้า</Text>
+        </View>
+      ) : null}
 
       <View style={styles.list}>
         {categories.map((category) => (
@@ -53,6 +65,15 @@ export function CategoriesScreen() {
 const styles = StyleSheet.create({
   content: {
     paddingBottom: spacing["3xl"],
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    paddingTop: spacing["3xl"],
+  },
+  muted: {
+    color: colors.textMuted,
+    fontSize: 14,
   },
   list: {
     gap: spacing.md,
