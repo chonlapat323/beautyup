@@ -12,8 +12,7 @@ export type Category = {
 export type Shade = {
   id: string;
   name: string;
-  tone: string;
-  swatch: string;
+  groupName: string;
   imageUrl?: string;
 };
 

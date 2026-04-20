@@ -28,12 +28,9 @@ type ApiProduct = {
 
 type ApiShade = {
   id: string;
-  categoryId: string;
   name: string;
-  code: string;
-  swatch: string;
   imageUrl?: string | null;
-  sortOrder: number;
+  shadeGroup: { id: string; name: string; sortOrder: number };
   isActive: boolean;
 };
 
@@ -65,8 +62,7 @@ function mapShade(s: ApiShade): Shade {
   return {
     id: s.id,
     name: s.name,
-    tone: s.code,
-    swatch: s.swatch,
+    groupName: s.shadeGroup.name,
     imageUrl: s.imageUrl ?? undefined,
   };
 }

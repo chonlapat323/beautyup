@@ -35,27 +35,26 @@ export function ShadeSelectionScreen() {
       .finally(() => setIsLoading(false));
   }, [route.params.categoryId]);
 
-  // Group shades by tone (family code e.g. "NB", "CB")
   const groups = useMemo(() => {
     const map = new Map<string, Shade[]>();
     for (const shade of shades) {
-      const key = shade.tone;
+      const key = shade.groupName;
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(shade);
     }
-    return Array.from(map.entries()).map(([tone, items]) => ({ tone, items }));
+    return Array.from(map.entries()).map(([groupName, items]) => ({ groupName, items }));
   }, [shades]);
 
   const [activeGroup, setActiveGroup] = useState<string>("");
 
   useEffect(() => {
     if (groups.length > 0 && !activeGroup) {
-      setActiveGroup(groups[0].tone);
+      setActiveGroup(groups[0].groupName);
     }
   }, [groups]);
 
   const filteredShades = useMemo(
-    () => groups.find((g) => g.tone === activeGroup)?.items ?? [],
+    () => groups.find((g) => g.groupName === activeGroup)?.items ?? [],
     [groups, activeGroup],
   );
 
@@ -93,15 +92,15 @@ export function ShadeSelectionScreen() {
             showsHorizontalScrollIndicator={false}
           >
             {groups.map((group) => {
-              const active = group.tone === activeGroup;
+              const active = group.groupName === activeGroup;
               return (
                 <Pressable
-                  key={group.tone}
-                  onPress={() => setActiveGroup(group.tone)}
+                  key={group.groupName}
+                  onPress={() => setActiveGroup(group.groupName)}
                   style={[styles.groupChip, active && styles.groupChipActive]}
                 >
                   <Text style={[styles.groupChipText, active && styles.groupChipTextActive]}>
-                    {group.tone}
+                    {group.groupName}
                   </Text>
                 </Pressable>
               );
@@ -137,10 +136,9 @@ export function ShadeSelectionScreen() {
                     ) : null}
                   </View>
                   <View style={styles.footer}>
-                    <View style={[styles.swatch, { backgroundColor: shade.swatch }]} />
                     <View style={styles.copy}>
                       <Text style={styles.name}>{shade.name}</Text>
-                      <Text style={styles.tone}>{shade.tone}</Text>
+                      <Text style={styles.tone}>{shade.groupName}</Text>
                     </View>
                   </View>
                 </Pressable>
@@ -224,7 +222,6 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     padding: spacing.lg,
   },
-  swatch: { width: 16, height: 16, borderRadius: radius.pill },
   copy: { flex: 1, gap: spacing.xs },
   name: { color: colors.textPrimary, ...typography.title },
   tone: { color: colors.textSecondary, ...typography.caption },
