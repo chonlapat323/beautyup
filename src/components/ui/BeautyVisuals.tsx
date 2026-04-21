@@ -60,7 +60,7 @@ export function RitualArtwork({ style }: StyledProps) {
 }
 
 export function CategoryArtwork({ categoryId, style }: CategoryArtworkProps) {
-  const palette = categoryPalettes[categoryId];
+  const palette = categoryPalettes[categoryId as keyof typeof categoryPalettes];
 
   if (categoryId === "color-bleach") {
     return (
@@ -112,16 +112,17 @@ export function ShadeArtwork({ children, shade, style }: ShadeArtworkProps) {
     rotate: -14 + (index % 6) * 3,
   }));
 
+  const swatchColor = "#C9826F";
   return (
-    <View style={[styles.shadeShell, { backgroundColor: soften(shade.swatch) }, style]}>
-      <View style={[styles.shadeHighlight, { backgroundColor: `${shade.swatch}55` }]} />
+    <View style={[styles.shadeShell, { backgroundColor: soften(swatchColor) }, style]}>
+      <View style={[styles.shadeHighlight, { backgroundColor: `${swatchColor}55` }]} />
       {strands.map((strand, index) => (
         <Fragment key={`${shade.id}-${index}`}>
           <View
             style={[
               styles.shadeStrand,
               {
-                backgroundColor: shade.swatch,
+                backgroundColor: swatchColor,
                 opacity: strand.opacity,
                 top: strand.top,
                 left: strand.left,

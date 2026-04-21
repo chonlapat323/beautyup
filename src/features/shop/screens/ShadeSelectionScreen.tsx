@@ -123,6 +123,7 @@ export function ShadeSelectionScreen() {
                     navigation.navigate("ProductList", {
                       categoryId: route.params.categoryId,
                       shadeId: shade.id,
+                      shadeName: shade.name,
                     });
                   }}
                   style={[styles.card, selected && styles.cardSelected]}

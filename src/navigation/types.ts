@@ -9,7 +9,7 @@ export type ShopStackParamList = {
   Home: undefined;
   Categories: undefined;
   ShadeSelection: { categoryId: string };
-  ProductList: { categoryId: string; shadeId?: string };
+  ProductList: { categoryId: string; shadeId?: string; shadeName?: string };
   ProductDetail: { productId: string };
   Cart: undefined;
   Checkout: undefined;

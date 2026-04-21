@@ -20,6 +20,7 @@ const wellaShinefinityImage =
 export const categories: Category[] = [
   {
     id: "color-bleach",
+    slug: "color-bleach",
     title: "Color & Bleach",
     subtitle: "Select shade first",
     requiresShadeSelection: true,
@@ -27,6 +28,7 @@ export const categories: Category[] = [
   },
   {
     id: "shampoo-mask",
+    slug: "shampoo-mask",
     title: "Shampoo & Mask",
     subtitle: "Care essentials",
     requiresShadeSelection: false,
@@ -34,6 +36,7 @@ export const categories: Category[] = [
   },
   {
     id: "leave-in",
+    slug: "leave-in",
     title: "Leave In",
     subtitle: "Finish & shine",
     requiresShadeSelection: false,
@@ -58,7 +61,7 @@ const milbonShadeFamilies = [
   { family: "hCN", levels: [13, 11, 9, 8, 7, 6], swatches: ["#F0E5DC", "#E4D1C1", "#D0B195", "#BA9379", "#A17A62", "#866550"] },
   { family: "hHZ", levels: [13, 11, 9, 8, 7, 6], swatches: ["#EFE6DE", "#E2D3C3", "#C9B29A", "#B3947B", "#9A7A63", "#816550"] },
   { family: "fAP", levels: [13, 11, 9, 8, 7, 6], swatches: ["#F5E1DC", "#EDCAC0", "#E19E8F", "#D67F6F", "#C76557", "#A85247"] },
-  { family: "fPK", levels: [13, 11, 9, 8, 7, 6], swatches: ["#F4E0E7", "#EBC7D2", "#DB9EB3", "#CB7C97", "#B85F7F", "#974C68"] },
+  { family: "fPK", levels: [13, 11, 9, 8, 7, 6] },
 ] as const;
 
 export const shadeGroups = milbonShadeFamilies.map((group) => ({
@@ -71,11 +74,10 @@ export const shadeGroups = milbonShadeFamilies.map((group) => ({
 }));
 
 export const shades: Shade[] = milbonShadeFamilies.flatMap((group) =>
-  group.levels.map((level, index) => ({
+  group.levels.map((level) => ({
     id: `${level}-${group.family}`,
     name: `${level}-${group.family}`,
-    tone: `Ordeve ${group.family}`,
-    swatch: group.swatches[index],
+    groupName: group.family,
     imageUrl: `https://milbon.com.sg/wp-content/uploads/2023/07/${level}-${group.family}.webp`,
   })),
 );
@@ -274,10 +276,10 @@ const generatedColorProducts: Product[] = shades
       categoryId: "color-bleach" as const,
       shadeId: shade.id,
       name: `${shade.name} Color Cream`,
-      subtitle: `${shade.tone} match`,
+      subtitle: `${shade.groupName} match`,
       price: 44 + (index % 8),
       description: `Mock salon color SKU aligned to the Milbon ${shade.name} tone family for presentation and browsing.`,
-      accentColor: shade.swatch,
+      accentColor: "#C9826F",
       imageUrl: lightTone ? wellaIlluminaColorImage : wellaKolestonPerfectImage,
     };
   });

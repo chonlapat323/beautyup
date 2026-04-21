@@ -1,12 +1,11 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Pressable, ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { shades } from "@/mock/catalog";
 import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -16,51 +15,54 @@ export function ProductListScreen() {
   const route = useRoute<RouteProp<ShopStackParamList, "ProductList">>();
   const categories = useAppStore((state) => state.categories);
   const products = useAppStore((state) => state.products);
-
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
-  const category = categories.find((item) => item.id === route.params.categoryId);
-  const selectedShade = shades.find((item) => item.id === route.params.shadeId);
-  const filteredProducts = products.filter((item) => item.categoryId === route.params.categoryId);
+
+  const { categoryId, shadeId, shadeName } = route.params;
+  const category = categories.find((item) => item.id === categoryId);
+
+  const filteredProducts = products.filter(
+    (item) =>
+      item.categoryId === categoryId &&
+      (shadeId ? item.shadeId === shadeId : true),
+  );
 
   return (
     <Screen contentContainerStyle={styles.content}>
       <AppHeader
-        title={category?.title ?? "Products"}
-        subtitle={selectedShade ? `Selected shade: ${selectedShade.name}` : "Browse products"}
+        title={category?.title ?? "สินค้า"}
+        subtitle={shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้า"}
       />
       <Breadcrumbs
         items={
-          selectedShade
+          shadeName
             ? [
                 { label: "Home", onPress: () => navigation.navigate("Home") },
                 { label: "Categories", onPress: () => navigation.navigate("Categories") },
                 {
-                  label: category?.title ?? "Products",
+                  label: category?.title ?? "สินค้า",
                   onPress: () => navigation.navigate("Categories"),
                 },
                 {
-                  label: selectedShade.name,
-                  onPress: () =>
-                    navigation.navigate("ShadeSelection", { categoryId: route.params.categoryId }),
+                  label: shadeName,
+                  onPress: () => navigation.navigate("ShadeSelection", { categoryId }),
                 },
-                { label: "Products" },
+                { label: "สินค้า" },
               ]
             : [
                 { label: "Home", onPress: () => navigation.navigate("Home") },
                 { label: "Categories", onPress: () => navigation.navigate("Categories") },
                 {
-                  label: category?.title ?? "Products",
+                  label: category?.title ?? "สินค้า",
                   onPress: () => navigation.navigate("Categories"),
                 },
-                { label: "Products" },
+                { label: "สินค้า" },
               ]
         }
       />
 
-      {selectedShade ? (
+      {shadeName ? (
         <View style={styles.filterPill}>
-          <View style={[styles.filterSwatch, { backgroundColor: selectedShade.swatch }]} />
-          <Text style={styles.filterText}>{selectedShade.name}</Text>
+          <Text style={styles.filterText}>{shadeName}</Text>
         </View>
       ) : null}
 
@@ -98,19 +100,11 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing["2xl"],
     marginBottom: spacing.xl,
     alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    borderRadius: radius.pill,
-  },
-  filterSwatch: {
-    width: 12,
-    height: 12,
     borderRadius: radius.pill,
   },
   filterText: {

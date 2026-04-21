@@ -23,15 +23,22 @@ type ApiProduct = {
   stock: number;
   status: "DRAFT" | "ACTIVE" | "INACTIVE";
   categoryId: string;
+  shadeId?: string | null;
   images?: { id: string; url: string; sortOrder: number }[];
 };
 
-type ApiShade = {
+type ApiShadeGroup = {
   id: string;
   name: string;
-  imageUrl?: string | null;
-  shadeGroup: { id: string; name: string; sortOrder: number };
+  sortOrder: number;
   isActive: boolean;
+  shades: {
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    sortOrder: number;
+  }[];
 };
 
 function mapCategory(c: ApiCategory): Category {
@@ -49,21 +56,13 @@ function mapProduct(p: ApiProduct): Product {
   return {
     id: p.id,
     categoryId: p.categoryId,
+    shadeId: p.shadeId ?? undefined,
     name: p.name,
     subtitle: p.description?.split(".")[0]?.trim() ?? "",
     price: parseFloat(p.price) || 0,
     description: p.description ?? "",
     accentColor: "#C9826F",
     imageUrl: p.images?.[0]?.url,
-  };
-}
-
-function mapShade(s: ApiShade): Shade {
-  return {
-    id: s.id,
-    name: s.name,
-    groupName: s.shadeGroup.name,
-    imageUrl: s.imageUrl ?? undefined,
   };
 }
 
@@ -86,12 +85,25 @@ export async function fetchProducts(): Promise<Product[]> {
 }
 
 export async function fetchShades(categoryId: string): Promise<Shade[]> {
-  const res = await fetch(`${API_BASE}/categories/${categoryId}/shades`, {
+  const res = await fetch(`${API_BASE}/categories/${categoryId}/shade-groups`, {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error(`Shades fetch failed: ${res.status}`);
-  const data = (await res.json()) as ApiShade[];
-  return data.filter((s) => s.isActive).map(mapShade);
+  const groups = (await res.json()) as ApiShadeGroup[];
+  const shades: Shade[] = [];
+  for (const group of groups) {
+    if (!group.isActive) continue;
+    for (const shade of group.shades) {
+      if (!shade.isActive) continue;
+      shades.push({
+        id: shade.id,
+        name: shade.name,
+        groupName: group.name,
+        imageUrl: shade.imageUrl ?? undefined,
+      });
+    }
+  }
+  return shades;
 }
 
 export async function loadCatalogFromApi(): Promise<{

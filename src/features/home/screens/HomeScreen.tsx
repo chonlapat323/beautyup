@@ -16,7 +16,7 @@ import { BrandLockup } from "@/components/ui/BrandLockup";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { HeroSlide } from "@/components/ui/HeroSlide";
 import { SectionTitle } from "@/components/ui/SectionTitle";
-import { categories, products } from "@/mock/catalog";
+import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -24,8 +24,20 @@ export function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const { width } = useWindowDimensions();
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+
+  const categories = useAppStore((state) => state.categories);
+  const products = useAppStore((state) => state.products);
   const featuredProducts = products.slice(0, 4);
   const slideWidth = width - spacing["2xl"] * 2;
+
+  const shadeCategory = categories.find((c) => c.requiresShadeSelection);
+  const regularCategory = categories.find((c) => !c.requiresShadeSelection);
+  const shadeProduct = shadeCategory
+    ? products.find((p) => p.categoryId === shadeCategory.id && p.imageUrl)
+    : undefined;
+  const regularProduct = regularCategory
+    ? products.find((p) => p.categoryId === regularCategory.id && p.imageUrl)
+    : undefined;
 
   const heroSlides = [
     {
@@ -43,8 +55,11 @@ export function HomeScreen() {
       title: "Find Your Shade First",
       body: "Explore the curated color journey through shade-led discovery before browsing the right products.",
       buttonLabel: "Select Shade",
-      imageUrl: products.find((item) => item.shadeId === "13-NB")?.imageUrl,
-      onPress: () => navigation.navigate("ShadeSelection", { categoryId: "color-bleach" }),
+      imageUrl: shadeProduct?.imageUrl ?? shadeCategory?.imageUrl,
+      onPress: () =>
+        shadeCategory
+          ? navigation.navigate("ShadeSelection", { categoryId: shadeCategory.id })
+          : navigation.navigate("Categories"),
     },
     {
       id: "daily-shine",
@@ -52,8 +67,11 @@ export function HomeScreen() {
       title: "Soft Finish, Everyday Glow",
       body: "Discover leave-in and salon care favorites designed to keep hair polished, light, and touchable.",
       buttonLabel: "View Ritual",
-      imageUrl: products.find((item) => item.categoryId === "leave-in")?.imageUrl,
-      onPress: () => navigation.navigate("ProductList", { categoryId: "leave-in" }),
+      imageUrl: regularProduct?.imageUrl ?? regularCategory?.imageUrl,
+      onPress: () =>
+        regularCategory
+          ? navigation.navigate("ProductList", { categoryId: regularCategory.id })
+          : navigation.navigate("Categories"),
     },
   ];
 
@@ -62,7 +80,6 @@ export function HomeScreen() {
       navigation.navigate("ShadeSelection", { categoryId });
       return;
     }
-
     navigation.navigate("ProductList", { categoryId });
   }
 
@@ -81,7 +98,6 @@ export function HomeScreen() {
       </View>
 
       <View style={styles.introBlock}>
-        {/* <Text style={styles.introTitle}>For your daily beauty ritual</Text> */}
         <Text style={styles.introBody}>
           Curated haircare and color essentials with a soft, premium retail experience.
         </Text>
@@ -156,28 +172,32 @@ export function HomeScreen() {
         ))}
       </View>
 
-      <SectionTitle actionLabel="View All" title="The Selection" />
+      {featuredProducts.length > 0 ? (
+        <>
+          <SectionTitle actionLabel="View All" title="The Selection" />
 
-      <ScrollView
-        contentContainerStyle={styles.productRow}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      >
-        {featuredProducts.map((product) => (
-          <Pressable
-            key={product.id}
-            onPress={() => navigation.navigate("ProductDetail", { productId: product.id })}
-            style={styles.productCard}
+          <ScrollView
+            contentContainerStyle={styles.productRow}
+            horizontal
+            showsHorizontalScrollIndicator={false}
           >
-            <CommerceImage style={styles.productImage} uri={product.imageUrl} />
-            <Text style={styles.productMeta}>{product.subtitle}</Text>
-            <Text style={styles.productName}>{product.name}</Text>
-            <Text numberOfLines={1} style={styles.productPrice}>
-              THB {product.price.toFixed(0)}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+            {featuredProducts.map((product) => (
+              <Pressable
+                key={product.id}
+                onPress={() => navigation.navigate("ProductDetail", { productId: product.id })}
+                style={styles.productCard}
+              >
+                <CommerceImage style={styles.productImage} uri={product.imageUrl} />
+                <Text style={styles.productMeta}>{product.subtitle}</Text>
+                <Text style={styles.productName}>{product.name}</Text>
+                <Text numberOfLines={1} style={styles.productPrice}>
+                  THB {product.price.toFixed(0)}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
+      ) : null}
     </Screen>
   );
 }
@@ -216,13 +236,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     paddingBottom: spacing["2xl"],
     gap: spacing.sm,
-  },
-  introTitle: {
-    color: colors.textPrimary,
-    maxWidth: 260,
-    fontSize: 34,
-    lineHeight: 40,
-    fontWeight: "600",
   },
   introBody: {
     color: colors.textSecondary,
