@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { ProfileScreen } from "@/features/profile/screens/ProfileScreen";
+import { ProfileStack } from "@/navigation/ProfileStack";
 import { CartScreen } from "@/features/cart/screens/CartScreen";
 import { OrderStack } from "@/navigation/OrderStack";
 import { ShopStack } from "@/navigation/ShopStack";
@@ -60,7 +60,7 @@ export function AppTabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStack}
         options={{
           tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="person-outline" />,
         }}

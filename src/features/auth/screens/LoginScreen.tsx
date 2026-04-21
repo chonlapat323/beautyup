@@ -5,13 +5,18 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
-import type { AuthStackParamList } from "@/navigation/types";
+import type { ProfileStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function LoginScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const signIn = useAppStore((state) => state.signIn);
+
+  function handleLogin() {
+    signIn();
+    navigation.popToTop();
+  }
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
@@ -45,7 +50,7 @@ export function LoginScreen() {
           value={password}
         />
 
-        <Pressable style={styles.button} onPress={signIn}>
+        <Pressable style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </Pressable>
 
@@ -56,7 +61,7 @@ export function LoginScreen() {
         <View style={styles.footerRow}>
           <Text style={styles.footerText}>Don&apos;t have an account?</Text>
           <Pressable onPress={() => navigation.navigate("Register")}>
-            <Text style={styles.footerLink}>Register</Text>
+            <Text style={styles.footerLink}>สมัครสมาชิก</Text>
           </Pressable>
         </View>
       </View>

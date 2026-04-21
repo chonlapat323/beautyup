@@ -6,13 +6,18 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
-import type { AuthStackParamList } from "@/navigation/types";
+import type { ProfileStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function RegisterScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const signIn = useAppStore((state) => state.signIn);
+
+  function handleRegister() {
+    signIn();
+    navigation.popToTop();
+  }
   const [fullName, setFullName] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -68,7 +73,7 @@ export function RegisterScreen() {
           value={confirmPassword}
         />
 
-        <Pressable style={styles.button} onPress={signIn}>
+        <Pressable style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Create Account</Text>
         </Pressable>
       </View>
@@ -76,7 +81,7 @@ export function RegisterScreen() {
       <View style={styles.footerRow}>
         <Text style={styles.footerText}>Already have an account?</Text>
         <Pressable onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.footerLink}>Login</Text>
+          <Text style={styles.footerLink}>เข้าสู่ระบบ</Text>
         </Pressable>
       </View>
     </Screen>

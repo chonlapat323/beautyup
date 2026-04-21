@@ -5,6 +5,12 @@ export type AuthStackParamList = {
   Register: undefined;
 };
 
+export type ProfileStackParamList = {
+  ProfileHome: undefined;
+  Login: undefined;
+  Register: undefined;
+};
+
 export type ShopStackParamList = {
   Home: undefined;
   Categories: undefined;
