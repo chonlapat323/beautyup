@@ -27,8 +27,23 @@ export function HomeScreen() {
 
   const categories = useAppStore((state) => state.categories);
   const products = useAppStore((state) => state.products);
+  const banners = useAppStore((state) => state.banners);
   const featuredProducts = products.slice(0, 4);
   const slideWidth = width - spacing["2xl"] * 2;
+
+  function getBannerPress(linkType: string, linkId?: string) {
+    if (linkType === "product" && linkId) {
+      return () => navigation.navigate("ProductDetail", { productId: linkId });
+    }
+    if (linkType === "category" && linkId) {
+      const cat = categories.find((c) => c.id === linkId);
+      if (cat?.requiresShadeSelection) {
+        return () => navigation.navigate("ShadeSelection", { categoryId: linkId });
+      }
+      return () => navigation.navigate("ProductList", { categoryId: linkId });
+    }
+    return () => navigation.navigate("Categories");
+  }
 
   const shadeCategory = categories.find((c) => c.requiresShadeSelection);
   const regularCategory = categories.find((c) => !c.requiresShadeSelection);
@@ -39,7 +54,7 @@ export function HomeScreen() {
     ? products.find((p) => p.categoryId === regularCategory.id && p.imageUrl)
     : undefined;
 
-  const heroSlides = [
+  const fallbackSlides = [
     {
       id: "spring-ritual",
       eyebrow: "Spring Ritual",
@@ -74,6 +89,19 @@ export function HomeScreen() {
           : navigation.navigate("Categories"),
     },
   ];
+
+  const heroSlides =
+    banners.length > 0
+      ? banners.map((b) => ({
+          id: b.id,
+          eyebrow: b.eyebrow,
+          title: b.title,
+          body: b.body ?? "",
+          buttonLabel: b.buttonLabel,
+          imageUrl: b.imageUrl,
+          onPress: getBannerPress(b.linkType, b.linkId),
+        }))
+      : fallbackSlides;
 
   function openCategory(categoryId: string, requiresShadeSelection: boolean) {
     if (requiresShadeSelection) {

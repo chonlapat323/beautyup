@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-import { loadCatalogFromApi } from "@/services/api";
+import { fetchBanners, loadCatalogFromApi } from "@/services/api";
 import { mockOrders } from "@/mock/catalog";
-import type { CartItem, Category, Order, OrderItem, Product } from "@/types/domain";
+import type { Banner, CartItem, Category, Order, OrderItem, Product } from "@/types/domain";
 
 const gatewayFee = 20;
 
@@ -13,6 +13,7 @@ type AppStore = {
   orders: Order[];
   categories: Category[];
   products: Product[];
+  banners: Banner[];
   isLoadingCatalog: boolean;
   catalogError: boolean;
   signIn: () => void;
@@ -32,6 +33,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   orders: mockOrders,
   categories: [],
   products: [],
+  banners: [],
   isLoadingCatalog: false,
   catalogError: false,
 
@@ -42,8 +44,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
   loadCatalog: async () => {
     set({ isLoadingCatalog: true, catalogError: false });
     try {
-      const { categories, products } = await loadCatalogFromApi();
-      set({ categories, products, catalogError: false });
+      const [{ categories, products }, banners] = await Promise.all([
+        loadCatalogFromApi(),
+        fetchBanners().catch(() => [] as Banner[]),
+      ]);
+      set({ categories, products, banners, catalogError: false });
     } catch {
       set({ catalogError: true });
     } finally {

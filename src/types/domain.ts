@@ -28,6 +28,19 @@ export type Product = {
   imageUrl?: string;
 };
 
+export type Banner = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  body?: string;
+  buttonLabel: string;
+  imageUrl?: string;
+  linkType: "none" | "product" | "category";
+  linkId?: string;
+  sortOrder: number;
+  isActive: boolean;
+};
+
 export type CartItem = {
   productId: string;
   quantity: number;

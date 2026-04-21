@@ -1,4 +1,4 @@
-import type { Category, Product, Shade } from "@/types/domain";
+import type { Banner, Category, Product, Shade } from "@/types/domain";
 
 const API_BASE =
   (process.env.EXPO_PUBLIC_API_URL as string | undefined) ?? "http://localhost:3000/api";
@@ -104,6 +104,39 @@ export async function fetchShades(categoryId: string): Promise<Shade[]> {
     }
   }
   return shades;
+}
+
+type ApiBanner = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  body?: string | null;
+  buttonLabel: string;
+  imageUrl?: string | null;
+  linkType: string;
+  linkId?: string | null;
+  sortOrder: number;
+  isActive: boolean;
+};
+
+export async function fetchBanners(): Promise<Banner[]> {
+  const res = await fetch(`${API_BASE}/banners?activeOnly=true`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`Banners fetch failed: ${res.status}`);
+  const data = (await res.json()) as ApiBanner[];
+  return data.map((b) => ({
+    id: b.id,
+    eyebrow: b.eyebrow,
+    title: b.title,
+    body: b.body ?? undefined,
+    buttonLabel: b.buttonLabel,
+    imageUrl: b.imageUrl ?? undefined,
+    linkType: (b.linkType as Banner["linkType"]) ?? "none",
+    linkId: b.linkId ?? undefined,
+    sortOrder: b.sortOrder,
+    isActive: b.isActive,
+  }));
 }
 
 export async function loadCatalogFromApi(): Promise<{
