@@ -124,7 +124,7 @@ type ApiBanner = {
 };
 
 export async function fetchBanners(): Promise<Banner[]> {
-  const res = await fetch(`${API_BASE}/banners?activeOnly=true`, {
+  const res = await fetch(`${API_BASE}/banners?active=true`, {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error(`Banners fetch failed: ${res.status}`);
