@@ -3,6 +3,7 @@ export type CategoryId = string;
 export type Category = {
   id: string;
   title: string;
+  eyebrow: string;
   subtitle: string;
   requiresShadeSelection: boolean;
   slug: string;

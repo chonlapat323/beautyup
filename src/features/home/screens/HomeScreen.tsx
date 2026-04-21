@@ -45,50 +45,20 @@ export function HomeScreen() {
     return () => navigation.navigate("Categories");
   }
 
-  const shadeCategory = categories.find((c) => c.requiresShadeSelection);
-  const regularCategory = categories.find((c) => !c.requiresShadeSelection);
-  const shadeProduct = shadeCategory
-    ? products.find((p) => p.categoryId === shadeCategory.id && p.imageUrl)
-    : undefined;
-  const regularProduct = regularCategory
-    ? products.find((p) => p.categoryId === regularCategory.id && p.imageUrl)
-    : undefined;
-
-  const fallbackSlides = [
-    {
-      id: "spring-ritual",
-      eyebrow: "Spring Ritual",
-      title: "Care That Feels Premium",
-      body: "Professional beauty essentials curated for soft shine, healthy texture, and everyday confidence.",
-      buttonLabel: "Shop Now",
-      imageUrl: featuredProducts[0]?.imageUrl,
-      onPress: () => navigation.navigate("Categories"),
-    },
-    {
-      id: "shade-first",
-      eyebrow: "Color Ritual",
-      title: "Find Your Shade First",
-      body: "Explore the curated color journey through shade-led discovery before browsing the right products.",
-      buttonLabel: "Select Shade",
-      imageUrl: shadeProduct?.imageUrl ?? shadeCategory?.imageUrl,
-      onPress: () =>
-        shadeCategory
-          ? navigation.navigate("ShadeSelection", { categoryId: shadeCategory.id })
-          : navigation.navigate("Categories"),
-    },
-    {
-      id: "daily-shine",
-      eyebrow: "Daily Essentials",
-      title: "Soft Finish, Everyday Glow",
-      body: "Discover leave-in and salon care favorites designed to keep hair polished, light, and touchable.",
-      buttonLabel: "View Ritual",
-      imageUrl: regularProduct?.imageUrl ?? regularCategory?.imageUrl,
-      onPress: () =>
-        regularCategory
-          ? navigation.navigate("ProductList", { categoryId: regularCategory.id })
-          : navigation.navigate("Categories"),
-    },
-  ];
+  const categorySlides = categories.map((cat) => {
+    const firstProduct = products.find((p) => p.categoryId === cat.id && p.imageUrl);
+    return {
+      id: cat.id,
+      eyebrow: cat.eyebrow,
+      title: cat.title,
+      body: cat.subtitle,
+      buttonLabel: cat.requiresShadeSelection ? "เลือกเฉดสี" : "ดูสินค้า",
+      imageUrl: firstProduct?.imageUrl ?? cat.imageUrl,
+      onPress: cat.requiresShadeSelection
+        ? () => navigation.navigate("ShadeSelection", { categoryId: cat.id })
+        : () => navigation.navigate("ProductList", { categoryId: cat.id }),
+    };
+  });
 
   const heroSlides =
     banners.length > 0
@@ -101,7 +71,7 @@ export function HomeScreen() {
           imageUrl: b.imageUrl,
           onPress: getBannerPress(b.linkType, b.linkId),
         }))
-      : fallbackSlides;
+      : categorySlides;
 
   function openCategory(categoryId: string, requiresShadeSelection: boolean) {
     if (requiresShadeSelection) {

@@ -7,6 +7,7 @@ type ApiCategory = {
   id: string;
   name: string;
   slug: string;
+  eyebrow?: string | null;
   description?: string | null;
   imageUrl?: string | null;
   requiresShadeSelection: boolean;
@@ -46,6 +47,7 @@ function mapCategory(c: ApiCategory): Category {
   return {
     id: c.id,
     title: c.name,
+    eyebrow: c.eyebrow ?? "",
     subtitle: c.description ?? "",
     requiresShadeSelection: c.requiresShadeSelection,
     slug: c.slug,
