@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -16,7 +16,16 @@ export function CartScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const cart = useAppStore((state) => state.cart);
   const updateQuantity = useAppStore((state) => state.updateQuantity);
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
   const summary = getCartSummary(cart);
+
+  function handleCheckout() {
+    if (!isAuthenticated) {
+      navigation.dispatch(CommonActions.navigate({ name: "Profile" }));
+      return;
+    }
+    navigation.navigate("Checkout");
+  }
 
   return (
     <Screen contentContainerStyle={styles.content}>
@@ -71,7 +80,7 @@ export function CartScreen() {
 
       <Pressable
         disabled={cart.length === 0}
-        onPress={() => navigation.navigate("Checkout")}
+        onPress={handleCheckout}
         style={[styles.button, cart.length === 0 && styles.buttonDisabled]}
       >
         <Text style={styles.buttonText}>Proceed to checkout</Text>
