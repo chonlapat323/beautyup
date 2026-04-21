@@ -28,7 +28,7 @@ export function HomeScreen() {
   const categories = useAppStore((state) => state.categories);
   const products = useAppStore((state) => state.products);
   const banners = useAppStore((state) => state.banners);
-  const featuredProducts = products.slice(0, 4);
+  const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 8);
   const slideWidth = width - spacing["2xl"] * 2;
 
   function getBannerPress(linkType: string, linkId?: string) {

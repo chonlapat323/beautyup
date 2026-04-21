@@ -22,6 +22,7 @@ type ApiProduct = {
   specialPrice?: string | null;
   stock: number;
   status: "DRAFT" | "ACTIVE" | "INACTIVE";
+  isFeatured: boolean;
   categoryId: string;
   shadeId?: string | null;
   images?: { id: string; url: string; sortOrder: number }[];
@@ -63,6 +64,7 @@ function mapProduct(p: ApiProduct): Product {
     description: p.description ?? "",
     accentColor: "#C9826F",
     imageUrl: p.images?.[0]?.url,
+    isFeatured: p.isFeatured ?? false,
   };
 }
 
