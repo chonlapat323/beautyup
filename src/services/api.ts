@@ -150,3 +150,104 @@ export async function loadCatalogFromApi(): Promise<{
   const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
   return { categories, products };
 }
+
+// ─── Mobile auth ──────────────────────────────────────────────────────────────
+
+type AuthResponse = { token: string; member: { id: string; fullName: string } };
+
+export async function mobileRegister(
+  fullName: string,
+  identifier: string,
+  password: string,
+  referralCode?: string,
+): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/mobile/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fullName, identifier, password, ...(referralCode ? { referralCode } : {}) }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "สมัครสมาชิกไม่สำเร็จ");
+  }
+  return res.json() as Promise<AuthResponse>;
+}
+
+export async function mobileLogin(
+  identifier: string,
+  password: string,
+): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/mobile/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identifier, password }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "อีเมล/รหัสผ่านไม่ถูกต้อง");
+  }
+  return res.json() as Promise<AuthResponse>;
+}
+
+// ─── Mobile checkout ──────────────────────────────────────────────────────────
+
+type CheckoutItem = { productId: string; quantity: number };
+
+type ApiOrder = {
+  id: string;
+  orderNumber: string;
+  totalAmount: string;
+  status: string;
+  createdAt: string;
+  items: { quantity: number; unitPrice: string; product: { name: string; id: string; images?: { url: string }[] } }[];
+};
+
+export async function mobileCheckout(
+  token: string,
+  items: CheckoutItem[],
+  shippingName: string,
+  shippingPhone: string,
+  shippingAddr: string,
+): Promise<ApiOrder> {
+  const res = await fetch(`${API_BASE}/mobile/checkout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "สั่งซื้อไม่สำเร็จ");
+  }
+  return res.json() as Promise<ApiOrder>;
+}
+
+export async function mobileGetOrders(token: string): Promise<ApiOrder[]> {
+  const res = await fetch(`${API_BASE}/mobile/orders`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดคำสั่งซื้อไม่สำเร็จ");
+  return res.json() as Promise<ApiOrder[]>;
+}
+
+export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
+  const items = o.items.map((i) => ({
+    productId: i.product.id,
+    name: i.product.name,
+    quantity: i.quantity,
+    price: parseFloat(i.unitPrice) || 0,
+  }));
+  const total = parseFloat(o.totalAmount) || 0;
+  return {
+    id: o.orderNumber,
+    itemCount: items.reduce((s, i) => s + i.quantity, 0),
+    total,
+    status: "Paid" as const,
+    placedAt: new Date(o.createdAt).toLocaleDateString("th-TH", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }),
+    gatewayFee: 0,
+    items,
+  };
+}

@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
@@ -25,6 +26,9 @@ const statusToneMap = {
 export function OrderHistoryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<OrderStackParamList>>();
   const orders = useAppStore((state) => state.orders);
+  const loadOrders = useAppStore((state) => state.loadOrders);
+
+  useEffect(() => { void loadOrders(); }, [loadOrders]);
 
   return (
     <Screen contentContainerStyle={styles.content}>

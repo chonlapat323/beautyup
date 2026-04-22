@@ -1,13 +1,14 @@
 import { create } from "zustand";
 
-import { fetchBanners, loadCatalogFromApi } from "@/services/api";
+import { fetchBanners, loadCatalogFromApi, mapApiOrder, mobileGetOrders } from "@/services/api";
 import { mockOrders } from "@/mock/catalog";
-import type { Banner, CartItem, Category, Order, OrderItem, Product } from "@/types/domain";
+import type { Banner, CartItem, Category, Order, Product } from "@/types/domain";
 
 const gatewayFee = 20;
 
 type AppStore = {
   isAuthenticated: boolean;
+  token: string | null;
   selectedShadeId?: string;
   cart: CartItem[];
   orders: Order[];
@@ -16,18 +17,19 @@ type AppStore = {
   banners: Banner[];
   isLoadingCatalog: boolean;
   catalogError: boolean;
-  signIn: () => void;
+  signIn: (token: string) => void;
   signOut: () => void;
   setSelectedShade: (shadeId?: string) => void;
   loadCatalog: () => Promise<void>;
+  loadOrders: () => Promise<void>;
   addToCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  checkout: () => string;
 };
 
 export const useAppStore = create<AppStore>((set, get) => ({
   isAuthenticated: false,
+  token: null,
   selectedShadeId: undefined,
   cart: [],
   orders: mockOrders,
@@ -37,8 +39,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
   isLoadingCatalog: false,
   catalogError: false,
 
-  signIn: () => set({ isAuthenticated: true }),
-  signOut: () => set({ isAuthenticated: false }),
+  signIn: (token) => set({ isAuthenticated: true, token }),
+  signOut: () => set({ isAuthenticated: false, token: null, orders: mockOrders }),
   setSelectedShade: (shadeId) => set({ selectedShadeId: shadeId }),
 
   loadCatalog: async () => {
@@ -53,6 +55,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
       set({ catalogError: true });
     } finally {
       set({ isLoadingCatalog: false });
+    }
+  },
+
+  loadOrders: async () => {
+    const { token } = get();
+    if (!token) return;
+    try {
+      const apiOrders = await mobileGetOrders(token);
+      set({ orders: apiOrders.map(mapApiOrder) });
+    } catch {
+      // keep existing orders on error
     }
   },
 
@@ -80,47 +93,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
     })),
 
   clearCart: () => set({ cart: [] }),
-
-  checkout: () => {
-    const { cart, orders, products } = get();
-    const subtotal = cart.reduce((sum, item) => {
-      const product = products.find((p) => p.id === item.productId);
-      return sum + (product?.price ?? 0) * item.quantity;
-    }, 0);
-    const total = subtotal + gatewayFee;
-    const orderId = `BU-${24000 + orders.length + 1}`;
-    const items: OrderItem[] = cart.map((item) => {
-      const product = products.find((p) => p.id === item.productId);
-      return {
-        productId: item.productId,
-        name: product?.name ?? item.productId,
-        quantity: item.quantity,
-        price: product?.price ?? 0,
-      };
-    });
-
-    set({
-      cart: [],
-      orders: [
-        {
-          id: orderId,
-          itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
-          total,
-          status: "Preparing",
-          placedAt: new Date().toLocaleDateString("th-TH", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          }),
-          gatewayFee,
-          items,
-        },
-        ...orders,
-      ],
-    });
-
-    return orderId;
-  },
 }));
 
 export function getCartSummary(cart: CartItem[]) {

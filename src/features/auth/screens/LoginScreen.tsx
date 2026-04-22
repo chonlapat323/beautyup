@@ -1,11 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import type { ProfileStackParamList } from "@/navigation/types";
+import { mobileLogin } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -13,12 +14,26 @@ export function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const signIn = useAppStore((state) => state.signIn);
 
-  function handleLogin() {
-    signIn();
-    navigation.popToTop();
-  }
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleLogin() {
+    if (!identifier || !password) {
+      Alert.alert("กรุณากรอกข้อมูลให้ครบ");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { token } = await mobileLogin(identifier, password);
+      signIn(token);
+      navigation.popToTop();
+    } catch (e) {
+      Alert.alert("เข้าสู่ระบบไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Screen contentContainerStyle={styles.content}>
@@ -50,8 +65,8 @@ export function LoginScreen() {
           value={password}
         />
 
-        <Pressable style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
+        <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleLogin()} disabled={isLoading}>
+          <Text style={styles.buttonText}>{isLoading ? "กำลังเข้าสู่ระบบ..." : "Login"}</Text>
         </Pressable>
 
         <Pressable style={styles.linkRow}>
@@ -119,6 +134,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: colors.textMuted,
   },
   buttonText: {
     color: "#FFFFFF",

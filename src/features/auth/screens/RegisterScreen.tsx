@@ -2,11 +2,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import type { ProfileStackParamList } from "@/navigation/types";
+import { mobileRegister } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -14,14 +15,33 @@ export function RegisterScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const signIn = useAppStore((state) => state.signIn);
 
-  function handleRegister() {
-    signIn();
-    navigation.popToTop();
-  }
   const [fullName, setFullName] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [referralCode, setReferralCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleRegister() {
+    if (!fullName || !identifier || !password) {
+      Alert.alert("กรุณากรอกข้อมูลให้ครบ");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("รหัสผ่านไม่ตรงกัน");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { token } = await mobileRegister(fullName, identifier, password, referralCode || undefined);
+      signIn(token);
+      navigation.popToTop();
+    } catch (e) {
+      Alert.alert("สมัครสมาชิกไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Screen contentContainerStyle={styles.content}>
@@ -72,9 +92,17 @@ export function RegisterScreen() {
           style={styles.input}
           value={confirmPassword}
         />
+        <TextInput
+          autoCapitalize="none"
+          onChangeText={setReferralCode}
+          placeholder="Referral code (optional)"
+          placeholderTextColor={colors.textMuted}
+          style={styles.input}
+          value={referralCode}
+        />
 
-        <Pressable style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Create Account</Text>
+        <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleRegister()} disabled={isLoading}>
+          <Text style={styles.buttonText}>{isLoading ? "กำลังสมัครสมาชิก..." : "Create Account"}</Text>
         </Pressable>
       </View>
 
@@ -142,6 +170,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: spacing.sm,
+  },
+  buttonDisabled: {
+    backgroundColor: colors.textMuted,
   },
   buttonText: {
     color: "#FFFFFF",
