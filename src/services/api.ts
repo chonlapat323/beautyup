@@ -153,7 +153,18 @@ export async function loadCatalogFromApi(): Promise<{
 
 // ─── Mobile auth ──────────────────────────────────────────────────────────────
 
-type AuthResponse = { token: string; member: { id: string; fullName: string } };
+type AuthResponse = {
+  token: string;
+  member: {
+    id: string;
+    fullName: string;
+    email: string | null;
+    phone: string | null;
+    memberType: string;
+    pointBalance: number;
+    referralCode: string | null;
+  };
+};
 
 export async function mobileRegister(
   fullName: string,
