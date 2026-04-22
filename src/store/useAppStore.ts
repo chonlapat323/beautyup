@@ -6,7 +6,7 @@ import type { Banner, CartItem, Category, Order, Product } from "@/types/domain"
 
 const gatewayFee = 20;
 
-type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number };
+type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; referralCode: string | null };
 
 type AppStore = {
   isAuthenticated: boolean;

@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
@@ -50,6 +50,17 @@ export function ProfileScreen() {
         <Text style={styles.name}>{member?.fullName ?? "-"}</Text>
         <Text style={styles.meta}>{memberTypeLabel}</Text>
         <Text style={styles.identifier}>{member?.email ?? member?.phone ?? ""}</Text>
+
+        {member?.referralCode && (
+          <Pressable
+            style={styles.referralBox}
+            onPress={() => void Share.share({ message: `ใช้รหัสแนะนำของฉัน ${member.referralCode} สมัคร Beauty Up รับส่วนลดพิเศษ!` })}
+          >
+            <Text style={styles.referralLabel}>รหัสแนะนำของคุณ</Text>
+            <Text style={styles.referralCode}>{member.referralCode}</Text>
+            <Text style={styles.referralHint}>กดเพื่อแชร์</Text>
+          </Pressable>
+        )}
 
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
@@ -171,6 +182,31 @@ const styles = StyleSheet.create({
     ...typography.caption,
     textAlign: "center",
     fontSize: 10,
+  },
+  referralBox: {
+    marginTop: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: "#f0faf4",
+    borderWidth: 1,
+    borderColor: "#b7ddc7",
+    padding: spacing.md,
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  referralLabel: {
+    color: colors.textSecondary,
+    ...typography.caption,
+  },
+  referralCode: {
+    color: colors.primary,
+    fontSize: 20,
+    fontWeight: "700",
+    letterSpacing: 2,
+  },
+  referralHint: {
+    color: colors.textMuted,
+    fontSize: 10,
+    ...typography.caption,
   },
   signOutButton: {
     marginTop: spacing.lg,
