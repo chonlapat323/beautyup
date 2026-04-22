@@ -6,7 +6,6 @@ import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { products } from "@/mock/catalog";
 import { navigateToHome, navigateToOrderHistory } from "@/navigation/helpers";
 import { useAppStore } from "@/store/useAppStore";
 import type { OrderStackParamList } from "@/navigation/types";
@@ -18,11 +17,12 @@ export function OrderDetailScreen() {
   const order = useAppStore((state) =>
     state.orders.find((entry) => entry.id === route.params.orderId),
   );
+  const products = useAppStore((state) => state.products);
 
   if (!order) {
     return (
       <Screen contentContainerStyle={styles.content}>
-        <AppHeader title="Order details" subtitle="We couldn't find this mock order." />
+        <AppHeader title="Order details" subtitle="ไม่พบรายการสั่งซื้อ" />
         <Breadcrumbs
           items={[
             { label: "Home", onPress: () => navigateToHome(navigation) },
@@ -63,13 +63,10 @@ export function OrderDetailScreen() {
         <Text style={styles.sectionTitle}>Items in this order</Text>
         {order.items.map((item) => {
           const product = products.find((entry) => entry.id === item.productId);
-          if (!product) {
-            return null;
-          }
 
           return (
             <View key={`${order.id}-${item.productId}`} style={styles.itemCard}>
-              <CommerceImage style={styles.itemArtwork} uri={product.imageUrl} />
+              <CommerceImage style={styles.itemArtwork} uri={product?.imageUrl} />
               <View style={styles.itemCopy}>
                 <Text style={styles.itemName}>{item.name}</Text>
                 <Text style={styles.itemMeta}>Qty {item.quantity}</Text>

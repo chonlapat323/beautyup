@@ -6,7 +6,6 @@ import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { products } from "@/mock/catalog";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
@@ -15,6 +14,7 @@ import { colors, radius, spacing, typography } from "@/theme";
 export function CartScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const cart = useAppStore((state) => state.cart);
+  const products = useAppStore((state) => state.products);
   const updateQuantity = useAppStore((state) => state.updateQuantity);
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
   const summary = getCartSummary(cart);
@@ -29,7 +29,7 @@ export function CartScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="Your cart" subtitle="Review your mock basket before checkout." />
+      <AppHeader title="Your cart" subtitle="ตรวจสอบสินค้าก่อนชำระเงิน" />
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigateToHome(navigation) },
@@ -45,9 +45,7 @@ export function CartScreen() {
         ) : (
           cart.map((item) => {
             const product = products.find((entry) => entry.id === item.productId);
-            if (!product) {
-              return null;
-            }
+            if (!product) return null;
 
             return (
               <View key={item.productId} style={styles.itemCard}>
