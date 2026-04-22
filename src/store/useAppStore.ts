@@ -6,9 +6,12 @@ import type { Banner, CartItem, Category, Order, Product } from "@/types/domain"
 
 const gatewayFee = 20;
 
+type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number };
+
 type AppStore = {
   isAuthenticated: boolean;
   token: string | null;
+  member: MemberInfo | null;
   selectedShadeId?: string;
   cart: CartItem[];
   orders: Order[];
@@ -17,7 +20,7 @@ type AppStore = {
   banners: Banner[];
   isLoadingCatalog: boolean;
   catalogError: boolean;
-  signIn: (token: string) => void;
+  signIn: (token: string, member: MemberInfo) => void;
   signOut: () => void;
   setSelectedShade: (shadeId?: string) => void;
   loadCatalog: () => Promise<void>;
@@ -30,6 +33,7 @@ type AppStore = {
 export const useAppStore = create<AppStore>((set, get) => ({
   isAuthenticated: false,
   token: null,
+  member: null,
   selectedShadeId: undefined,
   cart: [],
   orders: mockOrders,
@@ -39,8 +43,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
   isLoadingCatalog: false,
   catalogError: false,
 
-  signIn: (token) => set({ isAuthenticated: true, token }),
-  signOut: () => set({ isAuthenticated: false, token: null, orders: mockOrders }),
+  signIn: (token, member) => set({ isAuthenticated: true, token, member }),
+  signOut: () => set({ isAuthenticated: false, token: null, member: null, orders: mockOrders }),
   setSelectedShade: (shadeId) => set({ selectedShadeId: shadeId }),
 
   loadCatalog: async () => {

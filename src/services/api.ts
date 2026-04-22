@@ -199,7 +199,7 @@ type ApiOrder = {
   totalAmount: string;
   status: string;
   createdAt: string;
-  items: { quantity: number; unitPrice: string; product: { name: string; id: string; images?: { url: string }[] } }[];
+  items: { productId: string; name: string; quantity: number; unitPrice: string }[];
 };
 
 export async function mobileCheckout(
@@ -231,8 +231,8 @@ export async function mobileGetOrders(token: string): Promise<ApiOrder[]> {
 
 export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
   const items = o.items.map((i) => ({
-    productId: i.product.id,
-    name: i.product.name,
+    productId: i.productId,
+    name: i.name,
     quantity: i.quantity,
     price: parseFloat(i.unitPrice) || 0,
   }));

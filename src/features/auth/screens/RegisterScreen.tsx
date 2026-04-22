@@ -33,8 +33,8 @@ export function RegisterScreen() {
     }
     setIsLoading(true);
     try {
-      const { token } = await mobileRegister(fullName, identifier, password, referralCode || undefined);
-      signIn(token);
+      const { token, member } = await mobileRegister(fullName, identifier, password, referralCode || undefined);
+      signIn(token, member);
       navigation.popToTop();
     } catch (e) {
       Alert.alert("สมัครสมาชิกไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");

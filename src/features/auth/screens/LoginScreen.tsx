@@ -25,8 +25,8 @@ export function LoginScreen() {
     }
     setIsLoading(true);
     try {
-      const { token } = await mobileLogin(identifier, password);
-      signIn(token);
+      const { token, member } = await mobileLogin(identifier, password);
+      signIn(token, member);
       navigation.popToTop();
     } catch (e) {
       Alert.alert("เข้าสู่ระบบไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");

@@ -5,7 +5,6 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { navigateToHome } from "@/navigation/helpers";
 import { useAppStore } from "@/store/useAppStore";
 import type { ProfileStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -13,7 +12,12 @@ import { colors, radius, spacing, typography } from "@/theme";
 export function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const member = useAppStore((state) => state.member);
+  const orders = useAppStore((state) => state.orders);
   const signOut = useAppStore((state) => state.signOut);
+
+  const totalSpend = orders.reduce((s, o) => s + o.total, 0);
+  const memberTypeLabel = member?.memberType === "SALON" ? "Salon Member" : "Regular Member";
 
   if (!isAuthenticated) {
     return (
@@ -27,17 +31,10 @@ export function ProfileScreen() {
         </View>
 
         <View style={styles.guestActions}>
-          <Pressable
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate("Login")}
-          >
+          <Pressable style={styles.primaryButton} onPress={() => navigation.navigate("Login")}>
             <Text style={styles.primaryButtonText}>เข้าสู่ระบบ</Text>
           </Pressable>
-
-          <Pressable
-            style={styles.outlineButton}
-            onPress={() => navigation.navigate("Register")}
-          >
+          <Pressable style={styles.outlineButton} onPress={() => navigation.navigate("Register")}>
             <Text style={styles.outlineButtonText}>สมัครสมาชิก</Text>
           </Pressable>
         </View>
@@ -47,21 +44,24 @@ export function ProfileScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
-      <AppHeader
-        title="Profile"
-        subtitle="จัดการบัญชีและติดตามออเดอร์ของคุณ"
-      />
+      <AppHeader title="Profile" subtitle="จัดการบัญชีและติดตามออเดอร์ของคุณ" />
 
       <View style={styles.card}>
-        <Text style={styles.name}>Pao Chonlapat</Text>
-        <Text style={styles.meta}>สมาชิก Beauty Up</Text>
+        <Text style={styles.name}>{member?.fullName ?? "-"}</Text>
+        <Text style={styles.meta}>{memberTypeLabel}</Text>
+        <Text style={styles.identifier}>{member?.email ?? member?.phone ?? ""}</Text>
+
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>3</Text>
-            <Text style={styles.statLabel}>ออเดอร์ที่ใช้งาน</Text>
+            <Text style={styles.statValue}>{orders.length}</Text>
+            <Text style={styles.statLabel}>ออเดอร์ทั้งหมด</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>THB 1,284</Text>
+            <Text style={styles.statValue}>{member?.pointBalance ?? 0}</Text>
+            <Text style={styles.statLabel}>แต้มสะสม</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>฿{totalSpend.toLocaleString("th-TH", { maximumFractionDigits: 0 })}</Text>
             <Text style={styles.statLabel}>ยอดซื้อรวม</Text>
           </View>
         </View>
@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: spacing["3xl"],
   },
-  // Guest state
   guestBrand: {
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing["3xl"],
@@ -126,7 +125,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     ...typography.title,
   },
-  // Authenticated state
   card: {
     marginHorizontal: spacing["2xl"],
     marginTop: spacing.xl,
@@ -142,8 +140,13 @@ const styles = StyleSheet.create({
     ...typography.headline,
   },
   meta: {
+    color: colors.primary,
+    ...typography.caption,
+    fontWeight: "600",
+  },
+  identifier: {
     color: colors.textSecondary,
-    ...typography.body,
+    ...typography.caption,
   },
   statsRow: {
     flexDirection: "row",
@@ -154,16 +157,20 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: radius.md,
     backgroundColor: colors.surfaceMuted,
-    padding: spacing.lg,
+    padding: spacing.md,
     gap: spacing.xs,
+    alignItems: "center",
   },
   statValue: {
     color: colors.textPrimary,
     ...typography.title,
+    fontSize: 14,
   },
   statLabel: {
     color: colors.textSecondary,
     ...typography.caption,
+    textAlign: "center",
+    fontSize: 10,
   },
   signOutButton: {
     marginTop: spacing.lg,
