@@ -1,4 +1,3 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +15,7 @@ import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
+import { PointsPill } from "@/components/ui/PointsPill";
 import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, fonts, radius, spacing } from "@/theme";
@@ -28,7 +28,6 @@ export function HomeScreen() {
   const products = useAppStore((state) => state.products);
   const banners = useAppStore((state) => state.banners);
   const isLoadingCatalog = useAppStore((state) => state.isLoadingCatalog);
-  const member = useAppStore((state) => state.member);
   const addToCart = useAppStore((state) => state.addToCart);
 
   const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 8);
@@ -96,14 +95,7 @@ export function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <BrandLockup compact />
-        {member && (
-          <View style={styles.pointsPill}>
-            <MaterialIcons name="auto-awesome" size={13} color="#fff" />
-            <Text style={styles.pointsText}>
-              {member.pointBalance.toLocaleString()} แต้ม
-            </Text>
-          </View>
-        )}
+        <PointsPill />
       </View>
 
       {/* Banner carousel */}
@@ -263,20 +255,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-  },
-  pointsPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    backgroundColor: colors.primary,
-    borderRadius: radius.pill,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  pointsText: {
-    color: "#fff",
-    fontSize: 13,
-    fontFamily: fonts.semiBold,
   },
   bannerSection: {
     marginBottom: spacing.xl,
