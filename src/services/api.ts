@@ -172,11 +172,19 @@ export async function mobileRegister(
   phone: string,
   password: string,
   referralCode?: string,
+  salonCode?: string,
 ): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/mobile/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fullName, email: email || undefined, phone: phone || undefined, password, ...(referralCode ? { referralCode } : {}) }),
+    body: JSON.stringify({
+      fullName,
+      email: email || undefined,
+      phone: phone || undefined,
+      password,
+      ...(referralCode ? { referralCode } : {}),
+      ...(salonCode ? { salonCode } : {}),
+    }),
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };

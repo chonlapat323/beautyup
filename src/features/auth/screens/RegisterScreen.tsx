@@ -21,6 +21,7 @@ export function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [referralCode, setReferralCode] = useState("");
+  const [salonCode, setSalonCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleRegister() {
@@ -34,7 +35,7 @@ export function RegisterScreen() {
     }
     setIsLoading(true);
     try {
-      const { token, member } = await mobileRegister(fullName, email, phone, password, referralCode || undefined);
+      const { token, member } = await mobileRegister(fullName, email, phone, password, referralCode || undefined, salonCode || undefined);
       signIn(token, member);
       navigation.popToTop();
     } catch (e) {
@@ -108,6 +109,14 @@ export function RegisterScreen() {
           placeholderTextColor={colors.textMuted}
           style={styles.input}
           value={referralCode}
+        />
+        <TextInput
+          autoCapitalize="characters"
+          onChangeText={setSalonCode}
+          placeholder="Salon Code (optional)"
+          placeholderTextColor={colors.textMuted}
+          style={styles.input}
+          value={salonCode}
         />
 
         <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleRegister()} disabled={isLoading}>
