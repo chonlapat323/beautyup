@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { OrderListSkeleton } from "@/components/ui/Skeleton";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
@@ -27,6 +28,7 @@ export function OrderHistoryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<OrderStackParamList>>();
   const orders = useAppStore((state) => state.orders);
   const loadOrders = useAppStore((state) => state.loadOrders);
+  const isLoadingOrders = useAppStore((state) => state.isLoadingOrders);
 
   useEffect(() => { void loadOrders(); }, [loadOrders]);
 
@@ -40,8 +42,12 @@ export function OrderHistoryScreen() {
         ]}
       />
 
+      {isLoadingOrders ? (
+        <OrderListSkeleton />
+      ) : null}
+
       <View style={styles.list}>
-        {orders.map((order) => (
+        {!isLoadingOrders && orders.map((order) => (
           <Pressable
             key={order.id}
             onPress={() => navigation.navigate("OrderDetail", { orderId: order.id })}

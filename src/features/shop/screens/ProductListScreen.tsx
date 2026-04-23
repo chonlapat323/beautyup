@@ -1,11 +1,12 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
+import { ProductGridSkeleton } from "@/components/ui/Skeleton";
 import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -67,7 +68,7 @@ export function ProductListScreen() {
       ) : null}
 
       {isLoading ? (
-        <ActivityIndicator color={colors.primary} style={{ marginTop: spacing["3xl"] }} />
+        <ProductGridSkeleton />
       ) : filteredProducts.length === 0 ? (
         <View style={styles.empty}>
           <Text style={styles.emptyText}>ไม่พบสินค้าในหมวดหมู่นี้</Text>

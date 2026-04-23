@@ -19,6 +19,7 @@ type AppStore = {
   products: Product[];
   banners: Banner[];
   isLoadingCatalog: boolean;
+  isLoadingOrders: boolean;
   catalogError: boolean;
   signIn: (token: string, member: MemberInfo) => void;
   signOut: () => void;
@@ -41,6 +42,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   products: [],
   banners: [],
   isLoadingCatalog: false,
+  isLoadingOrders: false,
   catalogError: false,
 
   signIn: (token, member) => set({ isAuthenticated: true, token, member }),
@@ -65,11 +67,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
   loadOrders: async () => {
     const { token } = get();
     if (!token) return;
+    set({ isLoadingOrders: true });
     try {
       const apiOrders = await mobileGetOrders(token);
       set({ orders: apiOrders.map(mapApiOrder) });
     } catch {
       // keep existing orders on error
+    } finally {
+      set({ isLoadingOrders: false });
     }
   },
 

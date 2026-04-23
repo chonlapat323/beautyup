@@ -7,6 +7,7 @@ import { BRAND_NAME } from "@/brand";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
+import { CategoriesListSkeleton } from "@/components/ui/Skeleton";
 import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -30,9 +31,7 @@ export function CategoriesScreen() {
       />
 
       {isLoading ? (
-        <View style={styles.center}>
-          <Text style={styles.muted}>กำลังโหลด...</Text>
-        </View>
+        <CategoriesListSkeleton />
       ) : categories.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.muted}>ไม่พบหมวดหมู่สินค้า</Text>

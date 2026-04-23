@@ -15,6 +15,7 @@ import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { HeroSlide } from "@/components/ui/HeroSlide";
+import { HomeSkeleton } from "@/components/ui/Skeleton";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
@@ -28,6 +29,7 @@ export function HomeScreen() {
   const categories = useAppStore((state) => state.categories);
   const products = useAppStore((state) => state.products);
   const banners = useAppStore((state) => state.banners);
+  const isLoadingCatalog = useAppStore((state) => state.isLoadingCatalog);
   const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 8);
   const slideWidth = width - spacing["2xl"] * 2;
 
@@ -79,6 +81,17 @@ export function HomeScreen() {
       return;
     }
     navigation.navigate("ProductList", { categoryId });
+  }
+
+  if (isLoadingCatalog) {
+    return (
+      <Screen contentContainerStyle={styles.content}>
+        <View style={styles.header}>
+          <BrandLockup />
+        </View>
+        <HomeSkeleton />
+      </Screen>
+    );
   }
 
   return (
