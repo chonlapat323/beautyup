@@ -24,17 +24,22 @@ export function CheckoutScreen() {
   const [addresses, setAddresses] = useState<MemberAddress[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+  const [addressError, setAddressError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setIsLoadingAddresses(false);
+      return;
+    }
+    setAddressError(false);
     mobileGetAddresses(token)
       .then((list) => {
         setAddresses(list);
         const def = list.find((a) => a.isDefault) ?? list[0];
         if (def) setSelectedId(def.id);
       })
-      .catch(() => {})
+      .catch(() => setAddressError(true))
       .finally(() => setIsLoadingAddresses(false));
   }, [token]);
 
@@ -91,6 +96,11 @@ export function CheckoutScreen() {
 
         {isLoadingAddresses ? (
           <Text style={styles.hint}>กำลังโหลดที่อยู่...</Text>
+        ) : addressError ? (
+          <View style={styles.noAddressBox}>
+            <Text style={styles.noAddressText}>โหลดที่อยู่ไม่สำเร็จ</Text>
+            <Text style={styles.hint}>กรุณาตรวจสอบการเชื่อมต่อและลองใหม่อีกครั้ง</Text>
+          </View>
         ) : addresses.length === 0 ? (
           <View style={styles.noAddressBox}>
             <Text style={styles.noAddressText}>ยังไม่มีที่อยู่ที่บันทึกไว้</Text>
