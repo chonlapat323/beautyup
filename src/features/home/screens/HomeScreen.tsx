@@ -198,7 +198,6 @@ export function HomeScreen() {
                   )}
                 </View>
 
-                <Text style={styles.productBrand}>BEAUTYUP PRO</Text>
                 <Text style={styles.productName} numberOfLines={1}>{product.name}</Text>
                 <View style={styles.productPriceRow}>
                   <Text style={styles.productPrice}>THB {product.price.toFixed(0)}</Text>
@@ -386,13 +385,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: "#fff",
-  },
-  productBrand: {
-    fontSize: 9,
-    fontFamily: fonts.monoBold,
-    color: colors.textMuted,
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
   },
   productName: {
     fontSize: 12,
