@@ -168,14 +168,15 @@ type AuthResponse = {
 
 export async function mobileRegister(
   fullName: string,
-  identifier: string,
+  email: string,
+  phone: string,
   password: string,
   referralCode?: string,
 ): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/mobile/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fullName, identifier, password, ...(referralCode ? { referralCode } : {}) }),
+    body: JSON.stringify({ fullName, email: email || undefined, phone: phone || undefined, password, ...(referralCode ? { referralCode } : {}) }),
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };

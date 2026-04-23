@@ -16,15 +16,16 @@ export function RegisterScreen() {
   const signIn = useAppStore((state) => state.signIn);
 
   const [fullName, setFullName] = useState("");
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [referralCode, setReferralCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleRegister() {
-    if (!fullName || !identifier || !password) {
-      Alert.alert("กรุณากรอกข้อมูลให้ครบ");
+    if (!fullName || (!email && !phone) || !password) {
+      Alert.alert("กรุณากรอกชื่อ, อีเมลหรือเบอร์โทร และรหัสผ่าน");
       return;
     }
     if (password !== confirmPassword) {
@@ -33,7 +34,7 @@ export function RegisterScreen() {
     }
     setIsLoading(true);
     try {
-      const { token, member } = await mobileRegister(fullName, identifier, password, referralCode || undefined);
+      const { token, member } = await mobileRegister(fullName, email, phone, password, referralCode || undefined);
       signIn(token, member);
       navigation.popToTop();
     } catch (e) {
@@ -70,11 +71,19 @@ export function RegisterScreen() {
         <TextInput
           autoCapitalize="none"
           keyboardType="email-address"
-          onChangeText={setIdentifier}
-          placeholder="Phone or email"
+          onChangeText={setEmail}
+          placeholder="Email"
           placeholderTextColor={colors.textMuted}
           style={styles.input}
-          value={identifier}
+          value={email}
+        />
+        <TextInput
+          keyboardType="phone-pad"
+          onChangeText={setPhone}
+          placeholder="เบอร์โทรศัพท์"
+          placeholderTextColor={colors.textMuted}
+          style={styles.input}
+          value={phone}
         />
         <TextInput
           onChangeText={setPassword}
