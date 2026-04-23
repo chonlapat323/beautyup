@@ -33,7 +33,7 @@ export function HomeScreen() {
   const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 8);
 
   // Banner carousel
-  const bannerPad = spacing.xl;
+  const bannerPad = spacing["2xl"];
   const bannerWidth = width - bannerPad * 2;
   const bannerHeight = Math.round((bannerWidth * 10) / 16);
   const [activeBanner, setActiveBanner] = useState(0);
@@ -86,7 +86,7 @@ export function HomeScreen() {
   }
 
   // Category grid — 2 columns
-  const catPad = spacing.xl;
+  const catPad = spacing["2xl"];
   const catGap = spacing.md;
   const catCellSize = (width - catPad * 2 - catGap) / 2;
 
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   header: {
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing["2xl"],
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
     flexDirection: "row",
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing["2xl"],
     marginBottom: spacing.md,
   },
   sectionTitle: {
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   productRow: {
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing["2xl"],
     gap: spacing.lg,
     paddingBottom: spacing.xl,
   },
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   categoryGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing["2xl"],
     gap: spacing.md,
     marginBottom: spacing.xl,
   },
