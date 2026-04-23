@@ -77,6 +77,13 @@ export function ProfileScreen() {
           </View>
         </View>
 
+        <Pressable
+          onPress={() => navigation.navigate("Addresses")}
+          style={styles.menuButton}
+        >
+          <Text style={styles.menuButtonText}>📍  ที่อยู่ของฉัน</Text>
+        </Pressable>
+
         <Pressable onPress={signOut} style={styles.signOutButton}>
           <Text style={styles.signOutText}>ออกจากระบบ</Text>
         </Pressable>
@@ -208,8 +215,22 @@ const styles = StyleSheet.create({
     fontSize: 10,
     ...typography.caption,
   },
-  signOutButton: {
+  menuButton: {
     marginTop: spacing.lg,
+    height: 52,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.background,
+  },
+  menuButtonText: {
+    color: colors.textPrimary,
+    ...typography.title,
+  },
+  signOutButton: {
+    marginTop: spacing.sm,
     height: 52,
     borderRadius: radius.pill,
     alignItems: "center",

@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
@@ -8,7 +8,8 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileCheckout, mapApiOrder } from "@/services/api";
+import { mobileCheckout, mobileGetAddresses, mapApiOrder } from "@/services/api";
+import type { MemberAddress } from "@/services/api";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -19,25 +20,48 @@ export function CheckoutScreen() {
   const clearCart = useAppStore((state) => state.clearCart);
   const summary = getCartSummary(cart);
 
-  const [shippingName, setShippingName] = useState("");
-  const [shippingPhone, setShippingPhone] = useState("");
-  const [shippingAddr, setShippingAddr] = useState("");
+  const [addresses, setAddresses] = useState<MemberAddress[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (!token) return;
+    mobileGetAddresses(token)
+      .then((list) => {
+        setAddresses(list);
+        const def = list.find((a) => a.isDefault) ?? list[0];
+        if (def) setSelectedId(def.id);
+      })
+      .catch(() => {})
+      .finally(() => setIsLoadingAddresses(false));
+  }, [token]);
+
+  const selected = addresses.find((a) => a.id === selectedId);
+
   async function handleConfirm() {
-    if (!shippingName || !shippingPhone || !shippingAddr) {
-      Alert.alert("กรุณากรอกที่อยู่จัดส่งให้ครบ");
+    if (!selected) {
+      Alert.alert("กรุณาเลือกที่อยู่จัดส่ง");
       return;
     }
     if (!token) return;
     setIsLoading(true);
     try {
+      const addrLines = [
+        selected.addressLine1,
+        selected.addressLine2,
+        [selected.district, selected.province].filter(Boolean).join(" "),
+        selected.postalCode,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
       const order = await mobileCheckout(
         token,
         cart.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-        shippingName,
-        shippingPhone,
-        shippingAddr,
+        selected.recipient,
+        selected.phone,
+        addrLines,
       );
       clearCart();
       const mapped = mapApiOrder(order);
@@ -51,10 +75,7 @@ export function CheckoutScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
-      <AppHeader
-        title="Checkout"
-        subtitle="กรอกข้อมูลการจัดส่งและยืนยันคำสั่งซื้อ"
-      />
+      <AppHeader title="Checkout" subtitle="เลือกที่อยู่จัดส่งและยืนยันคำสั่งซื้อ" />
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigateToHome(navigation) },
@@ -63,32 +84,57 @@ export function CheckoutScreen() {
         ]}
       />
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>ที่อยู่จัดส่ง</Text>
-        <TextInput
-          onChangeText={setShippingName}
-          placeholder="ชื่อผู้รับ"
-          placeholderTextColor={colors.textMuted}
-          style={styles.input}
-          value={shippingName}
-        />
-        <TextInput
-          keyboardType="phone-pad"
-          onChangeText={setShippingPhone}
-          placeholder="เบอร์โทรศัพท์"
-          placeholderTextColor={colors.textMuted}
-          style={styles.input}
-          value={shippingPhone}
-        />
-        <TextInput
-          multiline
-          numberOfLines={3}
-          onChangeText={setShippingAddr}
-          placeholder="ที่อยู่"
-          placeholderTextColor={colors.textMuted}
-          style={[styles.input, styles.textArea]}
-          value={shippingAddr}
-        />
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>ที่อยู่จัดส่ง</Text>
+
+        {isLoadingAddresses ? (
+          <Text style={styles.hint}>กำลังโหลดที่อยู่...</Text>
+        ) : addresses.length === 0 ? (
+          <View style={styles.noAddressBox}>
+            <Text style={styles.noAddressText}>ยังไม่มีที่อยู่ที่บันทึกไว้</Text>
+            <Text style={styles.hint}>กรุณาไปเพิ่มที่อยู่ในหน้า Profile ก่อนสั่งซื้อ</Text>
+          </View>
+        ) : (
+          <View style={styles.addressList}>
+            {addresses.map((addr) => {
+              const isSelected = addr.id === selectedId;
+              const lines = [
+                addr.addressLine1,
+                addr.addressLine2,
+                [addr.district, addr.province].filter(Boolean).join(" "),
+                addr.postalCode,
+              ]
+                .filter(Boolean)
+                .join(", ");
+
+              return (
+                <Pressable
+                  key={addr.id}
+                  style={[styles.addressCard, isSelected && styles.addressCardSelected]}
+                  onPress={() => setSelectedId(addr.id)}
+                >
+                  <View style={styles.radioRow}>
+                    <View style={[styles.radio, isSelected && styles.radioSelected]}>
+                      {isSelected && <View style={styles.radioDot} />}
+                    </View>
+                    <View style={{ flex: 1, gap: 2 }}>
+                      <View style={styles.cardLabelRow}>
+                        {addr.label ? <Text style={styles.addrLabel}>{addr.label}</Text> : null}
+                        {addr.isDefault ? (
+                          <View style={styles.defaultBadge}>
+                            <Text style={styles.defaultBadgeText}>หลัก</Text>
+                          </View>
+                        ) : null}
+                      </View>
+                      <Text style={styles.addrRecipient}>{addr.recipient} · {addr.phone}</Text>
+                      <Text style={styles.addrLines}>{lines}</Text>
+                    </View>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
       </View>
 
       <View style={styles.summaryCard}>
@@ -99,9 +145,9 @@ export function CheckoutScreen() {
       </View>
 
       <Pressable
-        disabled={cart.length === 0 || isLoading}
+        disabled={cart.length === 0 || isLoading || !selected}
         onPress={() => void handleConfirm()}
-        style={[styles.button, (cart.length === 0 || isLoading) && styles.buttonDisabled]}
+        style={[styles.button, (cart.length === 0 || isLoading || !selected) && styles.buttonDisabled]}
       >
         <Text style={styles.buttonText}>{isLoading ? "กำลังดำเนินการ..." : "ยืนยันการสั่งซื้อ"}</Text>
       </Pressable>
@@ -119,37 +165,57 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
 }
 
 const styles = StyleSheet.create({
-  content: {
-    paddingBottom: spacing["3xl"],
-  },
-  card: {
+  content: { paddingBottom: spacing["3xl"] },
+  section: {
     marginHorizontal: spacing["2xl"],
-    borderRadius: radius.xl,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
-    padding: spacing["2xl"],
+    marginTop: spacing.lg,
     gap: spacing.md,
   },
-  cardTitle: {
-    color: colors.textPrimary,
-    ...typography.title,
-  },
-  input: {
-    height: 56,
-    borderRadius: radius.md,
-    backgroundColor: colors.background,
+  sectionTitle: { color: colors.textPrimary, ...typography.title },
+  hint: { color: colors.textMuted, ...typography.caption },
+  noAddressBox: {
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    paddingHorizontal: spacing.lg,
-    color: colors.textPrimary,
-    ...typography.body,
+    borderStyle: "dashed",
+    padding: spacing["2xl"],
+    alignItems: "center",
+    gap: spacing.xs,
   },
-  textArea: {
-    height: 88,
-    paddingTop: spacing.md,
-    textAlignVertical: "top",
+  noAddressText: { color: colors.textSecondary, ...typography.body },
+  addressList: { gap: spacing.sm },
+  addressCard: {
+    borderRadius: radius.lg,
+    borderWidth: 1.5,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.surface,
+    padding: spacing.md,
   },
+  addressCardSelected: { borderColor: colors.primary, backgroundColor: "#f0faf4" },
+  radioRow: { flexDirection: "row", gap: spacing.md, alignItems: "flex-start" },
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: colors.borderSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+  },
+  radioSelected: { borderColor: colors.primary },
+  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary },
+  cardLabelRow: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
+  addrLabel: { color: colors.primary, ...typography.caption, fontWeight: "700", textTransform: "uppercase" },
+  defaultBadge: {
+    backgroundColor: colors.primary,
+    borderRadius: 99,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+  },
+  defaultBadgeText: { color: "#FFF", fontSize: 9, fontWeight: "700" },
+  addrRecipient: { color: colors.textPrimary, ...typography.caption, fontWeight: "600" },
+  addrLines: { color: colors.textSecondary, ...typography.caption },
   summaryCard: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],
@@ -160,25 +226,11 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
   },
-  summaryTitle: {
-    color: colors.textPrimary,
-    ...typography.title,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  rowLabel: {
-    color: colors.textSecondary,
-    ...typography.body,
-  },
-  rowValue: {
-    color: colors.textPrimary,
-    ...typography.body,
-  },
-  strongText: {
-    ...typography.title,
-  },
+  summaryTitle: { color: colors.textPrimary, ...typography.title },
+  row: { flexDirection: "row", justifyContent: "space-between" },
+  rowLabel: { color: colors.textSecondary, ...typography.body },
+  rowValue: { color: colors.textPrimary, ...typography.body },
+  strongText: { ...typography.title },
   button: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],
@@ -187,11 +239,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     alignItems: "center",
   },
-  buttonDisabled: {
-    backgroundColor: colors.textMuted,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    ...typography.title,
-  },
+  buttonDisabled: { backgroundColor: colors.textMuted },
+  buttonText: { color: "#FFFFFF", ...typography.title },
 });

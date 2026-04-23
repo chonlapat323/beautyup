@@ -9,6 +9,8 @@ export type ProfileStackParamList = {
   ProfileHome: undefined;
   Login: undefined;
   Register: undefined;
+  Addresses: undefined;
+  AddressForm: { addressId?: string };
 };
 
 export type ShopStackParamList = {

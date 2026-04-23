@@ -209,6 +209,91 @@ export async function mobileLogin(
   return res.json() as Promise<AuthResponse>;
 }
 
+// ─── Mobile addresses ─────────────────────────────────────────────────────────
+
+export type MemberAddress = {
+  id: string;
+  label?: string | null;
+  recipient: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string | null;
+  district?: string | null;
+  province?: string | null;
+  postalCode?: string | null;
+  isDefault: boolean;
+};
+
+type AddressPayload = {
+  label?: string;
+  recipient: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  district?: string;
+  province?: string;
+  postalCode?: string;
+  isDefault?: boolean;
+};
+
+export async function mobileGetAddresses(token: string): Promise<MemberAddress[]> {
+  const res = await fetch(`${API_BASE}/mobile/addresses`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดที่อยู่ไม่สำเร็จ");
+  return res.json() as Promise<MemberAddress[]>;
+}
+
+export async function mobileAddAddress(token: string, payload: AddressPayload): Promise<MemberAddress> {
+  const res = await fetch(`${API_BASE}/mobile/addresses`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "เพิ่มที่อยู่ไม่สำเร็จ");
+  }
+  return res.json() as Promise<MemberAddress>;
+}
+
+export async function mobileUpdateAddress(
+  token: string,
+  id: string,
+  payload: Partial<AddressPayload>,
+): Promise<MemberAddress> {
+  const res = await fetch(`${API_BASE}/mobile/addresses/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "แก้ไขที่อยู่ไม่สำเร็จ");
+  }
+  return res.json() as Promise<MemberAddress>;
+}
+
+export async function mobileDeleteAddress(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/mobile/addresses/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "ลบที่อยู่ไม่สำเร็จ");
+  }
+}
+
+export async function mobileSetDefaultAddress(token: string, id: string): Promise<MemberAddress> {
+  const res = await fetch(`${API_BASE}/mobile/addresses/${id}/default`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("ตั้งที่อยู่หลักไม่สำเร็จ");
+  return res.json() as Promise<MemberAddress>;
+}
+
 // ─── Mobile checkout ──────────────────────────────────────────────────────────
 
 type CheckoutItem = { productId: string; quantity: number };
