@@ -11,6 +11,15 @@ import { useAppStore } from "@/store/useAppStore";
 import type { OrderStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
+const STATUS_LABELS: Record<string, string> = {
+  Pending: "รอดำเนินการ",
+  Paid: "ชำระแล้ว",
+  Processing: "กำลังเตรียม",
+  Shipped: "จัดส่งแล้ว",
+  Delivered: "ส่งสำเร็จ",
+  Cancelled: "ยกเลิก",
+};
+
 export function OrderDetailScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<OrderStackParamList>>();
   const route = useRoute<RouteProp<OrderStackParamList, "OrderDetail">>();
@@ -49,18 +58,26 @@ export function OrderDetailScreen() {
 
       <View style={styles.heroCard}>
         <View>
-          <Text style={styles.heroLabel}>Status</Text>
-          <Text style={styles.heroValue}>{order.status}</Text>
+          <Text style={styles.heroLabel}>สถานะ</Text>
+          <Text style={styles.heroValue}>{STATUS_LABELS[order.status] ?? order.status}</Text>
         </View>
         <View style={styles.heroDivider} />
         <View>
-          <Text style={styles.heroLabel}>Items</Text>
+          <Text style={styles.heroLabel}>จำนวนสินค้า</Text>
           <Text style={styles.heroValue}>{order.itemCount}</Text>
         </View>
       </View>
 
+      {(order.shippingName ?? order.shippingAddr) ? (
+        <View style={styles.shippingCard}>
+          <Text style={styles.sectionTitle}>ที่อยู่จัดส่ง</Text>
+          {order.shippingName ? <Text style={styles.shippingText}>{order.shippingName}{order.shippingPhone ? ` · ${order.shippingPhone}` : ""}</Text> : null}
+          {order.shippingAddr ? <Text style={styles.shippingAddr}>{order.shippingAddr}</Text> : null}
+        </View>
+      ) : null}
+
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Items in this order</Text>
+        <Text style={styles.sectionTitle}>รายการสินค้า</Text>
         {order.items.map((item) => {
           const product = products.find((entry) => entry.id === item.productId);
 
@@ -69,7 +86,7 @@ export function OrderDetailScreen() {
               <CommerceImage style={styles.itemArtwork} uri={product?.imageUrl} />
               <View style={styles.itemCopy}>
                 <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemMeta}>Qty {item.quantity}</Text>
+                <Text style={styles.itemMeta}>จำนวน {item.quantity}</Text>
               </View>
               <Text style={styles.itemPrice}>THB {(item.price * item.quantity).toFixed(0)}</Text>
             </View>
@@ -78,10 +95,10 @@ export function OrderDetailScreen() {
       </View>
 
       <View style={styles.summaryCard}>
-        <Text style={styles.sectionTitle}>Payment summary</Text>
-        <Row label="Subtotal" value={`THB ${subtotal.toFixed(0)}`} />
-        <Row label="Gateway fee" value={`THB ${order.gatewayFee.toFixed(0)}`} />
-        <Row label="Total" strong value={`THB ${order.total.toFixed(0)}`} />
+        <Text style={styles.sectionTitle}>สรุปยอดชำระ</Text>
+        <Row label="ยอดสินค้า" value={`THB ${subtotal.toFixed(0)}`} />
+        <Row label="ค่าธรรมเนียม" value={`THB ${order.gatewayFee.toFixed(0)}`} />
+        <Row label="รวมทั้งหมด" strong value={`THB ${order.total.toFixed(0)}`} />
       </View>
     </Screen>
   );
@@ -163,6 +180,25 @@ const styles = StyleSheet.create({
   },
   itemPrice: {
     color: colors.primaryStrong,
+    ...typography.caption,
+  },
+  shippingCard: {
+    marginTop: spacing["2xl"],
+    marginHorizontal: spacing["2xl"],
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    padding: spacing.lg,
+    gap: spacing.xs,
+  },
+  shippingText: {
+    color: colors.textPrimary,
+    ...typography.body,
+    fontWeight: "600",
+  },
+  shippingAddr: {
+    color: colors.textSecondary,
     ...typography.caption,
   },
   summaryCard: {

@@ -59,8 +59,11 @@ export type Order = {
   id: string;
   itemCount: number;
   total: number;
-  status: "Paid" | "Preparing" | "Delivered";
+  status: "Pending" | "Paid" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
   placedAt: string;
   gatewayFee: number;
   items: OrderItem[];
+  shippingName?: string;
+  shippingPhone?: string;
+  shippingAddr?: string;
 };

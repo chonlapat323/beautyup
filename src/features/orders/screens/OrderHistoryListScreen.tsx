@@ -9,17 +9,23 @@ import { useAppStore } from "@/store/useAppStore";
 import type { OrderStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
-const statusToneMap = {
-  Paid: {
-    backgroundColor: "#F5E7EA",
-  },
-  Preparing: {
-    backgroundColor: "#F5EEE5",
-  },
-  Delivered: {
-    backgroundColor: "#EAF2E8",
-  },
-} as const;
+const STATUS_LABELS: Record<string, string> = {
+  Pending: "รอดำเนินการ",
+  Paid: "ชำระแล้ว",
+  Processing: "กำลังเตรียม",
+  Shipped: "จัดส่งแล้ว",
+  Delivered: "ส่งสำเร็จ",
+  Cancelled: "ยกเลิก",
+};
+
+const statusBg: Record<string, string> = {
+  Pending: "#F5EEE5",
+  Paid: "#EAF2E8",
+  Processing: "#F5EEE5",
+  Shipped: "#E5EEF5",
+  Delivered: "#EAF2E8",
+  Cancelled: "#F5E7EA",
+};
 
 export function OrderHistoryListScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<OrderStackParamList>>();
@@ -27,7 +33,7 @@ export function OrderHistoryListScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="Order history" subtitle="Mock order updates for the presentation flow." />
+      <AppHeader title="Order history" subtitle="ประวัติคำสั่งซื้อของคุณ" />
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigation.getParent()?.navigate("Discover") },
@@ -44,11 +50,11 @@ export function OrderHistoryListScreen() {
           >
             <View style={styles.row}>
               <Text style={styles.orderId}>{order.id}</Text>
-              <View style={[styles.statusPill, statusToneMap[order.status]]}>
-                <Text style={styles.status}>{order.status}</Text>
+              <View style={[styles.statusPill, { backgroundColor: statusBg[order.status] ?? "#F1F5F3" }]}>
+                <Text style={styles.status}>{STATUS_LABELS[order.status] ?? order.status}</Text>
               </View>
             </View>
-            <Text style={styles.meta}>{order.itemCount} items • THB {order.total.toFixed(0)}</Text>
+            <Text style={styles.meta}>{order.itemCount} รายการ • THB {order.total.toFixed(0)}</Text>
             <Text style={styles.date}>{order.placedAt}</Text>
           </Pressable>
         ))}

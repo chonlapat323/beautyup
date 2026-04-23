@@ -304,6 +304,9 @@ type ApiOrder = {
   totalAmount: string;
   status: string;
   createdAt: string;
+  shippingName?: string;
+  shippingPhone?: string;
+  shippingAddr?: string;
   items: { productId: string; name: string; quantity: number; unitPrice: string }[];
 };
 
@@ -334,6 +337,15 @@ export async function mobileGetOrders(token: string): Promise<ApiOrder[]> {
   return res.json() as Promise<ApiOrder[]>;
 }
 
+const STATUS_MAP: Record<string, import("@/types/domain").Order["status"]> = {
+  PENDING: "Pending",
+  PAID: "Paid",
+  PROCESSING: "Processing",
+  SHIPPED: "Shipped",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
+};
+
 export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
   const items = o.items.map((i) => ({
     productId: i.productId,
@@ -346,7 +358,7 @@ export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
     id: o.orderNumber,
     itemCount: items.reduce((s, i) => s + i.quantity, 0),
     total,
-    status: "Paid" as const,
+    status: STATUS_MAP[o.status] ?? "Paid",
     placedAt: new Date(o.createdAt).toLocaleDateString("th-TH", {
       day: "2-digit",
       month: "short",
@@ -354,5 +366,8 @@ export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
     }),
     gatewayFee: 0,
     items,
+    shippingName: o.shippingName,
+    shippingPhone: o.shippingPhone,
+    shippingAddr: o.shippingAddr,
   };
 }
