@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
 import { fetchBanners, loadCatalogFromApi, mapApiOrder, mobileGetOrders } from "@/services/api";
-import { mockOrders } from "@/mock/catalog";
 import type { Banner, CartItem, Category, Order, Product } from "@/types/domain";
 
 const gatewayFee = 20;
@@ -37,7 +36,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   member: null,
   selectedShadeId: undefined,
   cart: [],
-  orders: mockOrders,
+  orders: [],
   categories: [],
   products: [],
   banners: [],
@@ -46,7 +45,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   catalogError: false,
 
   signIn: (token, member) => set({ isAuthenticated: true, token, member }),
-  signOut: () => set({ isAuthenticated: false, token: null, member: null, orders: mockOrders }),
+  signOut: () => set({ isAuthenticated: false, token: null, member: null, orders: [] }),
   setSelectedShade: (shadeId) => set({ selectedShadeId: shadeId }),
 
   loadCatalog: async () => {

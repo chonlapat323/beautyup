@@ -18,6 +18,7 @@ export function CheckoutScreen() {
   const cart = useAppStore((state) => state.cart);
   const token = useAppStore((state) => state.token);
   const clearCart = useAppStore((state) => state.clearCart);
+  const loadOrders = useAppStore((state) => state.loadOrders);
   const summary = getCartSummary(cart);
 
   const [addresses, setAddresses] = useState<MemberAddress[]>([]);
@@ -65,6 +66,7 @@ export function CheckoutScreen() {
       );
       clearCart();
       const mapped = mapApiOrder(order);
+      await loadOrders();
       navigation.replace("OrderSuccess", { orderId: mapped.id });
     } catch (e) {
       Alert.alert("สั่งซื้อไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
