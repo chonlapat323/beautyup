@@ -18,7 +18,7 @@ export function navigateToOrderHistory(navigation: NavigationLike) {
   const parent = navigation.getParent?.();
 
   if (parent) {
-    parent.navigate("Orders", { screen: "OrderHistory" });
+    parent.navigate("Profile", { screen: "OrderHistory" });
     return;
   }
 

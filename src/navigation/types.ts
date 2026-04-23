@@ -11,6 +11,8 @@ export type ProfileStackParamList = {
   Register: undefined;
   Addresses: undefined;
   AddressForm: { addressId?: string };
+  OrderHistory: undefined;
+  OrderDetail: { orderId: string };
 };
 
 export type ShopStackParamList = {
@@ -29,9 +31,16 @@ export type OrderStackParamList = {
   OrderDetail: { orderId: string };
 };
 
+export type ShopBrowseStackParamList = {
+  BrowseHome: undefined;
+  ShadeSelection: { categoryId: string };
+  ProductList: { categoryId: string; shadeId?: string; shadeName?: string };
+  ProductDetail: { productId: string };
+};
+
 export type TabParamList = {
   Discover: undefined;
+  Shop: NavigatorScreenParams<ShopBrowseStackParamList>;
   Cart: undefined;
-  Orders: NavigatorScreenParams<OrderStackParamList>;
   Profile: undefined;
 };

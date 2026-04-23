@@ -1,3 +1,17 @@
+import {
+  NotoSansThai_400Regular,
+  NotoSansThai_500Medium,
+  NotoSansThai_600SemiBold,
+  NotoSansThai_700Bold,
+  NotoSansThai_800ExtraBold,
+} from "@expo-google-fonts/noto-sans-thai";
+import {
+  JetBrainsMono_500Medium,
+  JetBrainsMono_600SemiBold,
+  JetBrainsMono_700Bold,
+} from "@expo-google-fonts/jetbrains-mono";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
@@ -6,6 +20,8 @@ import { StatusBar } from "expo-status-bar";
 import { RootNavigator } from "@/navigation/RootNavigator";
 import { useAppStore } from "@/store/useAppStore";
 import { colors } from "@/theme";
+
+SplashScreen.preventAutoHideAsync();
 
 const navigationTheme = {
   ...DefaultTheme,
@@ -23,9 +39,28 @@ export function AppRoot() {
   const loadCatalog = useAppStore((state) => state.loadCatalog);
   const catalogError = useAppStore((state) => state.catalogError);
 
+  const [fontsLoaded] = useFonts({
+    NotoSansThai_400Regular,
+    NotoSansThai_500Medium,
+    NotoSansThai_600SemiBold,
+    NotoSansThai_700Bold,
+    NotoSansThai_800ExtraBold,
+    JetBrainsMono_500Medium,
+    JetBrainsMono_600SemiBold,
+    JetBrainsMono_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      void SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
   useEffect(() => {
     void loadCatalog();
   }, [loadCatalog]);
+
+  if (!fontsLoaded) return null;
 
   return (
     <NavigationContainer theme={navigationTheme}>
@@ -54,5 +89,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "500",
     textAlign: "center",
+    fontFamily: "NotoSansThai_500Medium",
   },
 });

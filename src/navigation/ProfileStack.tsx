@@ -5,6 +5,8 @@ import { LoginScreen } from "@/features/auth/screens/LoginScreen";
 import { RegisterScreen } from "@/features/auth/screens/RegisterScreen";
 import { AddressesScreen } from "@/features/profile/screens/AddressesScreen";
 import { AddressFormScreen } from "@/features/profile/screens/AddressFormScreen";
+import { OrderHistoryScreen } from "@/features/orders/screens/OrderHistoryScreen";
+import { OrderDetailScreen } from "@/features/orders/screens/OrderDetailScreen";
 import type { ProfileStackParamList } from "@/navigation/types";
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -17,6 +19,8 @@ export function ProfileStack() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Addresses" component={AddressesScreen} />
       <Stack.Screen name="AddressForm" component={AddressFormScreen} />
+      <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+      <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
     </Stack.Navigator>
   );
 }

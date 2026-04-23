@@ -1,8 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,24 +15,43 @@ import {
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { HeroSlide } from "@/components/ui/HeroSlide";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
-import { SectionTitle } from "@/components/ui/SectionTitle";
 import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
-import { colors, radius, spacing, typography } from "@/theme";
+import { colors, fonts, radius, spacing } from "@/theme";
 
 export function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const { width } = useWindowDimensions();
-  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
 
   const categories = useAppStore((state) => state.categories);
   const products = useAppStore((state) => state.products);
   const banners = useAppStore((state) => state.banners);
   const isLoadingCatalog = useAppStore((state) => state.isLoadingCatalog);
+  const member = useAppStore((state) => state.member);
+  const addToCart = useAppStore((state) => state.addToCart);
+
   const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 8);
-  const slideWidth = width - spacing["2xl"] * 2;
+
+  // Banner carousel
+  const bannerPad = spacing.xl;
+  const bannerWidth = width - bannerPad * 2;
+  const bannerHeight = Math.round((bannerWidth * 10) / 16);
+  const [activeBanner, setActiveBanner] = useState(0);
+  const bannerScrollRef = useRef<ScrollView>(null);
+  const bannerSlides = banners.length > 0 ? banners : [];
+
+  useEffect(() => {
+    if (bannerSlides.length <= 1) return;
+    const id = setInterval(() => {
+      setActiveBanner((cur) => {
+        const next = (cur + 1) % bannerSlides.length;
+        bannerScrollRef.current?.scrollTo({ x: next * (bannerWidth + spacing.md), animated: true });
+        return next;
+      });
+    }, 4500);
+    return () => clearInterval(id);
+  }, [bannerSlides.length, bannerWidth]);
 
   function getBannerPress(linkType: string, linkId?: string) {
     if (linkType === "product" && linkId) {
@@ -47,34 +67,6 @@ export function HomeScreen() {
     return () => navigation.navigate("Categories");
   }
 
-  const categorySlides = categories.map((cat) => {
-    const firstProduct = products.find((p) => p.categoryId === cat.id && p.imageUrl);
-    return {
-      id: cat.id,
-      eyebrow: cat.eyebrow,
-      title: cat.title,
-      body: cat.subtitle,
-      buttonLabel: cat.requiresShadeSelection ? "เลือกเฉดสี" : "ดูสินค้า",
-      imageUrl: firstProduct?.imageUrl ?? cat.imageUrl,
-      onPress: cat.requiresShadeSelection
-        ? () => navigation.navigate("ShadeSelection", { categoryId: cat.id })
-        : () => navigation.navigate("ProductList", { categoryId: cat.id }),
-    };
-  });
-
-  const heroSlides =
-    banners.length > 0
-      ? banners.map((b) => ({
-          id: b.id,
-          eyebrow: b.eyebrow,
-          title: b.title,
-          body: b.body ?? "",
-          buttonLabel: b.buttonLabel,
-          imageUrl: b.imageUrl,
-          onPress: getBannerPress(b.linkType, b.linkId),
-        }))
-      : categorySlides;
-
   function openCategory(categoryId: string, requiresShadeSelection: boolean) {
     if (requiresShadeSelection) {
       navigation.navigate("ShadeSelection", { categoryId });
@@ -87,110 +79,107 @@ export function HomeScreen() {
     return (
       <Screen contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <BrandLockup />
+          <BrandLockup compact />
         </View>
         <HomeSkeleton />
       </Screen>
     );
   }
 
+  // Category grid — 2 columns
+  const catPad = spacing.xl;
+  const catGap = spacing.md;
+  const catCellSize = (width - catPad * 2 - catGap) / 2;
+
   return (
     <Screen contentContainerStyle={styles.content}>
+      {/* Header */}
       <View style={styles.header}>
-        <BrandLockup />
-
-        <Pressable
-          accessibilityLabel="Open profile"
-          onPress={() => navigation.getParent()?.navigate("Profile")}
-          style={styles.profileButton}
-        >
-          <MaterialIcons color={colors.primary} name="person-outline" size={18} />
-        </Pressable>
+        <BrandLockup compact />
+        {member && (
+          <View style={styles.pointsPill}>
+            <MaterialIcons name="auto-awesome" size={13} color="#fff" />
+            <Text style={styles.pointsText}>
+              {member.pointBalance.toLocaleString()} แต้ม
+            </Text>
+          </View>
+        )}
       </View>
 
-      <View style={styles.introBlock}>
-        <Text style={styles.introBody}>
-          Curated haircare and color essentials with a soft, premium retail experience.
-        </Text>
-      </View>
+      {/* Banner carousel */}
+      {bannerSlides.length > 0 && (
+        <View style={[styles.bannerSection, { paddingHorizontal: bannerPad }]}>
+          <View style={{ borderRadius: radius.lg, overflow: "hidden" }}>
+            <ScrollView
+              ref={bannerScrollRef}
+              horizontal
+              pagingEnabled={false}
+              decelerationRate="fast"
+              disableIntervalMomentum
+              snapToInterval={bannerWidth + spacing.md}
+              snapToAlignment="start"
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={(e) => {
+                const idx = Math.round(e.nativeEvent.contentOffset.x / (bannerWidth + spacing.md));
+                setActiveBanner(idx);
+              }}
+              contentContainerStyle={{ gap: spacing.md }}
+              style={{ borderRadius: radius.lg }}
+            >
+              {bannerSlides.map((b) => (
+                <Pressable key={b.id} onPress={getBannerPress(b.linkType, b.linkId)}>
+                  <ImageBackground
+                    source={{ uri: b.imageUrl }}
+                    style={[styles.bannerSlide, { width: bannerWidth, height: bannerHeight }]}
+                    imageStyle={{ borderRadius: radius.lg }}
+                    resizeMode="cover"
+                  >
+                    {/* Dark overlay */}
+                    <View style={[StyleSheet.absoluteFill, styles.bannerOverlay]} />
 
-      <View style={styles.heroSliderSection}>
-        <ScrollView
-          contentContainerStyle={styles.heroSliderContent}
-          decelerationRate="fast"
-          disableIntervalMomentum
-          horizontal
-          onMomentumScrollEnd={(event) => {
-            const nextIndex = Math.round(
-              event.nativeEvent.contentOffset.x / (slideWidth + spacing.md),
-            );
-            setActiveHeroIndex(nextIndex);
-          }}
-          showsHorizontalScrollIndicator={false}
-          snapToAlignment="start"
-          snapToInterval={slideWidth + spacing.md}
-        >
-          {heroSlides.map((slide) => (
-            <View key={slide.id} style={[styles.heroSlideWrap, { width: slideWidth }]}>
-              <HeroSlide
-                body={slide.body}
-                buttonLabel={slide.buttonLabel}
-                eyebrow={slide.eyebrow}
-                imageUrl={slide.imageUrl}
-                onPress={slide.onPress}
-                title={slide.title}
-              />
-            </View>
-          ))}
-        </ScrollView>
+                    {/* Dots — top right */}
+                    <View style={styles.bannerDots}>
+                      {bannerSlides.map((_, di) => (
+                        <View
+                          key={di}
+                          style={[
+                            styles.bannerDot,
+                            di === activeBanner ? styles.bannerDotActive : undefined,
+                          ]}
+                        />
+                      ))}
+                    </View>
 
-        <View style={styles.heroPagination}>
-          {heroSlides.map((slide, index) => (
-            <View
-              key={slide.id}
-              style={[
-                styles.heroDot,
-                index === activeHeroIndex ? styles.heroDotActive : undefined,
-              ]}
-            />
-          ))}
+                    {/* Copy */}
+                    <View style={styles.bannerCopy}>
+                      <Text style={styles.bannerEyebrow}>{b.eyebrow}</Text>
+                      <Text style={styles.bannerTitle}>{b.title}</Text>
+                      <View style={styles.bannerCta}>
+                        <Text style={styles.bannerCtaText}>{b.buttonLabel}</Text>
+                      </View>
+                    </View>
+                  </ImageBackground>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
         </View>
-      </View>
+      )}
 
-      <View style={styles.trustStrip}>
-        <Text style={styles.trustText}>Premium haircare selected for everyday confidence</Text>
-      </View>
-
-      <SectionTitle title="Curated Collections" />
-
-      <View style={styles.categoryList}>
-        {categories.map((category) => (
-          <Pressable
-            key={category.id}
-            onPress={() => openCategory(category.id, category.requiresShadeSelection)}
-            style={styles.categoryCard}
-          >
-            <View style={styles.categoryCopy}>
-              <Text style={styles.categoryTitle}>{category.title}</Text>
-              <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
-            </View>
-
-            <CommerceImage
-              style={styles.categoryImageFrame}
-              uri={category.imageUrl}
-            />
-          </Pressable>
-        ))}
-      </View>
-
-      {featuredProducts.length > 0 ? (
+      {/* สินค้าแนะนำ */}
+      {featuredProducts.length > 0 && (
         <>
-          <SectionTitle actionLabel="View All" title="The Selection" />
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>สินค้าแนะนำ</Text>
+            <Pressable onPress={() => navigation.navigate("Categories")}>
+              <Text style={styles.sectionAction}>ดูทั้งหมด →</Text>
+            </Pressable>
+          </View>
 
           <ScrollView
-            contentContainerStyle={styles.productRow}
             horizontal
             showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.productRow}
           >
             {featuredProducts.map((product) => (
               <Pressable
@@ -198,170 +187,282 @@ export function HomeScreen() {
                 onPress={() => navigation.navigate("ProductDetail", { productId: product.id })}
                 style={styles.productCard}
               >
-                <CommerceImage style={styles.productImage} uri={product.imageUrl} />
-                <Text style={styles.productMeta}>{product.subtitle}</Text>
-                <Text style={styles.productName}>{product.name}</Text>
-                <Text numberOfLines={1} style={styles.productPrice}>
-                  THB {product.price.toFixed(0)}
-                </Text>
+                {/* Image 3:4 */}
+                <View style={styles.productImageWrap}>
+                  <CommerceImage
+                    uri={product.imageUrl}
+                    style={styles.productImage}
+                  />
+                  {product.accentColor && product.accentColor !== "#2f7a4f" && (
+                    <View style={[styles.shadeDot, { backgroundColor: product.accentColor }]} />
+                  )}
+                </View>
+
+                <Text style={styles.productBrand}>BEAUTYUP PRO</Text>
+                <Text style={styles.productName} numberOfLines={1}>{product.name}</Text>
+                <View style={styles.productPriceRow}>
+                  <Text style={styles.productPrice}>THB {product.price.toFixed(0)}</Text>
+                  {product.originalPrice && (
+                    <Text style={styles.productOriginalPrice}>THB {product.originalPrice.toFixed(0)}</Text>
+                  )}
+                </View>
+                <Pressable
+                  onPress={(e) => { e.stopPropagation(); addToCart(product.id); }}
+                  style={styles.addToCartBtn}
+                >
+                  <Text style={styles.addToCartText}>+ เพิ่มลงตะกร้า</Text>
+                </Pressable>
               </Pressable>
             ))}
           </ScrollView>
         </>
-      ) : null}
+      )}
+
+      {/* หมวดหมู่ */}
+      {categories.length > 0 && (
+        <>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>หมวดหมู่</Text>
+          </View>
+
+          <View style={styles.categoryGrid}>
+            {categories.map((cat) => (
+              <Pressable
+                key={cat.id}
+                onPress={() => openCategory(cat.id, cat.requiresShadeSelection)}
+                style={[styles.categoryCell, { width: catCellSize, height: catCellSize }]}
+              >
+                <ImageBackground
+                  source={{ uri: cat.imageUrl }}
+                  style={StyleSheet.absoluteFill}
+                  imageStyle={{ borderRadius: radius.lg }}
+                  resizeMode="cover"
+                >
+                  <View style={[StyleSheet.absoluteFill, styles.catOverlay, { borderRadius: radius.lg }]} />
+                  <View style={styles.catCopy}>
+                    <Text style={styles.catEn}>{cat.eyebrow || cat.slug?.toUpperCase()}</Text>
+                    <Text style={styles.catTh}>{cat.title}</Text>
+                  </View>
+                </ImageBackground>
+              </Pressable>
+            ))}
+          </View>
+        </>
+      )}
     </Screen>
   );
 }
 
-const cardShadow = {
-  shadowColor: "#8A6870",
-  shadowOpacity: 0.08,
-  shadowRadius: 18,
-  shadowOffset: { width: 0, height: 10 },
-  elevation: 4,
-} as const;
-
 const styles = StyleSheet.create({
   content: {
-    paddingBottom: spacing["3xl"],
+    paddingBottom: 32,
   },
   header: {
-    paddingHorizontal: spacing["2xl"],
+    paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-  profileButton: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
-    backgroundColor: "rgba(255,255,255,0.75)",
+  pointsPill: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    gap: 5,
+    backgroundColor: colors.primary,
+    borderRadius: radius.pill,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  introBlock: {
-    paddingHorizontal: spacing["2xl"],
-    paddingTop: spacing.xl,
-    paddingBottom: spacing["2xl"],
-    gap: spacing.sm,
+  pointsText: {
+    color: "#fff",
+    fontSize: 13,
+    fontFamily: fonts.semiBold,
   },
-  introBody: {
-    color: colors.textSecondary,
-    maxWidth: 270,
-    ...typography.body,
-  },
-  heroSliderSection: {
+  bannerSection: {
     marginBottom: spacing.xl,
   },
-  heroSliderContent: {
-    paddingHorizontal: spacing["2xl"],
-    gap: spacing.md,
-  },
-  heroSlideWrap: {
-    width: "100%",
-  },
-  heroPagination: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: spacing.xs,
-    marginTop: spacing.md,
-  },
-  heroDot: {
-    width: 8,
-    height: 8,
-    borderRadius: radius.pill,
-    backgroundColor: colors.borderSoft,
-  },
-  heroDotActive: {
-    width: 24,
-    backgroundColor: colors.primary,
-  },
-  trustStrip: {
-    marginHorizontal: spacing["2xl"],
-    marginBottom: spacing["3xl"],
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
+  bannerSlide: {
     borderRadius: radius.lg,
-    backgroundColor: colors.surfaceMuted,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
-  },
-  trustText: {
-    color: colors.primaryStrong,
-    textAlign: "center",
-    ...typography.caption,
-  },
-  categoryList: {
-    paddingHorizontal: spacing["2xl"],
-    gap: spacing.md,
-    marginTop: spacing.lg,
-    marginBottom: spacing["3xl"],
-  },
-  categoryCard: {
-    minHeight: 118,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
     overflow: "hidden",
+    justifyContent: "flex-end",
+  },
+  bannerOverlay: {
+    backgroundColor: "rgba(0,0,0,0.38)",
+  },
+  bannerDots: {
+    position: "absolute",
+    top: 12,
+    right: 14,
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "stretch",
-    paddingLeft: spacing.xl,
-    ...cardShadow,
+    gap: 4,
+    alignItems: "center",
   },
-  categoryCopy: {
-    flex: 1,
-    justifyContent: "center",
-    gap: spacing.sm,
-    paddingRight: spacing.lg,
+  bannerDot: {
+    width: 4,
+    height: 4,
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(255,255,255,0.5)",
   },
-  categoryTitle: {
-    color: colors.textPrimary,
-    fontSize: 26,
-    lineHeight: 30,
-    fontWeight: "500",
+  bannerDotActive: {
+    width: 16,
+    backgroundColor: "#fff",
   },
-  categorySubtitle: {
-    color: colors.primary,
+  bannerCopy: {
+    padding: 18,
+    gap: 6,
+  },
+  bannerEyebrow: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 11,
+    fontFamily: fonts.semiBold,
+    letterSpacing: 1.2,
     textTransform: "uppercase",
-    ...typography.eyebrow,
   },
-  categoryImageFrame: {
-    width: 132,
-    alignSelf: "stretch",
-    backgroundColor: colors.surfaceMuted,
+  bannerTitle: {
+    color: "#fff",
+    fontSize: 20,
+    fontFamily: fonts.bold,
+    lineHeight: 26,
+  },
+  bannerCta: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    backgroundColor: "#fff",
+    borderRadius: radius.pill,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  bannerCtaText: {
+    color: colors.primaryDark,
+    fontSize: 13,
+    fontFamily: fonts.bold,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.xl,
+    marginBottom: spacing.md,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontFamily: fonts.bold,
+    color: colors.textPrimary,
+    letterSpacing: -0.2,
+  },
+  sectionAction: {
+    fontSize: 13,
+    fontFamily: fonts.semiBold,
+    color: colors.primary,
   },
   productRow: {
-    flexDirection: "row",
+    paddingHorizontal: spacing.xl,
     gap: spacing.lg,
-    paddingHorizontal: spacing["2xl"],
-    marginTop: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   productCard: {
-    width: 176,
-    gap: spacing.sm,
+    width: 148,
+    gap: 6,
+  },
+  productImageWrap: {
+    width: 148,
+    height: 197, // 3:4
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    backgroundColor: colors.surfaceMuted,
+    position: "relative",
   },
   productImage: {
     width: "100%",
-    height: 176,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    height: "100%",
   },
-  productMeta: {
+  shadeDot: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+  productBrand: {
+    fontSize: 9,
+    fontFamily: fonts.monoBold,
     color: colors.textMuted,
-    ...typography.caption,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
   },
   productName: {
+    fontSize: 12,
+    fontFamily: fonts.medium,
     color: colors.textPrimary,
-    minHeight: 44,
-    ...typography.body,
+    lineHeight: 16,
+  },
+  productPriceRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 5,
   },
   productPrice: {
-    color: colors.primaryStrong,
-    ...typography.title,
+    fontSize: 13,
+    fontFamily: fonts.bold,
+    color: colors.primary,
+  },
+  productOriginalPrice: {
+    fontSize: 11,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    textDecorationLine: "line-through",
+  },
+  addToCartBtn: {
+    height: 30,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+  },
+  addToCartText: {
+    fontSize: 11,
+    fontFamily: fonts.semiBold,
+    color: colors.primary,
+  },
+  categoryGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: spacing.xl,
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  categoryCell: {
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    backgroundColor: colors.surfaceMuted,
+    justifyContent: "flex-end",
+  },
+  catOverlay: {
+    backgroundColor: "rgba(0,0,0,0.35)",
+  },
+  catCopy: {
+    position: "absolute",
+    bottom: 12,
+    left: 12,
+    right: 8,
+    gap: 2,
+  },
+  catEn: {
+    fontSize: 9,
+    fontFamily: fonts.monoSemi,
+    color: "rgba(255,255,255,0.75)",
+    letterSpacing: 1.0,
+    textTransform: "uppercase",
+  },
+  catTh: {
+    fontSize: 14,
+    fontFamily: fonts.bold,
+    color: "#fff",
   },
 });

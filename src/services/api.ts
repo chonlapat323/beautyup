@@ -56,15 +56,18 @@ function mapCategory(c: ApiCategory): Category {
 }
 
 function mapProduct(p: ApiProduct): Product {
+  const basePrice = parseFloat(p.price) || 0;
+  const specialPrice = p.specialPrice ? parseFloat(p.specialPrice) : null;
   return {
     id: p.id,
     categoryId: p.categoryId,
     shadeId: p.shadeId ?? undefined,
     name: p.name,
     subtitle: p.description?.split(".")[0]?.trim() ?? "",
-    price: parseFloat(p.price) || 0,
+    price: specialPrice ?? basePrice,
+    originalPrice: specialPrice ? basePrice : undefined,
     description: p.description ?? "",
-    accentColor: "#C9826F",
+    accentColor: "#2f7a4f",
     imageUrl: p.images?.[0]?.url,
     isFeatured: p.isFeatured ?? false,
   };

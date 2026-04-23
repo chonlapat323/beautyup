@@ -1,13 +1,29 @@
+// Font family names — must match keys passed to useFonts() in AppRoot
+export const fonts = {
+  regular:   "NotoSansThai_400Regular",
+  medium:    "NotoSansThai_500Medium",
+  semiBold:  "NotoSansThai_600SemiBold",
+  bold:      "NotoSansThai_700Bold",
+  extraBold: "NotoSansThai_800ExtraBold",
+  mono:      "JetBrainsMono_500Medium",
+  monoSemi:  "JetBrainsMono_600SemiBold",
+  monoBold:  "JetBrainsMono_700Bold",
+} as const;
+
 export const colors = {
-  background: "#FFF8F7",
-  surface: "#FFFFFF",
-  surfaceMuted: "#FAF2F1",
-  primary: "#7F535C",
-  primaryStrong: "#714750",
-  textPrimary: "#2F2628",
-  textSecondary: "#6B6264",
-  textMuted: "#8D8587",
-  borderSoft: "#E9E0E0",
+  background: "#fafcfa",
+  surface: "#ffffff",
+  surfaceMuted: "#eef8f1",
+  primary: "#2f7a4f",
+  primaryDark: "#1f5236",
+  primaryStrong: "#1f5236",
+  primarySoft: "#eef8f1",
+  sage: "#c8e0d1",
+  textPrimary: "#1a1a1a",
+  textSecondary: "#6b7280",
+  textMuted: "#9ca3af",
+  borderSoft: "rgba(15, 40, 25, 0.08)",
+  borderStrong: "rgba(15, 40, 25, 0.14)",
 } as const;
 
 export const spacing = {
