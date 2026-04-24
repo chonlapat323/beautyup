@@ -179,15 +179,6 @@ export function HomeScreen() {
                   />
                   <View style={[StyleSheet.absoluteFill, styles.bannerOverlay]} />
 
-                  {/* Floating chip */}
-                  {b.eyebrow ? (
-                    <View style={styles.bannerChip}>
-                      <Text style={styles.bannerChipText}>
-                        {b.eyebrow.split("·")[0].trim()}
-                      </Text>
-                    </View>
-                  ) : null}
-
                   {/* Copy */}
                   <View style={styles.bannerCopy}>
                     <Text style={styles.bannerTitle}>{b.title}</Text>
@@ -359,18 +350,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: fonts.semiBold,
     letterSpacing: 0.8,
-  },
-  bannerChip: {
-    position: "absolute",
-    top: 14, left: 14,
-    backgroundColor: "rgba(255,255,255,0.22)",
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.4)",
-    borderRadius: radius.pill,
-    paddingHorizontal: 10, paddingVertical: 4,
-  },
-  bannerChipText: {
-    color: "#fff", fontSize: 10,
-    fontFamily: fonts.semiBold, letterSpacing: 0.8, textTransform: "uppercase",
   },
   bannerCopy: { padding: 20, gap: 6 },
   bannerTitle: {
