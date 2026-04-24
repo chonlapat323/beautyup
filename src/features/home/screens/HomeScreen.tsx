@@ -199,13 +199,16 @@ export function HomeScreen() {
           </ScrollView>
 
           {/* Badge — top right of active slide */}
-          {bannerSlides[activeBanner]?.tag ? (
+          {bannerSlides[activeBanner]?.tag === "NEW" && (
             <View style={styles.bannerBadge} pointerEvents="none">
-              <Text style={styles.bannerBadgeText}>
-                {bannerSlides[activeBanner].tag!.toUpperCase()}
-              </Text>
+              <Image source={badgeNew} style={styles.bannerBadgeImg} resizeMode="contain" />
             </View>
-          ) : null}
+          )}
+          {bannerSlides[activeBanner]?.tag === "BEST SELLER" && (
+            <View style={styles.bannerBadge} pointerEvents="none">
+              <Image source={badgeBest} style={styles.bannerBadgeImg} resizeMode="contain" />
+            </View>
+          )}
         </View>
       )}
 
@@ -348,18 +351,12 @@ const styles = StyleSheet.create({
   },
   bannerBadge: {
     position: "absolute",
-    top: 14,
-    right: 14,
-    backgroundColor: colors.primary,
-    borderRadius: radius.pill,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    top: 12,
+    right: 12,
   },
-  bannerBadgeText: {
-    color: "#fff",
-    fontSize: 10,
-    fontFamily: fonts.semiBold,
-    letterSpacing: 0.8,
+  bannerBadgeImg: {
+    width: 72,
+    height: 72,
   },
   bannerCopy: { padding: 20, gap: 6 },
   bannerTitle: {
