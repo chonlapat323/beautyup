@@ -7,6 +7,7 @@ import { HomeScreen } from "@/features/home/screens/HomeScreen";
 import { CategoriesScreen } from "@/features/shop/screens/CategoriesScreen";
 import { ProductDetailScreen } from "@/features/shop/screens/ProductDetailScreen";
 import { ProductListScreen } from "@/features/shop/screens/ProductListScreen";
+import { SearchScreen } from "@/features/shop/screens/SearchScreen";
 import { ShadeSelectionScreen } from "@/features/shop/screens/ShadeSelectionScreen";
 import type { ShopStackParamList } from "@/navigation/types";
 
@@ -16,6 +17,7 @@ export function ShopStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Search" component={SearchScreen} />
       <Stack.Screen name="Categories" component={CategoriesScreen} />
       <Stack.Screen name="ShadeSelection" component={ShadeSelectionScreen} />
       <Stack.Screen name="ProductList" component={ProductListScreen} />

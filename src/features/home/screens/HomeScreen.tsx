@@ -162,7 +162,7 @@ export function HomeScreen() {
       </View>
 
       {/* ── Search bar ────────────────────────────────────────────────────── */}
-      <Pressable style={styles.searchBar} onPress={() => navigation.navigate("Categories")}>
+      <Pressable style={styles.searchBar} onPress={() => navigation.navigate("Search")}>
         <MaterialIcons name="search" size={18} color={colors.textMuted} />
         <Text style={styles.searchPlaceholder}>ค้นหาสินค้า</Text>
       </Pressable>

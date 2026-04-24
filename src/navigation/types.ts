@@ -17,6 +17,7 @@ export type ProfileStackParamList = {
 
 export type ShopStackParamList = {
   Home: undefined;
+  Search: undefined;
   Categories: undefined;
   ShadeSelection: { categoryId: string };
   ProductList: { categoryId: string; shadeId?: string; shadeName?: string };
