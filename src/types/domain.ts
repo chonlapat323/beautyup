@@ -36,6 +36,7 @@ export type Banner = {
   eyebrow: string;
   title: string;
   body?: string;
+  tag?: string;
   buttonLabel: string;
   imageUrl?: string;
   linkType: "none" | "product" | "category";

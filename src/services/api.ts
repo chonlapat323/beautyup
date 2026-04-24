@@ -118,6 +118,7 @@ type ApiBanner = {
   eyebrow: string;
   title: string;
   body?: string | null;
+  tag?: string | null;
   buttonLabel: string;
   imageUrl?: string | null;
   linkType: string;
@@ -137,6 +138,7 @@ export async function fetchBanners(): Promise<Banner[]> {
     eyebrow: b.eyebrow,
     title: b.title,
     body: b.body ?? undefined,
+    tag: b.tag ?? undefined,
     buttonLabel: b.buttonLabel,
     imageUrl: b.imageUrl ?? undefined,
     linkType: (b.linkType as Banner["linkType"]) ?? "none",
