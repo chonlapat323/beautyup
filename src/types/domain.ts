@@ -28,6 +28,7 @@ export type Product = {
   description: string;
   accentColor: string;
   imageUrl?: string;
+  images?: string[];
   isFeatured?: boolean;
   tag?: string;
 };

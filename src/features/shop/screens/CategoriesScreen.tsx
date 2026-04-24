@@ -53,7 +53,9 @@ export function CategoriesScreen() {
               <Text style={styles.title}>{category.title}</Text>
               <Text style={styles.subtitle}>{category.subtitle}</Text>
             </View>
-            <CommerceImage style={styles.preview} uri={category.imageUrl} />
+            <View style={styles.previewWrapper}>
+              <CommerceImage style={styles.preview} uri={category.imageUrl} />
+            </View>
           </Pressable>
         ))}
       </View>
@@ -111,9 +113,17 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     ...typography.eyebrow,
   },
-  preview: {
+  previewWrapper: {
     width: 132,
     alignSelf: "stretch",
+    overflow: "hidden",
+  },
+  preview: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: colors.surfaceMuted,
   },
 });

@@ -15,6 +15,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 
 import { RootNavigator } from "@/navigation/RootNavigator";
@@ -63,6 +64,7 @@ export function AppRoot() {
   if (!fontsLoaded) return null;
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <NavigationContainer theme={navigationTheme}>
       <StatusBar style="dark" />
       {catalogError ? (
@@ -74,6 +76,7 @@ export function AppRoot() {
       ) : null}
       <RootNavigator />
     </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
 

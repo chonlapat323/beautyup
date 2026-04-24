@@ -59,6 +59,7 @@ function mapCategory(c: ApiCategory): Category {
 function mapProduct(p: ApiProduct): Product {
   const basePrice = parseFloat(p.price) || 0;
   const specialPrice = p.specialPrice ? parseFloat(p.specialPrice) : null;
+  const images = (p.images ?? []).map((img) => img.url);
   return {
     id: p.id,
     categoryId: p.categoryId,
@@ -69,7 +70,8 @@ function mapProduct(p: ApiProduct): Product {
     originalPrice: specialPrice ? basePrice : undefined,
     description: p.description ?? "",
     accentColor: "#2f7a4f",
-    imageUrl: p.images?.[0]?.url,
+    imageUrl: images[0],
+    images,
     isFeatured: p.isFeatured ?? false,
     tag: p.tag ?? undefined,
   };

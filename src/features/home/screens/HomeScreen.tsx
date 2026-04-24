@@ -69,8 +69,14 @@ export function HomeScreen() {
   const cart       = useAppStore((s) => s.cart);
   const addToCart  = useAppStore((s) => s.addToCart);
 
+  const loadCatalog = useAppStore((s) => s.loadCatalog);
+
   const cartCount        = cart.reduce((sum, i) => sum + i.quantity, 0);
-  const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 8);
+  const featuredProducts = (
+    products.filter((p) => p.isFeatured).length > 0
+      ? products.filter((p) => p.isFeatured)
+      : products
+  ).slice(0, 8);
 
   // ── Banner carousel ──────────────────────────────────────────────────────────
   const bannerHeight    = Math.round(width * 0.52);
@@ -138,7 +144,7 @@ export function HomeScreen() {
   const initials = member?.fullName?.trim().charAt(0).toUpperCase() ?? "?";
 
   return (
-    <Screen contentContainerStyle={styles.content}>
+    <Screen contentContainerStyle={styles.content} onRefresh={loadCatalog}>
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <View style={styles.header}>
@@ -186,7 +192,7 @@ export function HomeScreen() {
                   {cat.imageUrl ? (
                     <Image source={{ uri: cat.imageUrl }} style={styles.catCircleImg} resizeMode="cover" />
                   ) : (
-                    <View style={[styles.catCircleImg, { backgroundColor: colors.primarySoft }]} />
+                    <View style={styles.catCircleImg} />
                   )}
                 </View>
                 <Text style={styles.catLabel} numberOfLines={1}>{cat.title}</Text>
@@ -398,8 +404,9 @@ const styles = StyleSheet.create({
     borderColor: colors.sage,
   },
   catCircleImg: {
-    width: "100%",
-    height: "100%",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
   },
   catLabel: {
     fontSize: 11,
