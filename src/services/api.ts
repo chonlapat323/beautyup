@@ -24,6 +24,7 @@ type ApiProduct = {
   stock: number;
   status: "DRAFT" | "ACTIVE" | "INACTIVE";
   isFeatured: boolean;
+  tag?: string | null;
   categoryId: string;
   shadeId?: string | null;
   images?: { id: string; url: string; sortOrder: number }[];
@@ -70,6 +71,7 @@ function mapProduct(p: ApiProduct): Product {
     accentColor: "#2f7a4f",
     imageUrl: p.images?.[0]?.url,
     isFeatured: p.isFeatured ?? false,
+    tag: p.tag ?? undefined,
   };
 }
 

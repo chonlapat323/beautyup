@@ -4,6 +4,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
 import {
   Animated,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,6 +12,9 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+
+const badgeNew     = require("@/slide/new.png")  as ReturnType<typeof require>;
+const badgeBest    = require("@/slide/best.png") as ReturnType<typeof require>;
 
 import { Screen } from "@/components/layout/Screen";
 import { CommerceImage } from "@/components/ui/CommerceImage";
@@ -225,6 +229,12 @@ export function HomeScreen() {
                   {product.accentColor && product.accentColor !== "#2f7a4f" && (
                     <View style={[styles.shadeDot, { backgroundColor: product.accentColor }]} />
                   )}
+                  {product.tag === "NEW" && (
+                    <Image source={badgeNew} style={styles.productBadge} resizeMode="contain" />
+                  )}
+                  {product.tag === "BEST SELLER" && (
+                    <Image source={badgeBest} style={styles.productBadge} resizeMode="contain" />
+                  )}
                 </View>
                 <Text style={styles.productName} numberOfLines={1}>{product.name}</Text>
                 <View style={styles.productPriceRow}>
@@ -389,6 +399,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceMuted,
   },
   productImage: { width: "100%", height: "100%" },
+  productBadge: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    width: 54,
+    height: 54,
+  },
   shadeDot: {
     position: "absolute", top: 8, left: 8,
     width: 16, height: 16, borderRadius: 8,

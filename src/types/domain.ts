@@ -29,6 +29,7 @@ export type Product = {
   accentColor: string;
   imageUrl?: string;
   isFeatured?: boolean;
+  tag?: string;
 };
 
 export type Banner = {
