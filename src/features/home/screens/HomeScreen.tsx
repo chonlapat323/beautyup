@@ -13,15 +13,15 @@ import {
   View,
 } from "react-native";
 
-const badgeNew     = require("@/slide/new.png")  as ReturnType<typeof require>;
-const badgeBest    = require("@/slide/best.png") as ReturnType<typeof require>;
-
 import { Screen } from "@/components/layout/Screen";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
 import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import { colors, fonts, radius, spacing } from "@/theme";
+
+const badgeNew  = require("../../../slide/new.png")  as ReturnType<typeof require>;
+const badgeBest = require("../../../slide/best.png") as ReturnType<typeof require>;
 
 // ─── Section header helper ─────────────────────────────────────────────────────
 function SectionHead({
