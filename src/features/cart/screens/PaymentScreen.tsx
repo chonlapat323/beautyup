@@ -1,6 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
@@ -36,7 +37,7 @@ export function PaymentScreen() {
   const [cvv, setCvv] = useState("123");
 
   // QR state
-  const [qrData, setQrData] = useState<{ chargeId: string; qrCodeUrl: string; expiresAt: string } | null>(null);
+  const [qrData, setQrData] = useState<{ chargeId: string; barcode: string; expiresAt: string } | null>(null);
   const [isCreatingQR, setIsCreatingQR] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -239,7 +240,7 @@ export function PaymentScreen() {
           {qrData ? (
             <>
               <Text style={styles.sectionTitle}>สแกน QR เพื่อชำระเงิน</Text>
-              <Image source={{ uri: qrData.qrCodeUrl }} style={styles.qrImage} resizeMode="contain" />
+              <QRCode value={qrData.barcode} size={240} />
               <View style={styles.pollingRow}>
                 <ActivityIndicator size="small" color={colors.primary} />
                 <Text style={styles.pollingText}>รอการยืนยันชำระเงิน...</Text>
@@ -353,7 +354,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   row: { flexDirection: "row", gap: spacing.md },
-  qrImage: { width: 240, height: 240 },
   qrHint: { color: colors.textSecondary, ...typography.body, textAlign: "center" },
   qrCreateBtn: {
     borderRadius: radius.pill,
