@@ -73,6 +73,7 @@ export function PaymentScreen() {
       clearCart();
       await loadOrders();
       const mapped = mapApiOrder(order);
+      setIsLoading(false);
       navigation.replace("OrderSuccess", { orderId: mapped.id });
     } catch (e) {
       setModal({ title: "ชำระเงินไม่สำเร็จ", message: e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง" });
