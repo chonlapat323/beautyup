@@ -1,9 +1,7 @@
 import { create } from "zustand";
 
-import { fetchBanners, loadCatalogFromApi, mapApiOrder, mobileGetOrders } from "@/services/api";
+import { fetchBanners, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders } from "@/services/api";
 import type { Banner, CartItem, Category, Order, Product } from "@/types/domain";
-
-const gatewayFee = 20;
 
 type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; referralCode: string | null };
 
@@ -17,6 +15,7 @@ type AppStore = {
   categories: Category[];
   products: Product[];
   banners: Banner[];
+  gatewayFee: number;
   isLoadingCatalog: boolean;
   isLoadingOrders: boolean;
   catalogError: boolean;
@@ -40,6 +39,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   categories: [],
   products: [],
   banners: [],
+  gatewayFee: 20,
   isLoadingCatalog: false,
   isLoadingOrders: false,
   catalogError: false,
@@ -51,11 +51,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
   loadCatalog: async () => {
     set({ isLoadingCatalog: true, catalogError: false });
     try {
-      const [{ categories, products }, banners] = await Promise.all([
+      const [{ categories, products }, banners, config] = await Promise.all([
         loadCatalogFromApi(),
         fetchBanners().catch(() => [] as Banner[]),
+        fetchMobileConfig().catch(() => ({ gatewayFee: 20 })),
       ]);
-      set({ categories, products, banners, catalogError: false });
+      set({ categories, products, banners, gatewayFee: config.gatewayFee, catalogError: false });
     } catch {
       set({ catalogError: true });
     } finally {
@@ -104,7 +105,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 }));
 
 export function getCartSummary(cart: CartItem[]) {
-  const { products } = useAppStore.getState();
+  const { products, gatewayFee } = useAppStore.getState();
   const subtotal = cart.reduce((sum, item) => {
     const product = products.find((p) => p.id === item.productId);
     return sum + (product?.price ?? 0) * item.quantity;
