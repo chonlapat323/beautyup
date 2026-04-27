@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { CartScreen } from "@/features/cart/screens/CartScreen";
 import { CheckoutScreen } from "@/features/cart/screens/CheckoutScreen";
 import { OrderSuccessScreen } from "@/features/cart/screens/OrderSuccessScreen";
+import { PaymentScreen } from "@/features/cart/screens/PaymentScreen";
 import { HomeScreen } from "@/features/home/screens/HomeScreen";
 import { CategoriesScreen } from "@/features/shop/screens/CategoriesScreen";
 import { ProductDetailScreen } from "@/features/shop/screens/ProductDetailScreen";
@@ -24,6 +25,7 @@ export function ShopStack() {
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
       <Stack.Screen name="Cart" component={CartScreen} />
       <Stack.Screen name="Checkout" component={CheckoutScreen} />
+      <Stack.Screen name="Payment" component={PaymentScreen} />
       <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
     </Stack.Navigator>
   );

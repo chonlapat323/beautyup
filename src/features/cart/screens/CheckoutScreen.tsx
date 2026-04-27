@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
@@ -8,7 +8,7 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileCheckout, mobileGetAddresses, mapApiOrder } from "@/services/api";
+import { mobileGetAddresses } from "@/services/api";
 import type { MemberAddress } from "@/services/api";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -17,16 +17,12 @@ export function CheckoutScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const cart = useAppStore((state) => state.cart);
   const token = useAppStore((state) => state.token);
-  const clearCart = useAppStore((state) => state.clearCart);
-  const loadOrders = useAppStore((state) => state.loadOrders);
   const summary = getCartSummary(cart);
 
   const [addresses, setAddresses] = useState<MemberAddress[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
   const [addressError, setAddressError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
   useEffect(() => {
     if (!token) {
       setIsLoadingAddresses(false);
@@ -45,39 +41,22 @@ export function CheckoutScreen() {
 
   const selected = addresses.find((a) => a.id === selectedId);
 
-  async function handleConfirm() {
-    if (!selected) {
-      Alert.alert("กรุณาเลือกที่อยู่จัดส่ง");
-      return;
-    }
-    if (!token) return;
-    setIsLoading(true);
-    try {
-      const addrLines = [
-        selected.addressLine1,
-        selected.addressLine2,
-        [selected.district, selected.province].filter(Boolean).join(" "),
-        selected.postalCode,
-      ]
-        .filter(Boolean)
-        .join(", ");
+  function handleConfirm() {
+    if (!selected) return;
+    const addrLines = [
+      selected.addressLine1,
+      selected.addressLine2,
+      [selected.district, selected.province].filter(Boolean).join(" "),
+      selected.postalCode,
+    ]
+      .filter(Boolean)
+      .join(", ");
 
-      const order = await mobileCheckout(
-        token,
-        cart.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-        selected.recipient,
-        selected.phone,
-        addrLines,
-      );
-      clearCart();
-      const mapped = mapApiOrder(order);
-      await loadOrders();
-      navigation.replace("OrderSuccess", { orderId: mapped.id });
-    } catch (e) {
-      Alert.alert("สั่งซื้อไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
-    } finally {
-      setIsLoading(false);
-    }
+    navigation.navigate("Payment", {
+      shippingName: selected.recipient,
+      shippingPhone: selected.phone,
+      shippingAddr: addrLines,
+    });
   }
 
   return (
@@ -157,11 +136,11 @@ export function CheckoutScreen() {
       </View>
 
       <Pressable
-        disabled={cart.length === 0 || isLoading || !selected}
-        onPress={() => void handleConfirm()}
-        style={[styles.button, (cart.length === 0 || isLoading || !selected) && styles.buttonDisabled]}
+        disabled={cart.length === 0 || !selected}
+        onPress={handleConfirm}
+        style={[styles.button, (cart.length === 0 || !selected) && styles.buttonDisabled]}
       >
-        <Text style={styles.buttonText}>{isLoading ? "กำลังดำเนินการ..." : "ยืนยันการสั่งซื้อ"}</Text>
+        <Text style={styles.buttonText}>ไปชำระเงิน</Text>
       </Pressable>
     </Screen>
   );
