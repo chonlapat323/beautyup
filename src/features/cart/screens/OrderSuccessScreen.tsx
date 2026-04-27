@@ -35,7 +35,7 @@ export function OrderSuccessScreen() {
         </Pressable>
         <Pressable
           onPress={() =>
-            navigation.getParent()?.navigate("Orders", {
+            (navigation.getParent() as any)?.navigate("Profile", {
               screen: "OrderDetail",
               params: { orderId: route.params.orderId },
             })

@@ -86,26 +86,28 @@ export function ShadeSelectionScreen() {
       ) : (
         <>
           {/* Family group tabs */}
-          <ScrollView
-            contentContainerStyle={styles.groupRow}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {groups.map((group) => {
-              const active = group.groupName === activeGroup;
-              return (
-                <Pressable
-                  key={group.groupName}
-                  onPress={() => setActiveGroup(group.groupName)}
-                  style={[styles.groupChip, active && styles.groupChipActive]}
-                >
-                  <Text style={[styles.groupChipText, active && styles.groupChipTextActive]}>
-                    {group.groupName}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
+          <View style={styles.groupTabsWrap}>
+            <ScrollView
+              contentContainerStyle={styles.groupRow}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
+              {groups.map((group) => {
+                const active = group.groupName === activeGroup;
+                return (
+                  <Pressable
+                    key={group.groupName}
+                    onPress={() => setActiveGroup(group.groupName)}
+                    style={[styles.groupChip, active && styles.groupChipActive]}
+                  >
+                    <Text style={[styles.groupChipText, active && styles.groupChipTextActive]}>
+                      {group.groupName}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
 
           <View style={styles.familyHeader}>
             <Text style={styles.familyTitle}>{activeGroup}</Text>
@@ -156,19 +158,22 @@ const styles = StyleSheet.create({
   content: { paddingBottom: spacing["3xl"] },
   center: { alignItems: "center", paddingTop: spacing["3xl"] },
   muted: { color: colors.textMuted, fontSize: 14 },
+  groupTabsWrap: {
+    height: 44,
+    marginBottom: spacing.lg,
+  },
   groupRow: {
     gap: spacing.md,
     paddingHorizontal: spacing["2xl"],
-    paddingBottom: spacing.xl,
   },
   groupChip: {
-    minWidth: 70,
+    alignSelf: "flex-start",
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
   },
   groupChipActive: {
     borderColor: colors.primary,
