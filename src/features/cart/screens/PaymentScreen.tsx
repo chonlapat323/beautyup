@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import QRCode from "react-native-qrcode-svg";
+import { SvgXml } from "react-native-svg";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
@@ -37,13 +37,20 @@ export function PaymentScreen() {
   const [cvv, setCvv] = useState("123");
 
   // QR state
-  const [qrData, setQrData] = useState<{ chargeId: string; barcode: string; expiresAt: string } | null>(null);
+  const [qrData, setQrData] = useState<{ chargeId: string; svgContent: string; expiresAt: string } | null>(null);
   const [isCreatingQR, setIsCreatingQR] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState<{ title: string; message?: string } | null>(null);
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Auto-create QR when switching to QR tab
+  useEffect(() => {
+    if (method !== "qr" || qrData || isCreatingQR) return;
+    void handleCreateQR();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [method]);
 
   // Polling when QR is shown
   useEffect(() => {
@@ -237,11 +244,17 @@ export function PaymentScreen() {
         </View>
       ) : (
         <View style={styles.qrCard}>
-          {qrData ? (
+          {isCreatingQR ? (
+            <>
+              <Text style={styles.sectionTitle}>PromptPay QR</Text>
+              <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: spacing["2xl"] }} />
+              <Text style={styles.qrHint}>กำลังสร้าง QR Code...</Text>
+            </>
+          ) : qrData ? (
             <>
               <Text style={styles.sectionTitle}>สแกน QR เพื่อชำระเงิน</Text>
-              {qrData.barcode ? (
-                <QRCode value={qrData.barcode} size={240} />
+              {qrData.svgContent ? (
+                <SvgXml xml={qrData.svgContent} width={240} height={240} />
               ) : (
                 <Text style={styles.qrHint}>ไม่สามารถโหลด QR Code ได้ กรุณาลองใหม่</Text>
               )}
@@ -250,22 +263,7 @@ export function PaymentScreen() {
                 <Text style={styles.pollingText}>รอการยืนยันชำระเงิน...</Text>
               </View>
             </>
-          ) : (
-            <>
-              <Text style={styles.sectionTitle}>PromptPay QR</Text>
-              <Text style={styles.qrHint}>กดปุ่มด้านล่างเพื่อสร้าง QR Code สำหรับสแกนจ่ายผ่านแอปธนาคาร</Text>
-              <Pressable
-                onPress={() => void handleCreateQR()}
-                disabled={isCreatingQR}
-                style={[styles.qrCreateBtn, isCreatingQR && styles.buttonDisabled]}
-              >
-                {isCreatingQR
-                  ? <ActivityIndicator color="#fff" />
-                  : <Text style={styles.buttonText}>สร้าง QR Code</Text>
-                }
-              </Pressable>
-            </>
-          )}
+          ) : null}
         </View>
       )}
 
@@ -359,13 +357,6 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: "row", gap: spacing.md },
   qrHint: { color: colors.textSecondary, ...typography.body, textAlign: "center" },
-  qrCreateBtn: {
-    borderRadius: radius.pill,
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing["3xl"],
-    alignItems: "center",
-  },
   pollingRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   pollingText: { color: colors.textSecondary, ...typography.caption },
   summaryCard: {

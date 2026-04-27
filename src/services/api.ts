@@ -367,7 +367,7 @@ export async function mobileInitiatePromptPay(
   shippingName: string,
   shippingPhone: string,
   shippingAddr: string,
-): Promise<{ chargeId: string; barcode: string; expiresAt: string }> {
+): Promise<{ chargeId: string; svgContent: string; expiresAt: string }> {
   const res = await fetch(`${API_BASE}/mobile/promptpay`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -377,7 +377,7 @@ export async function mobileInitiatePromptPay(
     const err = (await res.json().catch(() => ({}))) as { message?: string };
     throw new Error(err.message ?? "สร้าง QR ไม่สำเร็จ");
   }
-  return res.json() as Promise<{ chargeId: string; barcode: string; expiresAt: string }>;
+  return res.json() as Promise<{ chargeId: string; svgContent: string; expiresAt: string }>;
 }
 
 export async function mobileCheckPromptPay(
