@@ -1,14 +1,17 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { AppModal } from "@/components/ui/AppModal";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { navigateToHome, navigateToOrderHistory } from "@/navigation/helpers";
 import { useAppStore } from "@/store/useAppStore";
 import type { OrderStackParamList } from "@/navigation/types";
+import { mobileGetReceiptUrl } from "@/services/api";
 import { colors, radius, spacing, typography } from "@/theme";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -27,6 +30,23 @@ export function OrderDetailScreen() {
     state.orders.find((entry) => entry.id === route.params.orderId),
   );
   const products = useAppStore((state) => state.products);
+  const token = useAppStore((state) => state.token);
+
+  const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
+  const [errorModal, setErrorModal] = useState<string | null>(null);
+
+  async function handleDownloadReceipt() {
+    if (!token || !order) return;
+    setIsLoadingReceipt(true);
+    try {
+      const url = await mobileGetReceiptUrl(token, order.id);
+      await Linking.openURL(url);
+    } catch {
+      setErrorModal("ยังไม่มีใบเสร็จสำหรับคำสั่งซื้อนี้ กรุณาลองใหม่อีกครั้ง");
+    } finally {
+      setIsLoadingReceipt(false);
+    }
+  }
 
   if (!order) {
     return (
@@ -100,6 +120,23 @@ export function OrderDetailScreen() {
         <Row label="ค่าธรรมเนียม" value={`THB ${order.gatewayFee.toFixed(0)}`} />
         <Row label="รวมทั้งหมด" strong value={`THB ${order.total.toFixed(0)}`} />
       </View>
+
+      <Pressable
+        onPress={() => void handleDownloadReceipt()}
+        disabled={isLoadingReceipt}
+        style={[styles.receiptButton, isLoadingReceipt && styles.receiptButtonDisabled]}
+      >
+        <Text style={styles.receiptButtonText}>
+          {isLoadingReceipt ? "กำลังโหลดใบเสร็จ..." : "ดาวน์โหลดใบเสร็จ"}
+        </Text>
+      </Pressable>
+
+      <AppModal
+        visible={errorModal !== null}
+        title="ไม่พบใบเสร็จ"
+        message={errorModal ?? undefined}
+        onConfirm={() => setErrorModal(null)}
+      />
     </Screen>
   );
 }
@@ -224,6 +261,20 @@ const styles = StyleSheet.create({
     ...typography.body,
   },
   strongText: {
+    ...typography.title,
+  },
+  receiptButton: {
+    marginTop: spacing["2xl"],
+    marginHorizontal: spacing["2xl"],
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    paddingVertical: spacing.lg,
+    alignItems: "center",
+  },
+  receiptButtonDisabled: { borderColor: colors.textMuted },
+  receiptButtonText: {
+    color: colors.primary,
     ...typography.title,
   },
 });
