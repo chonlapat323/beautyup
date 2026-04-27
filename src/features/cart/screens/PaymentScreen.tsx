@@ -1,10 +1,11 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { AppModal } from "@/components/ui/AppModal";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
@@ -24,11 +25,12 @@ export function PaymentScreen() {
   const loadOrders = useAppStore((state) => state.loadOrders);
   const summary = getCartSummary(cart);
 
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [expiry, setExpiry] = useState("");   // MM/YY
-  const [cvv, setCvv] = useState("");
+  const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
+  const [cardName, setCardName] = useState("TEST USER");
+  const [expiry, setExpiry] = useState("12/27");
+  const [cvv, setCvv] = useState("123");
   const [isLoading, setIsLoading] = useState(false);
+  const [modal, setModal] = useState<{ title: string; message?: string } | null>(null);
 
   function formatCardNumber(value: string) {
     const digits = value.replace(/\D/g, "").slice(0, 16);
@@ -44,7 +46,7 @@ export function PaymentScreen() {
   async function handlePay() {
     const [expMonth, expYear] = expiry.split("/").map(Number);
     if (!cardNumber || !cardName || !expMonth || !expYear || !cvv) {
-      Alert.alert("กรุณากรอกข้อมูลบัตรให้ครบถ้วน");
+      setModal({ title: "กรุณากรอกข้อมูลให้ครบถ้วน", message: "กรุณากรอกหมายเลขบัตร ชื่อบนบัตร วันหมดอายุ และ CVV" });
       return;
     }
     if (!token) return;
@@ -73,7 +75,7 @@ export function PaymentScreen() {
       const mapped = mapApiOrder(order);
       navigation.replace("OrderSuccess", { orderId: mapped.id });
     } catch (e) {
-      Alert.alert("ชำระเงินไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
+      setModal({ title: "ชำระเงินไม่สำเร็จ", message: e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง" });
     } finally {
       setIsLoading(false);
     }
@@ -160,6 +162,13 @@ export function PaymentScreen() {
       >
         <Text style={styles.buttonText}>{isLoading ? "กำลังชำระเงิน..." : "ชำระเงิน"}</Text>
       </Pressable>
+
+      <AppModal
+        visible={modal !== null}
+        title={modal?.title ?? ""}
+        message={modal?.message}
+        onConfirm={() => setModal(null)}
+      />
     </Screen>
   );
 }

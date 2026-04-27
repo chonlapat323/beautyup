@@ -310,6 +310,9 @@ type CheckoutItem = { productId: string; quantity: number };
 type ApiOrder = {
   id: string;
   orderNumber: string;
+  subtotalAmount: string;
+  shippingAmount: string;
+  gatewayFee: string;
   totalAmount: string;
   status: string;
   createdAt: string;
@@ -374,7 +377,7 @@ export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
       month: "short",
       year: "numeric",
     }),
-    gatewayFee: 0,
+    gatewayFee: parseFloat(o.gatewayFee) || 0,
     items,
     shippingName: o.shippingName,
     shippingPhone: o.shippingPhone,
