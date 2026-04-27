@@ -361,6 +361,36 @@ export async function mobileGetReceiptUrl(token: string, orderId: string): Promi
   return data.url;
 }
 
+export async function mobileInitiatePromptPay(
+  token: string,
+  items: CheckoutItem[],
+  shippingName: string,
+  shippingPhone: string,
+  shippingAddr: string,
+): Promise<{ chargeId: string; qrCodeUrl: string; expiresAt: string }> {
+  const res = await fetch(`${API_BASE}/mobile/promptpay`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "สร้าง QR ไม่สำเร็จ");
+  }
+  return res.json() as Promise<{ chargeId: string; qrCodeUrl: string; expiresAt: string }>;
+}
+
+export async function mobileCheckPromptPay(
+  token: string,
+  chargeId: string,
+): Promise<{ status: string; order?: ApiOrder }> {
+  const res = await fetch(`${API_BASE}/mobile/promptpay/${chargeId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("ตรวจสอบสถานะไม่สำเร็จ");
+  return res.json() as Promise<{ status: string; order?: ApiOrder }>;
+}
+
 export async function mobileGetOrders(token: string): Promise<ApiOrder[]> {
   const res = await fetch(`${API_BASE}/mobile/orders`, {
     headers: { Authorization: `Bearer ${token}` },
