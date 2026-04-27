@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
@@ -169,6 +169,15 @@ export function PaymentScreen() {
         message={modal?.message}
         onConfirm={() => setModal(null)}
       />
+
+      <Modal visible={isLoading} transparent animationType="fade" statusBarTranslucent>
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.loadingText}>กำลังชำระเงิน...</Text>
+          </View>
+        </View>
+      </Modal>
     </Screen>
   );
 }
@@ -223,4 +232,19 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: { backgroundColor: colors.textMuted },
   buttonText: { color: "#FFFFFF", ...typography.title },
+  loadingOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingBox: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    paddingVertical: spacing["3xl"],
+    paddingHorizontal: spacing["3xl"],
+    alignItems: "center",
+    gap: spacing.lg,
+  },
+  loadingText: { color: colors.textPrimary, ...typography.body },
 });
