@@ -240,7 +240,11 @@ export function PaymentScreen() {
           {qrData ? (
             <>
               <Text style={styles.sectionTitle}>สแกน QR เพื่อชำระเงิน</Text>
-              <QRCode value={qrData.barcode} size={240} />
+              {qrData.barcode ? (
+                <QRCode value={qrData.barcode} size={240} />
+              ) : (
+                <Text style={styles.qrHint}>ไม่สามารถโหลด QR Code ได้ กรุณาลองใหม่</Text>
+              )}
               <View style={styles.pollingRow}>
                 <ActivityIndicator size="small" color={colors.primary} />
                 <Text style={styles.pollingText}>รอการยืนยันชำระเงิน...</Text>
