@@ -2,11 +2,10 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { OrderListSkeleton } from "@/components/ui/Skeleton";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { OrderListSkeleton } from "@/components/ui/Skeleton";
 import { navigateToHome } from "@/navigation/helpers";
 import type { OrderStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -36,40 +35,51 @@ export function OrderHistoryScreen() {
   const loadOrders = useAppStore((state) => state.loadOrders);
   const isLoadingOrders = useAppStore((state) => state.isLoadingOrders);
 
-  useEffect(() => { void loadOrders(); }, [loadOrders]);
+  useEffect(() => {
+    void loadOrders();
+  }, [loadOrders]);
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Order history" subtitle="ประวัติคำสั่งซื้อของคุณ" />}>
-      <Breadcrumbs
-        items={[
-          { label: "Home", onPress: () => navigateToHome(navigation) },
-          { label: "Orders" },
-        ]}
-      />
-
-      {isLoadingOrders ? (
-        <OrderListSkeleton />
-      ) : null}
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="ประวัติคำสั่งซื้อ"
+          subtitle="ติดตามออเดอร์และสถานะล่าสุดของคุณ"
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "ประวัติคำสั่งซื้อ" },
+          ]}
+        />
+      }
+    >
+      {isLoadingOrders ? <OrderListSkeleton /> : null}
 
       <View style={styles.list}>
-        {!isLoadingOrders && orders.map((order) => (
-          <Pressable
-            key={order.id}
-            onPress={() => navigation.navigate("OrderDetail", { orderId: order.id })}
-            style={styles.card}
-          >
-            <View style={styles.row}>
-              <Text style={styles.orderId}>{order.id}</Text>
-              <View style={[styles.statusPill, { backgroundColor: statusBg[order.status] ?? "#F1F5F3" }]}>
-                <Text style={styles.status}>{STATUS_LABELS[order.status] ?? order.status}</Text>
+        {!isLoadingOrders &&
+          orders.map((order) => (
+            <Pressable
+              key={order.id}
+              onPress={() => navigation.navigate("OrderDetail", { orderId: order.id })}
+              style={styles.card}
+            >
+              <View style={styles.row}>
+                <Text style={styles.orderId}>{order.id}</Text>
+                <View
+                  style={[
+                    styles.statusPill,
+                    { backgroundColor: statusBg[order.status] ?? "#F1F5F3" },
+                  ]}
+                >
+                  <Text style={styles.status}>{STATUS_LABELS[order.status] ?? order.status}</Text>
+                </View>
               </View>
-            </View>
-            <Text style={styles.meta}>
-              {order.itemCount} รายการ · THB {order.total.toFixed(0)}
-            </Text>
-            <Text style={styles.date}>{order.placedAt}</Text>
-          </Pressable>
-        ))}
+              <Text style={styles.meta}>
+                {order.itemCount} รายการ · THB {order.total.toFixed(0)}
+              </Text>
+              <Text style={styles.date}>{order.placedAt}</Text>
+            </Pressable>
+          ))}
       </View>
     </Screen>
   );
@@ -77,6 +87,7 @@ export function OrderHistoryScreen() {
 
 const styles = StyleSheet.create({
   content: {
+    paddingTop: spacing.lg,
     paddingBottom: spacing["3xl"],
   },
   list: {

@@ -4,7 +4,6 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
@@ -28,18 +27,23 @@ export function CartScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Your cart" subtitle="ตรวจสอบสินค้าก่อนชำระเงิน" />}>
-      <Breadcrumbs
-        items={[
-          { label: "Home", onPress: () => navigateToHome(navigation) },
-          { label: "Cart" },
-        ]}
-      />
-
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="ตะกร้าสินค้า"
+          subtitle="ตรวจสอบรายการก่อนดำเนินการชำระเงิน"
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "ตะกร้าสินค้า" },
+          ]}
+        />
+      }
+    >
       <View style={styles.list}>
         {cart.length === 0 ? (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>Your cart is empty.</Text>
+            <Text style={styles.emptyText}>ยังไม่มีสินค้าในตะกร้า</Text>
           </View>
         ) : (
           cart.map((item) => {
@@ -69,16 +73,16 @@ export function CartScreen() {
       </View>
 
       <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>Order summary</Text>
-        <Row label="Subtotal" value={`THB ${summary.subtotal.toFixed(0)}`} />
-        <Row label="Gateway fee" value={`THB ${summary.gatewayFee.toFixed(0)}`} />
-        <Row label="Total" strong value={`THB ${summary.total.toFixed(0)}`} />
-        {summary.pointsPreview > 0 && (
+        <Text style={styles.summaryTitle}>สรุปรายการ</Text>
+        <Row label="ยอดสินค้า" value={`THB ${summary.subtotal.toFixed(0)}`} />
+        <Row label="ค่าธรรมเนียม" value={`THB ${summary.gatewayFee.toFixed(0)}`} />
+        <Row label="ยอดรวม" strong value={`THB ${summary.total.toFixed(0)}`} />
+        {summary.pointsPreview > 0 ? (
           <View style={styles.pointsRow}>
             <Text style={styles.pointsLabel}>แต้มที่จะได้รับ</Text>
-            <Text style={styles.pointsValue}>+{summary.pointsPreview} แต้ม</Text>
+            <Text style={styles.pointsValue}>+{summary.pointsPreview} pts</Text>
           </View>
-        )}
+        ) : null}
       </View>
 
       <Pressable
@@ -86,7 +90,7 @@ export function CartScreen() {
         onPress={handleCheckout}
         style={[styles.button, cart.length === 0 && styles.buttonDisabled]}
       >
-        <Text style={styles.buttonText}>Proceed to checkout</Text>
+        <Text style={styles.buttonText}>ดำเนินการชำระเงิน</Text>
       </Pressable>
     </Screen>
   );
@@ -103,6 +107,7 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
 
 const styles = StyleSheet.create({
   content: {
+    paddingTop: spacing.lg,
     paddingBottom: spacing["3xl"],
   },
   list: {

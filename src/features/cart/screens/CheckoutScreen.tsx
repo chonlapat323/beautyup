@@ -1,15 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileGetAddresses } from "@/services/api";
 import type { MemberAddress } from "@/services/api";
+import { mobileGetAddresses } from "@/services/api";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -23,6 +22,7 @@ export function CheckoutScreen() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
   const [addressError, setAddressError] = useState(false);
+
   useEffect(() => {
     if (!token) {
       setIsLoadingAddresses(false);
@@ -32,14 +32,14 @@ export function CheckoutScreen() {
     mobileGetAddresses(token)
       .then((list) => {
         setAddresses(list);
-        const def = list.find((a) => a.isDefault) ?? list[0];
-        if (def) setSelectedId(def.id);
+        const defaultAddress = list.find((address) => address.isDefault) ?? list[0];
+        if (defaultAddress) setSelectedId(defaultAddress.id);
       })
       .catch(() => setAddressError(true))
       .finally(() => setIsLoadingAddresses(false));
   }, [token]);
 
-  const selected = addresses.find((a) => a.id === selectedId);
+  const selected = addresses.find((address) => address.id === selectedId);
 
   function handleConfirm() {
     if (!selected) return;
@@ -60,15 +60,20 @@ export function CheckoutScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Checkout" subtitle="เลือกที่อยู่จัดส่งและยืนยันคำสั่งซื้อ" />}>
-      <Breadcrumbs
-        items={[
-          { label: "Home", onPress: () => navigateToHome(navigation) },
-          { label: "Cart", onPress: () => navigation.navigate("Cart") },
-          { label: "Checkout" },
-        ]}
-      />
-
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="ตรวจสอบคำสั่งซื้อ"
+          subtitle="เลือกที่อยู่จัดส่งและยืนยันรายการของคุณ"
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
+            { label: "ตรวจสอบคำสั่งซื้อ" },
+          ]}
+        />
+      }
+    >
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>ที่อยู่จัดส่ง</Text>
 
@@ -77,12 +82,12 @@ export function CheckoutScreen() {
         ) : addressError ? (
           <View style={styles.noAddressBox}>
             <Text style={styles.noAddressText}>โหลดที่อยู่ไม่สำเร็จ</Text>
-            <Text style={styles.hint}>กรุณาตรวจสอบการเชื่อมต่อและลองใหม่อีกครั้ง</Text>
+            <Text style={styles.hint}>กรุณาตรวจสอบการเชื่อมต่อแล้วลองใหม่อีกครั้ง</Text>
           </View>
         ) : addresses.length === 0 ? (
           <View style={styles.noAddressBox}>
             <Text style={styles.noAddressText}>ยังไม่มีที่อยู่ที่บันทึกไว้</Text>
-            <Text style={styles.hint}>กรุณาไปเพิ่มที่อยู่ในหน้า Profile ก่อนสั่งซื้อ</Text>
+            <Text style={styles.hint}>กรุณาเพิ่มที่อยู่ในหน้าโปรไฟล์ก่อนสั่งซื้อ</Text>
           </View>
         ) : (
           <View style={styles.addressList}>
@@ -105,9 +110,9 @@ export function CheckoutScreen() {
                 >
                   <View style={styles.radioRow}>
                     <View style={[styles.radio, isSelected && styles.radioSelected]}>
-                      {isSelected && <View style={styles.radioDot} />}
+                      {isSelected ? <View style={styles.radioDot} /> : null}
                     </View>
-                    <View style={{ flex: 1, gap: 2 }}>
+                    <View style={styles.addressCopy}>
                       <View style={styles.cardLabelRow}>
                         {addr.label ? <Text style={styles.addrLabel}>{addr.label}</Text> : null}
                         {addr.isDefault ? (
@@ -116,7 +121,9 @@ export function CheckoutScreen() {
                           </View>
                         ) : null}
                       </View>
-                      <Text style={styles.addrRecipient}>{addr.recipient} · {addr.phone}</Text>
+                      <Text style={styles.addrRecipient}>
+                        {addr.recipient} · {addr.phone}
+                      </Text>
                       <Text style={styles.addrLines}>{lines}</Text>
                     </View>
                   </View>
@@ -129,7 +136,7 @@ export function CheckoutScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>สรุปยอดชำระ</Text>
-        <Row label="ยอดรวม" value={`THB ${summary.subtotal.toFixed(0)}`} />
+        <Row label="ยอดสินค้า" value={`THB ${summary.subtotal.toFixed(0)}`} />
         <Row label="ค่าธรรมเนียม" value={`THB ${summary.gatewayFee.toFixed(0)}`} />
         <Row label="ยอดชำระทั้งหมด" value={`THB ${summary.total.toFixed(0)}`} strong />
       </View>
@@ -155,14 +162,22 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
 }
 
 const styles = StyleSheet.create({
-  content: { paddingBottom: spacing["3xl"] },
+  content: {
+    paddingTop: spacing.lg,
+    paddingBottom: spacing["3xl"],
+  },
   section: {
     marginHorizontal: spacing["2xl"],
-    marginTop: spacing.lg,
     gap: spacing.md,
   },
-  sectionTitle: { color: colors.textPrimary, ...typography.title },
-  hint: { color: colors.textMuted, ...typography.caption },
+  sectionTitle: {
+    color: colors.textPrimary,
+    ...typography.title,
+  },
+  hint: {
+    color: colors.textMuted,
+    ...typography.caption,
+  },
   noAddressBox: {
     borderRadius: radius.lg,
     borderWidth: 1,
@@ -172,8 +187,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.xs,
   },
-  noAddressText: { color: colors.textSecondary, ...typography.body },
-  addressList: { gap: spacing.sm },
+  noAddressText: {
+    color: colors.textSecondary,
+    ...typography.body,
+  },
+  addressList: {
+    gap: spacing.sm,
+  },
   addressCard: {
     borderRadius: radius.lg,
     borderWidth: 1.5,
@@ -181,8 +201,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     padding: spacing.md,
   },
-  addressCardSelected: { borderColor: colors.primary, backgroundColor: "#f0faf4" },
-  radioRow: { flexDirection: "row", gap: spacing.md, alignItems: "flex-start" },
+  addressCardSelected: {
+    borderColor: colors.primary,
+    backgroundColor: "#F0FAF4",
+  },
+  radioRow: {
+    flexDirection: "row",
+    gap: spacing.md,
+    alignItems: "flex-start",
+  },
   radio: {
     width: 20,
     height: 20,
@@ -193,19 +220,50 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 2,
   },
-  radioSelected: { borderColor: colors.primary },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary },
-  cardLabelRow: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
-  addrLabel: { color: colors.primary, ...typography.caption, fontWeight: "700", textTransform: "uppercase" },
+  radioSelected: {
+    borderColor: colors.primary,
+  },
+  radioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary,
+  },
+  addressCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  cardLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  addrLabel: {
+    color: colors.primary,
+    ...typography.caption,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
   defaultBadge: {
     backgroundColor: colors.primary,
     borderRadius: 99,
     paddingHorizontal: 6,
     paddingVertical: 1,
   },
-  defaultBadgeText: { color: "#FFF", fontSize: 9, fontWeight: "700" },
-  addrRecipient: { color: colors.textPrimary, ...typography.caption, fontWeight: "600" },
-  addrLines: { color: colors.textSecondary, ...typography.caption },
+  defaultBadgeText: {
+    color: "#FFF",
+    fontSize: 9,
+    fontWeight: "700",
+  },
+  addrRecipient: {
+    color: colors.textPrimary,
+    ...typography.caption,
+    fontWeight: "600",
+  },
+  addrLines: {
+    color: colors.textSecondary,
+    ...typography.caption,
+  },
   summaryCard: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],
@@ -216,11 +274,25 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
   },
-  summaryTitle: { color: colors.textPrimary, ...typography.title },
-  row: { flexDirection: "row", justifyContent: "space-between" },
-  rowLabel: { color: colors.textSecondary, ...typography.body },
-  rowValue: { color: colors.textPrimary, ...typography.body },
-  strongText: { ...typography.title },
+  summaryTitle: {
+    color: colors.textPrimary,
+    ...typography.title,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  rowLabel: {
+    color: colors.textSecondary,
+    ...typography.body,
+  },
+  rowValue: {
+    color: colors.textPrimary,
+    ...typography.body,
+  },
+  strongText: {
+    ...typography.title,
+  },
   button: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],
@@ -229,6 +301,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     alignItems: "center",
   },
-  buttonDisabled: { backgroundColor: colors.textMuted },
-  buttonText: { color: "#FFFFFF", ...typography.title },
+  buttonDisabled: {
+    backgroundColor: colors.textMuted,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    ...typography.title,
+  },
 });

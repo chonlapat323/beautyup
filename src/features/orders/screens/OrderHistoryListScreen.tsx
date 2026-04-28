@@ -4,9 +4,9 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { useAppStore } from "@/store/useAppStore";
+import { navigateToHome } from "@/navigation/helpers";
 import type { OrderStackParamList } from "@/navigation/types";
+import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -32,14 +32,19 @@ export function OrderHistoryListScreen() {
   const orders = useAppStore((state) => state.orders);
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Order history" subtitle="ประวัติคำสั่งซื้อของคุณ" />}>
-      <Breadcrumbs
-        items={[
-          { label: "Home", onPress: () => navigation.getParent()?.navigate("Discover") },
-          { label: "Orders" },
-        ]}
-      />
-
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="ประวัติคำสั่งซื้อ"
+          subtitle="ดูรายการออเดอร์ย้อนหลังของคุณ"
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "ประวัติคำสั่งซื้อ" },
+          ]}
+        />
+      }
+    >
       <View style={styles.list}>
         {orders.map((order) => (
           <Pressable
@@ -49,11 +54,18 @@ export function OrderHistoryListScreen() {
           >
             <View style={styles.row}>
               <Text style={styles.orderId}>{order.id}</Text>
-              <View style={[styles.statusPill, { backgroundColor: statusBg[order.status] ?? "#F1F5F3" }]}>
+              <View
+                style={[
+                  styles.statusPill,
+                  { backgroundColor: statusBg[order.status] ?? "#F1F5F3" },
+                ]}
+              >
                 <Text style={styles.status}>{STATUS_LABELS[order.status] ?? order.status}</Text>
               </View>
             </View>
-            <Text style={styles.meta}>{order.itemCount} รายการ • THB {order.total.toFixed(0)}</Text>
+            <Text style={styles.meta}>
+              {order.itemCount} รายการ · THB {order.total.toFixed(0)}
+            </Text>
             <Text style={styles.date}>{order.placedAt}</Text>
           </Pressable>
         ))}
@@ -64,6 +76,7 @@ export function OrderHistoryListScreen() {
 
 const styles = StyleSheet.create({
   content: {
+    paddingTop: spacing.lg,
     paddingBottom: spacing["3xl"],
   },
   list: {

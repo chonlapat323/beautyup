@@ -6,12 +6,11 @@ import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { navigateToHome, navigateToOrderHistory } from "@/navigation/helpers";
-import { useAppStore } from "@/store/useAppStore";
 import type { OrderStackParamList } from "@/navigation/types";
 import { mobileGetOrderDocuments } from "@/services/api";
+import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -55,14 +54,23 @@ export function OrderDetailScreen() {
 
   if (!order) {
     return (
-      <Screen contentContainerStyle={styles.content} header={<AppHeader title="Order details" subtitle="ไม่พบรายการสั่งซื้อ" />}>
-        <Breadcrumbs
-          items={[
-            { label: "Home", onPress: () => navigateToHome(navigation) },
-            { label: "Orders", onPress: () => navigateToOrderHistory(navigation) },
-            { label: "Order Detail" },
-          ]}
-        />
+      <Screen
+        contentContainerStyle={styles.content}
+        header={
+          <AppHeader
+            title="รายละเอียดคำสั่งซื้อ"
+            subtitle="ไม่พบรายการสั่งซื้อ"
+            breadcrumbs={[
+              { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+              { label: "ประวัติคำสั่งซื้อ", onPress: () => navigateToOrderHistory(navigation) },
+              { label: "รายละเอียดคำสั่งซื้อ" },
+            ]}
+          />
+        }
+      >
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>ไม่พบข้อมูลคำสั่งซื้อที่เลือก</Text>
+        </View>
       </Screen>
     );
   }
@@ -70,15 +78,20 @@ export function OrderDetailScreen() {
   const subtotal = order.total - order.gatewayFee;
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title={order.id} subtitle={`Placed on ${order.placedAt}`} />}>
-      <Breadcrumbs
-        items={[
-          { label: "Home", onPress: () => navigateToHome(navigation) },
-          { label: "Orders", onPress: () => navigateToOrderHistory(navigation) },
-          { label: order.id },
-        ]}
-      />
-
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="รายละเอียดคำสั่งซื้อ"
+          subtitle={`สั่งซื้อเมื่อ ${order.placedAt}`}
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "ประวัติคำสั่งซื้อ", onPress: () => navigateToOrderHistory(navigation) },
+            { label: "รายละเอียดคำสั่งซื้อ" },
+          ]}
+        />
+      }
+    >
       <View style={styles.heroCard}>
         <View>
           <Text style={styles.heroLabel}>สถานะ</Text>
@@ -103,7 +116,12 @@ export function OrderDetailScreen() {
       {(order.shippingName ?? order.shippingAddr) ? (
         <View style={styles.shippingCard}>
           <Text style={styles.sectionTitle}>ที่อยู่จัดส่ง</Text>
-          {order.shippingName ? <Text style={styles.shippingText}>{order.shippingName}{order.shippingPhone ? ` · ${order.shippingPhone}` : ""}</Text> : null}
+          {order.shippingName ? (
+            <Text style={styles.shippingText}>
+              {order.shippingName}
+              {order.shippingPhone ? ` · ${order.shippingPhone}` : ""}
+            </Text>
+          ) : null}
           {order.shippingAddr ? <Text style={styles.shippingAddr}>{order.shippingAddr}</Text> : null}
         </View>
       ) : null}
@@ -170,7 +188,21 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
 
 const styles = StyleSheet.create({
   content: {
+    paddingTop: spacing.lg,
     paddingBottom: spacing["3xl"],
+  },
+  emptyState: {
+    marginHorizontal: spacing["2xl"],
+    marginTop: spacing.lg,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    padding: spacing["2xl"],
+  },
+  emptyText: {
+    color: colors.textSecondary,
+    ...typography.body,
   },
   heroCard: {
     marginHorizontal: spacing["2xl"],
@@ -298,7 +330,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     alignItems: "center",
   },
-  docButtonDisabled: { borderColor: colors.textMuted },
+  docButtonDisabled: {
+    borderColor: colors.textMuted,
+  },
   docButtonText: {
     color: colors.primary,
     ...typography.title,

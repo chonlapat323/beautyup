@@ -5,13 +5,13 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
+import { navigateToCategories, navigateToHome } from "@/navigation/helpers";
+import type { ShopStackParamList } from "@/navigation/types";
 import { fetchShades } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
-import type { Shade } from "@/types/domain";
-import type { ShopStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
+import type { Shade } from "@/types/domain";
 
 export function ShadeSelectionScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
@@ -23,6 +23,7 @@ export function ShadeSelectionScreen() {
   const [shades, setShades] = useState<Shade[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [activeGroup, setActiveGroup] = useState<string>("");
 
   const category = categories.find((c) => c.id === route.params.categoryId);
 
@@ -45,32 +46,34 @@ export function ShadeSelectionScreen() {
     return Array.from(map.entries()).map(([groupName, items]) => ({ groupName, items }));
   }, [shades]);
 
-  const [activeGroup, setActiveGroup] = useState<string>("");
-
   useEffect(() => {
     if (groups.length > 0 && !activeGroup) {
       setActiveGroup(groups[0].groupName);
     }
-  }, [groups]);
+  }, [activeGroup, groups]);
 
   const filteredShades = useMemo(
-    () => groups.find((g) => g.groupName === activeGroup)?.items ?? [],
-    [groups, activeGroup],
+    () => groups.find((group) => group.groupName === activeGroup)?.items ?? [],
+    [activeGroup, groups],
   );
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title="เลือกเฉดสี" subtitle={category?.title ?? "Color & Bleach"} />}>
-      <Breadcrumbs
-        items={[
-          { label: "Home", onPress: () => navigation.navigate("Home") },
-          { label: "Categories", onPress: () => navigation.navigate("Categories") },
-          { label: category?.title ?? "Color", onPress: () => navigation.navigate("Categories") },
-          { label: "เฉดสี" },
-        ]}
-      />
-
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="เลือกเฉดสี"
+          subtitle={category?.title ?? "Color & Bleach"}
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
+            { label: "เลือกเฉดสี" },
+          ]}
+        />
+      }
+    >
       {isLoading ? (
-        <ActivityIndicator color={colors.primary} style={{ marginTop: spacing["3xl"] }} />
+        <ActivityIndicator color={colors.primary} style={styles.loader} />
       ) : error ? (
         <View style={styles.center}>
           <Text style={styles.muted}>ไม่สามารถโหลดเฉดสีได้</Text>
@@ -81,7 +84,6 @@ export function ShadeSelectionScreen() {
         </View>
       ) : (
         <>
-          {/* Family group tabs */}
           <View style={styles.groupTabsWrap}>
             <ScrollView
               contentContainerStyle={styles.groupRow}
@@ -151,9 +153,21 @@ export function ShadeSelectionScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingBottom: spacing["3xl"] },
-  center: { alignItems: "center", paddingTop: spacing["3xl"] },
-  muted: { color: colors.textMuted, fontSize: 14 },
+  content: {
+    paddingTop: spacing.lg,
+    paddingBottom: spacing["3xl"],
+  },
+  loader: {
+    marginTop: spacing["3xl"],
+  },
+  center: {
+    alignItems: "center",
+    paddingTop: spacing["3xl"],
+  },
+  muted: {
+    color: colors.textMuted,
+    fontSize: 14,
+  },
   groupTabsWrap: {
     height: 44,
     marginBottom: spacing.lg,
@@ -175,15 +189,26 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
     backgroundColor: colors.surfaceMuted,
   },
-  groupChipText: { color: colors.textSecondary, ...typography.caption },
-  groupChipTextActive: { color: colors.primaryStrong },
+  groupChipText: {
+    color: colors.textSecondary,
+    ...typography.caption,
+  },
+  groupChipTextActive: {
+    color: colors.primaryStrong,
+  },
   familyHeader: {
     paddingHorizontal: spacing["2xl"],
     paddingBottom: spacing.lg,
     gap: spacing.xs,
   },
-  familyTitle: { color: colors.textPrimary, ...typography.title },
-  familyCaption: { color: colors.primaryStrong, ...typography.caption },
+  familyTitle: {
+    color: colors.textPrimary,
+    ...typography.title,
+  },
+  familyCaption: {
+    color: colors.primaryStrong,
+    ...typography.caption,
+  },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -203,9 +228,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 4,
   },
-  cardSelected: { borderColor: colors.primary, borderWidth: 2 },
-  imageWrap: { height: 178, backgroundColor: colors.surfaceMuted },
-  imageShell: { position: "relative" },
+  cardSelected: {
+    borderColor: colors.primary,
+    borderWidth: 2,
+  },
+  imageWrap: {
+    height: 178,
+    backgroundColor: colors.surfaceMuted,
+  },
+  imageShell: {
+    position: "relative",
+  },
   selectedBadge: {
     position: "absolute",
     top: 0,
@@ -217,14 +250,26 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     backgroundColor: "rgba(255,255,255,0.92)",
   },
-  selectedBadgeText: { color: colors.primaryStrong, ...typography.caption },
+  selectedBadgeText: {
+    color: colors.primaryStrong,
+    ...typography.caption,
+  },
   footer: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
     padding: spacing.lg,
   },
-  copy: { flex: 1, gap: spacing.xs },
-  name: { color: colors.textPrimary, ...typography.title },
-  tone: { color: colors.textSecondary, ...typography.caption },
+  copy: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  name: {
+    color: colors.textPrimary,
+    ...typography.title,
+  },
+  tone: {
+    color: colors.textSecondary,
+    ...typography.caption,
+  },
 });

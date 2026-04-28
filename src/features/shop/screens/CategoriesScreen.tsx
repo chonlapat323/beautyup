@@ -3,34 +3,38 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
-import { BRAND_NAME } from "@/brand";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { CategoriesListSkeleton } from "@/components/ui/Skeleton";
-import { useAppStore } from "@/store/useAppStore";
+import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
+import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function CategoriesScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const categories = useAppStore((state) => state.categories);
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Curated collections" subtitle={`Choose a category to start shopping through the ${BRAND_NAME} demo flow.`} />}>
-      <Breadcrumbs
-        items={[
-          { label: "Home", onPress: () => navigation.navigate("Home") },
-          { label: "Categories" },
-        ]}
-      />
-
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="หมวดหมู่สินค้า"
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หมวดหมู่สินค้า" },
+          ]}
+        />
+      }
+    >
       {isLoading ? (
         <CategoriesListSkeleton />
       ) : categories.length === 0 ? (
         <View style={styles.center}>
-          <Text style={styles.muted}>ไม่พบหมวดหมู่สินค้า</Text>
+          <Text style={styles.muted}>ยังไม่พบหมวดหมู่สินค้า</Text>
         </View>
       ) : null}
 
@@ -40,15 +44,24 @@ export function CategoriesScreen() {
             key={category.id}
             onPress={() =>
               category.requiresShadeSelection
-                ? navigation.navigate("ShadeSelection", { categoryId: category.id })
-                : navigation.navigate("ProductList", { categoryId: category.id })
+                ? navigation.navigate("ShadeSelection", {
+                    categoryId: category.id,
+                  })
+                : navigation.navigate("ProductList", {
+                    categoryId: category.id,
+                  })
             }
             style={styles.card}
           >
             <View style={styles.copy}>
               <Text style={styles.title}>{category.title}</Text>
-              <Text style={styles.subtitle}>{category.subtitle}</Text>
+              <Text style={styles.subtitle}>
+                {category.requiresShadeSelection
+                  ? "เลือกเฉดสีก่อนช้อป"
+                  : "พร้อมช้อปได้ทันที"}
+              </Text>
             </View>
+
             <View style={styles.previewWrapper}>
               <CommerceImage style={styles.preview} uri={category.imageUrl} />
             </View>
@@ -61,6 +74,7 @@ export function CategoriesScreen() {
 
 const styles = StyleSheet.create({
   content: {
+    paddingTop: spacing.lg,
     paddingBottom: spacing["3xl"],
   },
   center: {
@@ -70,7 +84,7 @@ const styles = StyleSheet.create({
   },
   muted: {
     color: colors.textMuted,
-    fontSize: 14,
+    ...typography.body,
   },
   list: {
     gap: spacing.md,
@@ -106,8 +120,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: colors.primary,
-    textTransform: "uppercase",
-    ...typography.eyebrow,
+    ...typography.caption,
   },
   previewWrapper: {
     width: 132,

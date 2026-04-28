@@ -13,8 +13,8 @@ import {
 } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
+import { AppHeader } from "@/components/ui/AppHeader";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { PointsPill } from "@/components/ui/PointsPill";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -23,26 +23,21 @@ import { colors, fonts, spacing } from "@/theme";
 const badgeNew = require("../../../slide/new.png") as ReturnType<typeof require>;
 const badgeBest = require("../../../slide/best.png") as ReturnType<typeof require>;
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "สวัสดีตอนเช้า";
-  if (hour < 17) return "สวัสดีตอนบ่าย";
-  return "สวัสดีตอนเย็น";
-}
-
 function SectionHeader({
   title,
   onViewAll,
+  horizontalPadding = 24,
 }: {
   title: string;
   onViewAll?: () => void;
+  horizontalPadding?: number;
 }) {
   return (
-    <View style={sectionStyles.row}>
+    <View style={[sectionStyles.row, { paddingHorizontal: horizontalPadding }]}>
       <Text style={sectionStyles.title}>{title}</Text>
       {onViewAll ? (
         <Pressable hitSlop={8} onPress={onViewAll}>
-          <Text style={sectionStyles.link}>ดูทั้งหมด &gt;</Text>
+          <Text style={sectionStyles.link}>View all &gt;</Text>
         </Pressable>
       ) : null}
     </View>
@@ -54,7 +49,6 @@ const sectionStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 24,
     marginBottom: spacing.md,
   },
   title: {
@@ -78,11 +72,9 @@ export function HomeScreen() {
   const products = useAppStore((state) => state.products);
   const banners = useAppStore((state) => state.banners);
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
-  const member = useAppStore((state) => state.member);
   const addToCart = useAppStore((state) => state.addToCart);
   const loadCatalog = useAppStore((state) => state.loadCatalog);
 
-  const initials = member?.fullName?.trim().charAt(0).toUpperCase() ?? "P";
   const featuredProducts = (
     products.filter((product) => product.isFeatured).length > 0
       ? products.filter((product) => product.isFeatured)
@@ -90,8 +82,9 @@ export function HomeScreen() {
   ).slice(0, 8);
   const heroSlides = (banners.length > 0 ? banners : []).slice(0, 4);
 
-  const heroWidth = width;
-  const heroHeight = Math.round(width * 0.58);
+  const horizontalPadding = width < 360 ? 18 : width >= 430 ? 28 : 24;
+  const heroHeight = Math.round(width * (width < 380 ? 0.66 : 0.58));
+  const editorialTitleSize = width < 360 ? 24 : width >= 430 ? 30 : 28;
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const heroScrollRef = useRef<ScrollView>(null);
   const pulse = useRef(new Animated.Value(0)).current;
@@ -125,7 +118,7 @@ export function HomeScreen() {
       setActiveHeroIndex((currentIndex) => {
         const nextIndex = (currentIndex + 1) % heroSlides.length;
         heroScrollRef.current?.scrollTo({
-          x: nextIndex * heroWidth,
+          x: nextIndex * width,
           animated: true,
         });
         return nextIndex;
@@ -133,7 +126,7 @@ export function HomeScreen() {
     }, 4200);
 
     return () => clearInterval(intervalId);
-  }, [heroSlides.length, heroWidth]);
+  }, [heroSlides.length, width]);
 
   function openCategory(categoryId: string, requiresShadeSelection: boolean) {
     if (requiresShadeSelection) {
@@ -164,54 +157,56 @@ export function HomeScreen() {
     navigation.navigate("Categories");
   }
 
-  const homeHeader = (
-    <View style={styles.header}>
-      <View style={styles.profileGroup}>
-        <View style={styles.avatarShell}>
-          <View style={styles.avatarWrap}>
-            <Text style={styles.avatarText}>{initials}</Text>
-          </View>
-        </View>
-        <View style={styles.profileCopy}>
-          <Text style={styles.greeting}>{getGreeting()}</Text>
-          <Text numberOfLines={1} style={styles.memberName}>
-            {member?.fullName ?? "Pao"}
-          </Text>
-        </View>
-      </View>
-      <PointsPill />
-    </View>
-  );
-
   if (isLoading) {
     return (
-      <Screen header={homeHeader} contentContainerStyle={styles.content}>
+      <Screen
+        header={<AppHeader showSearch onSearchPress={() => navigation.navigate("Search")} />}
+        contentContainerStyle={styles.content}
+      >
         <HomeSkeleton />
       </Screen>
     );
   }
 
   return (
-    <Screen header={homeHeader} contentContainerStyle={styles.content} onRefresh={loadCatalog}>
-      <Pressable
-        onPress={() => navigation.navigate("Search")}
-        style={styles.searchBar}
-      >
-        <View style={styles.searchIconWrap}>
-          <MaterialIcons name="search" size={18} color="#567260" />
-        </View>
-        <Text style={styles.searchPlaceholder}>ค้นหาผลิตภัณฑ์ดูแลเส้นผม</Text>
-      </Pressable>
+    <Screen
+      header={<AppHeader showSearch onSearchPress={() => navigation.navigate("Search")} />}
+      contentContainerStyle={styles.content}
+      onRefresh={loadCatalog}
+    >
+      <View style={[styles.editorialCard, { marginHorizontal: horizontalPadding }]}>
+        <View style={styles.editorialGlowTop} />
+        <View style={styles.editorialGlowBottom} />
+        <Text style={styles.editorialEyebrow}>Daily Ritual</Text>
+        <Text
+          style={[
+            styles.editorialTitle,
+            {
+              fontSize: editorialTitleSize,
+              lineHeight: editorialTitleSize + 6,
+            },
+          ]}
+        >
+          Calm care. Clean finish.
+        </Text>
+        <Text style={styles.editorialBody}>
+          Soft green tones, calm spacing, and a premium start to every session.
+        </Text>
+      </View>
 
       {categories.length > 0 ? (
         <>
           <SectionHeader
+            horizontalPadding={horizontalPadding}
             onViewAll={() => navigation.navigate("Categories")}
-            title="หมวดหมู่สินค้า"
+            title="Categories"
           />
 
           <ScrollView
-            contentContainerStyle={styles.categoryRow}
+            contentContainerStyle={[
+              styles.categoryRow,
+              { paddingLeft: horizontalPadding, paddingRight: horizontalPadding },
+            ]}
             horizontal
             showsHorizontalScrollIndicator={false}
           >
@@ -237,11 +232,12 @@ export function HomeScreen() {
                   {category.title}
                 </Text>
                 <Text numberOfLines={1} style={styles.categoryCaption}>
-                  {category.requiresShadeSelection ? "เลือกเฉดก่อน" : "พร้อมช้อป"}
+                  {category.requiresShadeSelection
+                    ? "Choose shade"
+                    : "Ready to shop"}
                 </Text>
               </Pressable>
             ))}
-            <View style={styles.rowTrail} />
           </ScrollView>
         </>
       ) : null}
@@ -256,7 +252,7 @@ export function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             onMomentumScrollEnd={(event) => {
               const index = Math.round(
-                event.nativeEvent.contentOffset.x / heroWidth,
+                event.nativeEvent.contentOffset.x / width,
               );
               setActiveHeroIndex(index);
             }}
@@ -265,7 +261,7 @@ export function HomeScreen() {
               <Pressable
                 key={banner.id}
                 onPress={() => openBanner(banner.linkType, banner.linkId)}
-                style={[styles.heroCard, { width: heroWidth, height: heroHeight }]}
+                style={[styles.heroCard, { width, height: heroHeight }]}
               >
                 <View style={styles.heroBackdropLayer}>
                   <CommerceImage
@@ -295,19 +291,19 @@ export function HomeScreen() {
 
                 <View style={styles.heroCopy}>
                   <Text style={styles.heroEyebrow}>
-                    {banner.eyebrow || "คอลเลกชันแนะนำ"}
+                    {banner.eyebrow || "Featured edit"}
                   </Text>
                   <Text numberOfLines={2} style={styles.heroTitle}>
                     {banner.title}
                   </Text>
                   <Text numberOfLines={2} style={styles.heroBody}>
                     {banner.body ||
-                      "คัดสรรผลิตภัณฑ์ดูแลเส้นผมที่ให้สัมผัสนุ่ม ละมุน และดูพรีเมียมในทุกวัน"}
+                      "Curated haircare with a softer feel, calm styling, and a premium finish for every day."}
                   </Text>
 
                   <Pressable style={styles.heroButton}>
                     <Text style={styles.heroButtonText}>
-                      {banner.buttonLabel || "เลือกชม"}
+                      {banner.buttonLabel || "Explore"}
                     </Text>
                     <Animated.View
                       style={{
@@ -366,12 +362,16 @@ export function HomeScreen() {
       {featuredProducts.length > 0 ? (
         <>
           <SectionHeader
+            horizontalPadding={horizontalPadding}
             onViewAll={() => navigation.navigate("Categories")}
-            title="สินค้าแนะนำ"
+            title="Featured"
           />
 
           <ScrollView
-            contentContainerStyle={styles.productRow}
+            contentContainerStyle={[
+              styles.productRow,
+              { paddingLeft: horizontalPadding, paddingRight: horizontalPadding },
+            ]}
             horizontal
             showsHorizontalScrollIndicator={false}
           >
@@ -430,11 +430,10 @@ export function HomeScreen() {
                   }}
                   style={styles.addButton}
                 >
-                  <Text style={styles.addButtonText}>เพิ่มลงตะกร้า</Text>
+                  <Text style={styles.addButtonText}>Add to cart</Text>
                 </Pressable>
               </Pressable>
             ))}
-            <View style={styles.rowTrail} />
           </ScrollView>
         </>
       ) : null}
@@ -444,112 +443,66 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   content: {
+    paddingTop: 16,
     paddingBottom: 44,
-    backgroundColor: "#fbfefb",
+    backgroundColor: "#F7FBF8",
   },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingTop: 18,
-    paddingBottom: 16,
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(15, 40, 25, 0.06)",
-    shadowColor: "#1f5236",
+  editorialCard: {
+    overflow: "hidden",
+    borderRadius: 30,
+    backgroundColor: "#F1F7F2",
+    borderWidth: 1,
+    borderColor: "#D9E8DD",
+    paddingHorizontal: 22,
+    paddingVertical: 24,
+    gap: 8,
+    marginBottom: 26,
+    shadowColor: "#214530",
     shadowOpacity: 0.07,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
-  },
-  profileGroup: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
-    flex: 1,
-  },
-  avatarShell: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: "#edf7ef",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#dbeadd",
-  },
-  avatarWrap: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#1f5236",
-    shadowOpacity: 0.18,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
     elevation: 3,
   },
-  avatarText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontFamily: fonts.bold,
+  editorialGlowTop: {
+    position: "absolute",
+    top: -34,
+    right: -26,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: "rgba(105, 149, 118, 0.18)",
   },
-  profileCopy: {
-    gap: 2,
-    flex: 1,
-    paddingTop: 4,
+  editorialGlowBottom: {
+    position: "absolute",
+    bottom: -40,
+    left: -22,
+    width: 132,
+    height: 132,
+    borderRadius: 66,
+    backgroundColor: "rgba(183, 214, 194, 0.48)",
   },
-  greeting: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontFamily: fonts.medium,
-    color: "#7d8d82",
+  editorialEyebrow: {
+    fontSize: 11,
+    letterSpacing: 1.6,
+    textTransform: "uppercase",
+    fontFamily: fonts.semiBold,
+    color: "#527260",
   },
-  memberName: {
-    fontSize: 24,
-    lineHeight: 28,
+  editorialTitle: {
+    maxWidth: 240,
     fontFamily: fonts.extraBold,
-    color: "#163222",
+    color: "#173022",
   },
-
-  searchBar: {
-    marginHorizontal: 24,
-    marginBottom: 22,
-    borderRadius: 28,
-    backgroundColor: "#f1f8f2",
-    minHeight: 56,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#deece1",
-    shadowColor: "#2b563c",
-    shadowOpacity: 0.05,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 1,
-  },
-  searchIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "#e4f0e7",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  searchPlaceholder: {
+  editorialBody: {
+    maxWidth: 260,
     fontSize: 14,
+    lineHeight: 20,
     fontFamily: fonts.medium,
-    color: "#6d8a78",
+    color: "#5E7767",
   },
 
   categoryRow: {
-    paddingLeft: 24,
     gap: 12,
     paddingBottom: 24,
   },
@@ -618,8 +571,7 @@ const styles = StyleSheet.create({
   heroSection: {
     marginBottom: spacing["2xl"],
   },
-  heroScrollContent: {
-  },
+  heroScrollContent: {},
   heroCard: {
     overflow: "hidden",
     backgroundColor: "#dbe8dc",
@@ -733,12 +685,8 @@ const styles = StyleSheet.create({
   },
 
   productRow: {
-    paddingLeft: spacing["2xl"],
     gap: spacing.md,
     paddingBottom: spacing.xl,
-  },
-  rowTrail: {
-    width: 24,
   },
   productCard: {
     width: 166,

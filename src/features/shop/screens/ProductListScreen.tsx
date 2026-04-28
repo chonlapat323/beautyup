@@ -4,11 +4,11 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { ProductGridSkeleton } from "@/components/ui/Skeleton";
-import { useAppStore } from "@/store/useAppStore";
+import { navigateToCategories, navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
+import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function ProductListScreen() {
@@ -28,35 +28,26 @@ export function ProductListScreen() {
   );
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title={category?.title ?? "สินค้า"} subtitle={shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้า"} />}>
-      <Breadcrumbs
-        items={
-          shadeName
-            ? [
-                { label: "Home", onPress: () => navigation.navigate("Home") },
-                { label: "Categories", onPress: () => navigation.navigate("Categories") },
-                {
-                  label: category?.title ?? "สินค้า",
-                  onPress: () => navigation.navigate("Categories"),
-                },
-                {
-                  label: shadeName,
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title={category?.title ?? "สินค้า"}
+          subtitle={shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้าที่เหมาะกับคุณ"}
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
+            shadeName
+              ? {
+                  label: "เลือกเฉดสี",
                   onPress: () => navigation.navigate("ShadeSelection", { categoryId }),
-                },
-                { label: "สินค้า" },
-              ]
-            : [
-                { label: "Home", onPress: () => navigation.navigate("Home") },
-                { label: "Categories", onPress: () => navigation.navigate("Categories") },
-                {
-                  label: category?.title ?? "สินค้า",
-                  onPress: () => navigation.navigate("Categories"),
-                },
-                { label: "สินค้า" },
-              ]
-        }
-      />
-
+                }
+              : null,
+            { label: "สินค้า" },
+          ].filter(Boolean) as { label: string; onPress?: () => void }[]}
+        />
+      }
+    >
       {shadeName ? (
         <View style={styles.filterPill}>
           <Text style={styles.filterText}>{shadeName}</Text>
@@ -91,6 +82,7 @@ export function ProductListScreen() {
 
 const styles = StyleSheet.create({
   content: {
+    paddingTop: spacing.lg,
     paddingBottom: spacing["2xl"],
   },
   filterPill: {

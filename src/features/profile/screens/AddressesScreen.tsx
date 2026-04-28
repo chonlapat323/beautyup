@@ -1,14 +1,15 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { navigateToHome, navigateToProfileHome } from "@/navigation/helpers";
+import type { ProfileStackParamList } from "@/navigation/types";
 import type { MemberAddress } from "@/services/api";
 import { mobileDeleteAddress, mobileGetAddresses, mobileSetDefaultAddress } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
-import type { ProfileStackParamList } from "@/navigation/types";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function AddressesScreen() {
@@ -40,37 +41,45 @@ export function AddressesScreen() {
     try {
       await mobileSetDefaultAddress(token, addr.id);
       await load();
-    } catch (e) {
-      Alert.alert("เกิดข้อผิดพลาด", e instanceof Error ? e.message : "กรุณาลองใหม่");
+    } catch (error) {
+      Alert.alert("เกิดข้อผิดพลาด", error instanceof Error ? error.message : "กรุณาลองใหม่");
     }
   }
 
   async function handleDelete(addr: MemberAddress) {
-    Alert.alert(
-      "ลบที่อยู่",
-      `ต้องการลบ "${addr.label ?? addr.addressLine1}"?`,
-      [
-        { text: "ยกเลิก", style: "cancel" },
-        {
-          text: "ลบ",
-          style: "destructive",
-          onPress: async () => {
-            if (!token) return;
-            try {
-              await mobileDeleteAddress(token, addr.id);
-              await load();
-            } catch (e) {
-              Alert.alert("ลบไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่");
-            }
-          },
+    Alert.alert("ลบที่อยู่", `ต้องการลบ "${addr.label ?? addr.addressLine1}"?`, [
+      { text: "ยกเลิก", style: "cancel" },
+      {
+        text: "ลบ",
+        style: "destructive",
+        onPress: async () => {
+          if (!token) return;
+          try {
+            await mobileDeleteAddress(token, addr.id);
+            await load();
+          } catch (error) {
+            Alert.alert("ลบไม่สำเร็จ", error instanceof Error ? error.message : "กรุณาลองใหม่");
+          }
         },
-      ],
-    );
+      },
+    ]);
   }
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title="ที่อยู่ของฉัน" subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า" />}>
-
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="ที่อยู่ของฉัน"
+          subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า"
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "บัญชีของฉัน", onPress: () => navigateToProfileHome(navigation) },
+            { label: "ที่อยู่ของฉัน" },
+          ]}
+        />
+      }
+    >
       {isLoading ? (
         <Text style={styles.placeholder}>กำลังโหลด...</Text>
       ) : addresses.length === 0 ? (
@@ -91,10 +100,7 @@ export function AddressesScreen() {
         </View>
       )}
 
-      <Pressable
-        style={styles.addBtn}
-        onPress={() => navigation.navigate("AddressForm", {})}
-      >
+      <Pressable style={styles.addBtn} onPress={() => navigation.navigate("AddressForm", {})}>
         <Text style={styles.addBtnText}>+ เพิ่มที่อยู่ใหม่</Text>
       </Pressable>
     </Screen>
@@ -122,7 +128,7 @@ function AddressCard({
   return (
     <View style={[styles.card, addr.isDefault && styles.cardDefault]}>
       <View style={styles.cardHeader}>
-        <View style={{ gap: 2 }}>
+        <View style={styles.cardHeaderCopy}>
           {addr.label ? <Text style={styles.cardLabel}>{addr.label}</Text> : null}
           {addr.isDefault ? (
             <View style={styles.defaultBadge}>
@@ -137,11 +143,11 @@ function AddressCard({
       <Text style={styles.addrText}>{lines.join(", ")}</Text>
 
       <View style={styles.cardActions}>
-        {!addr.isDefault && (
+        {!addr.isDefault ? (
           <Pressable style={styles.actionBtn} onPress={onSetDefault}>
             <Text style={styles.actionBtnText}>ตั้งเป็นที่อยู่หลัก</Text>
           </Pressable>
-        )}
+        ) : null}
         <Pressable style={styles.actionBtn} onPress={onEdit}>
           <Text style={styles.actionBtnText}>แก้ไข</Text>
         </Pressable>
@@ -154,8 +160,16 @@ function AddressCard({
 }
 
 const styles = StyleSheet.create({
-  content: { paddingBottom: spacing["3xl"] },
-  placeholder: { color: colors.textSecondary, textAlign: "center", marginTop: spacing["3xl"], ...typography.body },
+  content: {
+    paddingTop: spacing.lg,
+    paddingBottom: spacing["3xl"],
+  },
+  placeholder: {
+    color: colors.textSecondary,
+    textAlign: "center",
+    marginTop: spacing["3xl"],
+    ...typography.body,
+  },
   emptyBox: {
     marginHorizontal: spacing["2xl"],
     marginTop: spacing["2xl"],
@@ -166,8 +180,14 @@ const styles = StyleSheet.create({
     padding: spacing["3xl"],
     alignItems: "center",
   },
-  emptyText: { color: colors.textMuted, ...typography.body },
-  list: { marginHorizontal: spacing["2xl"], marginTop: spacing.lg, gap: spacing.md },
+  emptyText: {
+    color: colors.textMuted,
+    ...typography.body,
+  },
+  list: {
+    marginHorizontal: spacing["2xl"],
+    gap: spacing.md,
+  },
   card: {
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
@@ -176,9 +196,25 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.xs,
   },
-  cardDefault: { borderColor: colors.primary, backgroundColor: "#f0faf4" },
-  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
-  cardLabel: { color: colors.primary, ...typography.caption, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.5 },
+  cardDefault: {
+    borderColor: colors.primary,
+    backgroundColor: "#F0FAF4",
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  cardHeaderCopy: {
+    gap: 2,
+  },
+  cardLabel: {
+    color: colors.primary,
+    ...typography.caption,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
   defaultBadge: {
     marginTop: 2,
     alignSelf: "flex-start",
@@ -187,11 +223,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
   },
-  defaultBadgeText: { color: "#FFF", fontSize: 10, fontWeight: "700" },
-  recipient: { color: colors.textPrimary, ...typography.title, marginTop: spacing.xs },
-  phone: { color: colors.textSecondary, ...typography.caption },
-  addrText: { color: colors.textSecondary, ...typography.body, marginTop: spacing.xs },
-  cardActions: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginTop: spacing.sm },
+  defaultBadgeText: {
+    color: "#FFF",
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  recipient: {
+    color: colors.textPrimary,
+    ...typography.title,
+    marginTop: spacing.xs,
+  },
+  phone: {
+    color: colors.textSecondary,
+    ...typography.caption,
+  },
+  addrText: {
+    color: colors.textSecondary,
+    ...typography.body,
+    marginTop: spacing.xs,
+  },
+  cardActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
   actionBtn: {
     borderRadius: radius.pill,
     borderWidth: 1,
@@ -199,9 +255,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
   },
-  actionBtnText: { color: colors.textPrimary, ...typography.caption },
-  deleteBtn: { borderColor: "#fca5a5" },
-  deleteBtnText: { color: "#ef4444", ...typography.caption },
+  actionBtnText: {
+    color: colors.textPrimary,
+    ...typography.caption,
+  },
+  deleteBtn: {
+    borderColor: "#FCA5A5",
+  },
+  deleteBtnText: {
+    color: "#EF4444",
+    ...typography.caption,
+  },
   addBtn: {
     marginHorizontal: spacing["2xl"],
     marginTop: spacing["2xl"],
@@ -211,5 +275,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  addBtnText: { color: "#FFF", ...typography.title },
+  addBtnText: {
+    color: "#FFF",
+    ...typography.title,
+  },
 });

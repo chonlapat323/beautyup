@@ -7,10 +7,9 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileCheckout, mapApiOrder, mobileInitiatePromptPay, mobileCheckPromptPay } from "@/services/api";
+import { mobileCheckPromptPay, mobileCheckout, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
 import { createOmiseToken } from "@/services/omise";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -26,34 +25,30 @@ export function PaymentScreen() {
   const token = useAppStore((state) => state.token);
   const clearCart = useAppStore((state) => state.clearCart);
   const loadOrders = useAppStore((state) => state.loadOrders);
-  const updateMemberPoints = useAppStore((state) => state.updateMemberPoints);
   const summary = getCartSummary(cart);
 
   const [method, setMethod] = useState<PaymentMethod>("card");
-
-  // Card state
   const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
   const [cardName, setCardName] = useState("TEST USER");
   const [expiry, setExpiry] = useState("12/27");
   const [cvv, setCvv] = useState("123");
-
-  // QR state
-  const [qrData, setQrData] = useState<{ chargeId: string; svgContent: string; expiresAt: string } | null>(null);
+  const [qrData, setQrData] = useState<{
+    chargeId: string;
+    svgContent: string;
+    expiresAt: string;
+  } | null>(null);
   const [isCreatingQR, setIsCreatingQR] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState<{ title: string; message?: string } | null>(null);
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Auto-create QR when switching to QR tab
   useEffect(() => {
     if (method !== "qr" || qrData || isCreatingQR) return;
     void handleCreateQR();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method]);
 
-  // Polling when QR is shown
   useEffect(() => {
     if (!qrData || !token) return;
 
@@ -70,10 +65,13 @@ export function PaymentScreen() {
           } else if (result.status === "failed" || result.status === "expired") {
             clearPolling();
             setQrData(null);
-            setModal({ title: "ชำระเงินไม่สำเร็จ", message: "QR Code หมดอายุหรือการชำระเงินไม่สำเร็จ กรุณาลองใหม่" });
+            setModal({
+              title: "ชำระเงินไม่สำเร็จ",
+              message: "QR Code หมดอายุหรือการชำระเงินไม่สำเร็จ กรุณาลองใหม่",
+            });
           }
         } catch {
-          // ignore transient poll errors
+          // Ignore transient poll errors.
         }
       })();
     }, 3000);
@@ -103,7 +101,10 @@ export function PaymentScreen() {
   async function handlePay() {
     const [expMonth, expYear] = expiry.split("/").map(Number);
     if (!cardNumber || !cardName || !expMonth || !expYear || !cvv) {
-      setModal({ title: "กรุณากรอกข้อมูลให้ครบถ้วน", message: "กรุณากรอกหมายเลขบัตร ชื่อบนบัตร วันหมดอายุ และ CVV" });
+      setModal({
+        title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        message: "กรุณากรอกหมายเลขบัตร ชื่อบนบัตร วันหมดอายุ และ CVV",
+      });
       return;
     }
     if (!token) return;
@@ -120,7 +121,7 @@ export function PaymentScreen() {
 
       const order = await mobileCheckout(
         token,
-        cart.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+        cart.map((item) => ({ productId: item.productId, quantity: item.quantity })),
         shippingName,
         shippingPhone,
         shippingAddr,
@@ -130,10 +131,12 @@ export function PaymentScreen() {
       clearCart();
       await loadOrders();
       const mapped = mapApiOrder(order);
-      setIsLoading(false);
       navigation.replace("OrderSuccess", { orderId: mapped.id });
-    } catch (e) {
-      setModal({ title: "ชำระเงินไม่สำเร็จ", message: e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง" });
+    } catch (error) {
+      setModal({
+        title: "ชำระเงินไม่สำเร็จ",
+        message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -145,43 +148,58 @@ export function PaymentScreen() {
     try {
       const result = await mobileInitiatePromptPay(
         token,
-        cart.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+        cart.map((item) => ({ productId: item.productId, quantity: item.quantity })),
         shippingName,
         shippingPhone,
         shippingAddr,
       );
       setQrData(result);
-    } catch (e) {
-      setModal({ title: "สร้าง QR ไม่สำเร็จ", message: e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง" });
+    } catch (error) {
+      setModal({
+        title: "สร้าง QR ไม่สำเร็จ",
+        message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง",
+      });
     } finally {
       setIsCreatingQR(false);
     }
   }
 
   return (
-    <Screen contentContainerStyle={styles.content} header={<AppHeader title="ชำระเงิน" />}>
-      <Breadcrumbs
-        items={[
-          { label: "Home", onPress: () => navigateToHome(navigation) },
-          { label: "Cart", onPress: () => navigation.navigate("Cart") },
-          { label: "Checkout", onPress: () => navigation.navigate("Checkout") },
-          { label: "ชำระเงิน" },
-        ]}
-      />
-
-      {/* Payment method toggle */}
+    <Screen
+      contentContainerStyle={styles.content}
+      header={
+        <AppHeader
+          title="ชำระเงิน"
+          subtitle="เลือกวิธีชำระเงินและยืนยันการสั่งซื้อ"
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
+            { label: "ตรวจสอบคำสั่งซื้อ", onPress: () => navigation.navigate("Checkout") },
+            { label: "ชำระเงิน" },
+          ]}
+        />
+      }
+    >
       <View style={styles.toggle}>
         <Pressable
           style={[styles.toggleBtn, method === "card" && styles.toggleBtnActive]}
-          onPress={() => { setMethod("card"); setQrData(null); clearPolling(); }}
+          onPress={() => {
+            setMethod("card");
+            setQrData(null);
+            clearPolling();
+          }}
         >
-          <Text style={[styles.toggleText, method === "card" && styles.toggleTextActive]}>บัตรเครดิต</Text>
+          <Text style={[styles.toggleText, method === "card" && styles.toggleTextActive]}>
+            บัตรเครดิต
+          </Text>
         </Pressable>
         <Pressable
           style={[styles.toggleBtn, method === "qr" && styles.toggleBtnActive]}
           onPress={() => setMethod("qr")}
         >
-          <Text style={[styles.toggleText, method === "qr" && styles.toggleTextActive]}>PromptPay QR</Text>
+          <Text style={[styles.toggleText, method === "qr" && styles.toggleTextActive]}>
+            PromptPay QR
+          </Text>
         </Pressable>
       </View>
 
@@ -197,7 +215,7 @@ export function PaymentScreen() {
               placeholderTextColor={colors.textMuted}
               keyboardType="numeric"
               value={cardNumber}
-              onChangeText={(v) => setCardNumber(formatCardNumber(v))}
+              onChangeText={(value) => setCardNumber(formatCardNumber(value))}
               maxLength={19}
             />
           </View>
@@ -223,7 +241,7 @@ export function PaymentScreen() {
                 placeholderTextColor={colors.textMuted}
                 keyboardType="numeric"
                 value={expiry}
-                onChangeText={(v) => setExpiry(formatExpiry(v))}
+                onChangeText={(value) => setExpiry(formatExpiry(value))}
                 maxLength={5}
               />
             </View>
@@ -236,7 +254,7 @@ export function PaymentScreen() {
                 keyboardType="numeric"
                 secureTextEntry
                 value={cvv}
-                onChangeText={(v) => setCvv(v.replace(/\D/g, "").slice(0, 4))}
+                onChangeText={(value) => setCvv(value.replace(/\D/g, "").slice(0, 4))}
                 maxLength={4}
               />
             </View>
@@ -247,7 +265,11 @@ export function PaymentScreen() {
           {isCreatingQR ? (
             <>
               <Text style={styles.sectionTitle}>PromptPay QR</Text>
-              <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: spacing["2xl"] }} />
+              <ActivityIndicator
+                size="large"
+                color={colors.primary}
+                style={{ marginVertical: spacing["2xl"] }}
+              />
               <Text style={styles.qrHint}>กำลังสร้าง QR Code...</Text>
             </>
           ) : qrData ? (
@@ -272,7 +294,7 @@ export function PaymentScreen() {
         <Text style={styles.summaryAmount}>THB {summary.total.toFixed(0)}</Text>
       </View>
 
-      {method === "card" && (
+      {method === "card" ? (
         <Pressable
           onPress={() => void handlePay()}
           disabled={isLoading}
@@ -280,7 +302,7 @@ export function PaymentScreen() {
         >
           <Text style={styles.buttonText}>ชำระเงิน</Text>
         </Pressable>
-      )}
+      ) : null}
 
       <AppModal
         visible={modal !== null}
@@ -302,11 +324,13 @@ export function PaymentScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingBottom: spacing["3xl"] },
+  content: {
+    paddingTop: spacing.lg,
+    paddingBottom: spacing["3xl"],
+  },
   toggle: {
     flexDirection: "row",
     marginHorizontal: spacing["2xl"],
-    marginTop: spacing.lg,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.borderSoft,
@@ -318,9 +342,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.background,
   },
-  toggleBtnActive: { backgroundColor: colors.primary },
-  toggleText: { color: colors.textSecondary, ...typography.body },
-  toggleTextActive: { color: "#fff", fontWeight: "600" },
+  toggleBtnActive: {
+    backgroundColor: colors.primary,
+  },
+  toggleText: {
+    color: colors.textSecondary,
+    ...typography.body,
+  },
+  toggleTextActive: {
+    color: "#FFF",
+    fontWeight: "600",
+  },
   card: {
     marginHorizontal: spacing["2xl"],
     marginTop: spacing.lg,
@@ -342,9 +374,19 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     alignItems: "center",
   },
-  sectionTitle: { color: colors.textPrimary, ...typography.title, alignSelf: "flex-start" },
-  fieldGroup: { gap: spacing.xs, alignSelf: "stretch" },
-  label: { color: colors.textSecondary, ...typography.caption },
+  sectionTitle: {
+    color: colors.textPrimary,
+    ...typography.title,
+    alignSelf: "flex-start",
+  },
+  fieldGroup: {
+    gap: spacing.xs,
+    alignSelf: "stretch",
+  },
+  label: {
+    color: colors.textSecondary,
+    ...typography.caption,
+  },
   input: {
     borderWidth: 1,
     borderColor: colors.borderSoft,
@@ -355,10 +397,24 @@ const styles = StyleSheet.create({
     ...typography.body,
     backgroundColor: colors.background,
   },
-  row: { flexDirection: "row", gap: spacing.md },
-  qrHint: { color: colors.textSecondary, ...typography.body, textAlign: "center" },
-  pollingRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  pollingText: { color: colors.textSecondary, ...typography.caption },
+  row: {
+    flexDirection: "row",
+    gap: spacing.md,
+  },
+  qrHint: {
+    color: colors.textSecondary,
+    ...typography.body,
+    textAlign: "center",
+  },
+  pollingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  pollingText: {
+    color: colors.textSecondary,
+    ...typography.caption,
+  },
   summaryCard: {
     marginHorizontal: spacing["2xl"],
     marginTop: spacing["2xl"],
@@ -371,8 +427,14 @@ const styles = StyleSheet.create({
     borderColor: colors.borderSoft,
     padding: spacing.lg,
   },
-  summaryLabel: { color: colors.textSecondary, ...typography.body },
-  summaryAmount: { color: colors.primaryStrong, ...typography.title },
+  summaryLabel: {
+    color: colors.textSecondary,
+    ...typography.body,
+  },
+  summaryAmount: {
+    color: colors.primaryStrong,
+    ...typography.title,
+  },
   button: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],
@@ -381,8 +443,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     alignItems: "center",
   },
-  buttonDisabled: { backgroundColor: colors.textMuted },
-  buttonText: { color: "#FFFFFF", ...typography.title },
+  buttonDisabled: {
+    backgroundColor: colors.textMuted,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    ...typography.title,
+  },
   loadingOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",
@@ -397,5 +464,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.lg,
   },
-  loadingText: { color: colors.textPrimary, ...typography.body },
+  loadingText: {
+    color: colors.textPrimary,
+    ...typography.body,
+  },
 });
