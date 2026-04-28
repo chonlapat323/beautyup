@@ -66,7 +66,7 @@ export type Order = {
   status: "Pending" | "Paid" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
   placedAt: string;
   gatewayFee: number;
-  pointEarned: number;
+  pointEarned?: number;
   items: OrderItem[];
   shippingName?: string;
   shippingPhone?: string;

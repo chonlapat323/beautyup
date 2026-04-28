@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import { colors, fonts, spacing, typography } from "@/theme";

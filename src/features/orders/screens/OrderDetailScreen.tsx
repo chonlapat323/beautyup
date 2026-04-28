@@ -91,7 +91,7 @@ export function OrderDetailScreen() {
           <Text style={styles.heroLabel}>จำนวนสินค้า</Text>
           <Text style={styles.heroValue}>{order.itemCount}</Text>
         </View>
-        {order.pointEarned > 0 ? (
+        {(order.pointEarned ?? 0) > 0 ? (
           <>
             <View style={styles.heroDivider} />
             <View>
