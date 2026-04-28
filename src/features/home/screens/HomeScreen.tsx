@@ -14,6 +14,7 @@ import {
 
 import { Screen } from "@/components/layout/Screen";
 import { CommerceImage } from "@/components/ui/CommerceImage";
+import { PointsPill } from "@/components/ui/PointsPill";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -191,16 +192,19 @@ export function HomeScreen() {
           </View>
         </View>
 
-        <Pressable onPress={() => navigation.navigate("Cart")} style={styles.cartButton}>
-          <MaterialIcons name="shopping-bag" size={21} color={colors.primaryDark} />
-          {cartCount > 0 ? (
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>
-                {cartCount > 99 ? "99+" : cartCount}
-              </Text>
-            </View>
-          ) : null}
-        </Pressable>
+        <View style={styles.rightGroup}>
+          <PointsPill />
+          <Pressable onPress={() => navigation.navigate("Cart")} style={styles.cartButton}>
+            <MaterialIcons name="shopping-bag" size={21} color={colors.primaryDark} />
+            {cartCount > 0 ? (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>
+                  {cartCount > 99 ? "99+" : cartCount}
+                </Text>
+              </View>
+            ) : null}
+          </Pressable>
+        </View>
       </View>
 
       <Pressable
@@ -514,6 +518,11 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontFamily: fonts.extraBold,
     color: "#163222",
+  },
+  rightGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   cartButton: {
     width: 56,
