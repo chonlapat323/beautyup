@@ -14,7 +14,6 @@ import {
 
 import { Screen } from "@/components/layout/Screen";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { PointsPill } from "@/components/ui/PointsPill";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -191,7 +190,6 @@ export function HomeScreen() {
           </View>
         </View>
 
-        <PointsPill />
       </View>
 
       <Pressable

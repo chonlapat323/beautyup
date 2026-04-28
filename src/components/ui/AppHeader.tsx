@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 import { BrandLockup } from "@/components/ui/BrandLockup";
-import { PointsPill } from "@/components/ui/PointsPill";
 import { colors, fonts, spacing, typography } from "@/theme";
 
 type AppHeaderProps = {
@@ -12,10 +11,7 @@ type AppHeaderProps = {
 export function AppHeader({ title, subtitle }: AppHeaderProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.topRow}>
-        <BrandLockup compact />
-        <PointsPill />
-      </View>
+      <BrandLockup compact />
       <Text style={styles.title}>{title}</Text>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
     </View>
@@ -28,11 +24,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingBottom: spacing.xl,
     gap: spacing.sm,
-  },
-  topRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
   title: {
     color: colors.textPrimary,

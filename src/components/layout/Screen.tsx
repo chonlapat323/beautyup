@@ -2,6 +2,7 @@ import { PropsWithChildren, useState } from "react";
 import { RefreshControl, ScrollView, ScrollViewProps, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { PointsPill } from "@/components/ui/PointsPill";
 import { colors } from "@/theme";
 
 type ScreenProps = PropsWithChildren<{
@@ -29,6 +30,9 @@ export function Screen({
     return (
       <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
         <View style={styles.content}>{children}</View>
+        <View style={styles.pillOverlay} pointerEvents="box-none">
+          <PointsPill />
+        </View>
       </SafeAreaView>
     );
   }
@@ -51,6 +55,9 @@ export function Screen({
       >
         {children}
       </ScrollView>
+      <View style={styles.pillOverlay} pointerEvents="box-none">
+        <PointsPill />
+      </View>
     </SafeAreaView>
   );
 }
@@ -63,5 +70,10 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     backgroundColor: colors.background,
+  },
+  pillOverlay: {
+    position: "absolute",
+    top: 16,
+    right: 24,
   },
 });
