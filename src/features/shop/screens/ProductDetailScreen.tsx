@@ -17,7 +17,7 @@ export function ProductDetailScreen() {
   const route = useRoute<RouteProp<ShopStackParamList, "ProductDetail">>();
   const insets = useSafeAreaInsets();
   const addToCart = useAppStore((state) => state.addToCart);
-  const product = useAppStore((state) =>
+  const foundProduct = useAppStore((state) =>
     state.products.find((item) => item.id === route.params.productId),
   );
 
@@ -25,10 +25,9 @@ export function ProductDetailScreen() {
   const [activeSlide, setActiveSlide] = useState(0);
   const carouselRef = useRef<ScrollView>(null);
 
-  if (!product) return null;
+  if (!foundProduct) return null;
 
-  const currentProduct = product;
-
+  const product = foundProduct;
   const images =
     product.images && product.images.length > 0
       ? product.images
@@ -58,8 +57,7 @@ export function ProductDetailScreen() {
               { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
               {
                 label: "สินค้า",
-                onPress: () =>
-                  navigation.navigate("ProductList", { categoryId: currentProduct.categoryId }),
+                onPress: () => navigation.navigate("ProductList", { categoryId: product.categoryId }),
               },
               { label: "รายละเอียดสินค้า" },
             ]}
@@ -97,14 +95,12 @@ export function ProductDetailScreen() {
 
         <View style={styles.body}>
           <View style={styles.priceRow}>
-            <Text style={styles.price}>THB {currentProduct.price.toFixed(0)}</Text>
-            {currentProduct.originalPrice ? (
-              <Text style={styles.originalPrice}>THB {currentProduct.originalPrice.toFixed(0)}</Text>
+            <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>
+            {product.originalPrice ? (
+              <Text style={styles.originalPrice}>THB {product.originalPrice.toFixed(0)}</Text>
             ) : null}
           </View>
-          {currentProduct.description ? (
-            <Text style={styles.description}>{currentProduct.description}</Text>
-          ) : null}
+          {product.description ? <Text style={styles.description}>{product.description}</Text> : null}
         </View>
       </Screen>
 
@@ -177,9 +173,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingTop: spacing.md,
     paddingHorizontal: spacing["2xl"],
-    backgroundColor: "rgba(247, 251, 248, 0.96)",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(31, 82, 54, 0.08)",
   },
   button: {
     borderRadius: radius.pill,

@@ -1,9 +1,11 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { colors, fonts } from "@/theme";
 import type { Category } from "@/types/domain";
+
+const centerLeafIcon = require("../../../logo/icon.png") as ReturnType<typeof require>;
 
 type HomeCategoriesSectionProps = {
   categories: Category[];
@@ -28,9 +30,6 @@ export function HomeCategoriesSection({
 
         <View style={styles.header}>
           <View style={styles.titleWrap}>
-            <View style={styles.titleIcon}>
-              <MaterialIcons color="#F6FBF7" name="eco" size={14} />
-            </View>
             <Text style={styles.title}>Categories</Text>
           </View>
 
@@ -71,7 +70,7 @@ export function HomeCategoriesSection({
         <View style={styles.bottomBridge} />
         <View style={styles.bottomNotch}>
           <View style={styles.bottomBadge}>
-            <MaterialIcons color={colors.primaryDark} name="eco" size={16} />
+            <Image resizeMode="contain" source={centerLeafIcon} style={styles.bottomBadgeIcon} />
           </View>
         </View>
       </View>
@@ -82,7 +81,7 @@ export function HomeCategoriesSection({
 const styles = StyleSheet.create({
   shell: {
     position: "relative",
-    marginBottom: 34,
+    marginBottom: 42,
   },
   section: {
     overflow: "hidden",
@@ -91,7 +90,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: "#8EB397",
     paddingTop: 16,
-    paddingBottom: 28,
+    paddingBottom: 34,
     paddingHorizontal: 16,
     shadowColor: "#214530",
     shadowOpacity: 0.04,
@@ -127,16 +126,7 @@ const styles = StyleSheet.create({
   titleWrap: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
     flexShrink: 1,
-  },
-  titleIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: colors.primaryDark,
-    alignItems: "center",
-    justifyContent: "center",
   },
   title: {
     fontSize: 20,
@@ -220,23 +210,23 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    bottom: -24,
+    bottom: -28,
     alignItems: "center",
     zIndex: 5,
   },
   bottomBridge: {
     position: "absolute",
     top: 0,
-    width: 66,
-    height: 18,
+    width: 74,
+    height: 20,
     backgroundColor: "#FFFFFF",
     borderTopWidth: 1.5,
     borderColor: "#FFFFFF",
   },
   bottomNotch: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: 62,
+    height: 62,
+    borderRadius: 31,
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
     borderColor: "#8EB397",
@@ -249,13 +239,15 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   bottomBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#D6E6DA",
     alignItems: "center",
     justifyContent: "center",
+  },
+  bottomBadgeIcon: {
+    width: 28,
+    height: 28,
   },
 });
