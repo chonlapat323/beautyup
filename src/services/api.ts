@@ -352,13 +352,15 @@ export async function mobileCheckout(
   return res.json() as Promise<ApiOrder>;
 }
 
-export async function mobileGetReceiptUrl(token: string, orderId: string): Promise<string> {
-  const res = await fetch(`${API_BASE}/mobile/orders/${orderId}/receipt`, {
+export async function mobileGetOrderDocuments(
+  token: string,
+  orderId: string,
+): Promise<{ taxInvoiceUrl: string | null; receiptUrl: string | null }> {
+  const res = await fetch(`${API_BASE}/mobile/orders/${orderId}/documents`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("ไม่พบใบเสร็จสำหรับคำสั่งซื้อนี้");
-  const data = (await res.json()) as { url: string };
-  return data.url;
+  if (!res.ok) throw new Error("ไม่พบเอกสารสำหรับคำสั่งซื้อนี้");
+  return res.json() as Promise<{ taxInvoiceUrl: string | null; receiptUrl: string | null }>;
 }
 
 export async function mobileInitiatePromptPay(

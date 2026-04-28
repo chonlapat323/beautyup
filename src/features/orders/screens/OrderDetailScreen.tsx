@@ -11,7 +11,7 @@ import { CommerceImage } from "@/components/ui/CommerceImage";
 import { navigateToHome, navigateToOrderHistory } from "@/navigation/helpers";
 import { useAppStore } from "@/store/useAppStore";
 import type { OrderStackParamList } from "@/navigation/types";
-import { mobileGetReceiptUrl } from "@/services/api";
+import { mobileGetOrderDocuments } from "@/services/api";
 import { colors, radius, spacing, typography } from "@/theme";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -32,19 +32,24 @@ export function OrderDetailScreen() {
   const products = useAppStore((state) => state.products);
   const token = useAppStore((state) => state.token);
 
-  const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [errorModal, setErrorModal] = useState<string | null>(null);
 
-  async function handleDownloadReceipt() {
+  async function handleOpenDocument(type: "taxInvoice" | "receipt") {
     if (!token || !order) return;
-    setIsLoadingReceipt(true);
+    setIsLoading(true);
     try {
-      const url = await mobileGetReceiptUrl(token, order.id);
+      const docs = await mobileGetOrderDocuments(token, order.id);
+      const url = type === "taxInvoice" ? docs.taxInvoiceUrl : docs.receiptUrl;
+      if (!url) {
+        setErrorModal("ยังไม่มีเอกสารสำหรับคำสั่งซื้อนี้ กรุณาลองใหม่อีกครั้ง");
+        return;
+      }
       await Linking.openURL(url);
     } catch {
-      setErrorModal("ยังไม่มีใบเสร็จสำหรับคำสั่งซื้อนี้ กรุณาลองใหม่อีกครั้ง");
+      setErrorModal("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
     } finally {
-      setIsLoadingReceipt(false);
+      setIsLoading(false);
     }
   }
 
@@ -100,7 +105,6 @@ export function OrderDetailScreen() {
         <Text style={styles.sectionTitle}>รายการสินค้า</Text>
         {order.items.map((item) => {
           const product = products.find((entry) => entry.id === item.productId);
-
           return (
             <View key={`${order.id}-${item.productId}`} style={styles.itemCard}>
               <CommerceImage style={styles.itemArtwork} uri={product?.imageUrl} />
@@ -121,19 +125,26 @@ export function OrderDetailScreen() {
         <Row label="รวมทั้งหมด" strong value={`THB ${order.total.toFixed(0)}`} />
       </View>
 
-      <Pressable
-        onPress={() => void handleDownloadReceipt()}
-        disabled={isLoadingReceipt}
-        style={[styles.receiptButton, isLoadingReceipt && styles.receiptButtonDisabled]}
-      >
-        <Text style={styles.receiptButtonText}>
-          {isLoadingReceipt ? "กำลังโหลดใบเสร็จ..." : "ดาวน์โหลดใบเสร็จ"}
-        </Text>
-      </Pressable>
+      <View style={styles.docButtons}>
+        <Pressable
+          onPress={() => void handleOpenDocument("taxInvoice")}
+          disabled={isLoading}
+          style={[styles.docButton, isLoading && styles.docButtonDisabled]}
+        >
+          <Text style={styles.docButtonText}>ใบกำกับภาษี</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => void handleOpenDocument("receipt")}
+          disabled={isLoading}
+          style={[styles.docButton, isLoading && styles.docButtonDisabled]}
+        >
+          <Text style={styles.docButtonText}>ใบเสร็จรับเงิน</Text>
+        </Pressable>
+      </View>
 
       <AppModal
         visible={errorModal !== null}
-        title="ไม่พบใบเสร็จ"
+        title="ไม่พบเอกสาร"
         message={errorModal ?? undefined}
         onConfirm={() => setErrorModal(null)}
       />
@@ -263,17 +274,22 @@ const styles = StyleSheet.create({
   strongText: {
     ...typography.title,
   },
-  receiptButton: {
+  docButtons: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],
+    flexDirection: "row",
+    gap: spacing.md,
+  },
+  docButton: {
+    flex: 1,
     borderRadius: radius.pill,
     borderWidth: 1.5,
     borderColor: colors.primary,
     paddingVertical: spacing.lg,
     alignItems: "center",
   },
-  receiptButtonDisabled: { borderColor: colors.textMuted },
-  receiptButtonText: {
+  docButtonDisabled: { borderColor: colors.textMuted },
+  docButtonText: {
     color: colors.primary,
     ...typography.title,
   },
