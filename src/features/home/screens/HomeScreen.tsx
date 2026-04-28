@@ -83,7 +83,6 @@ export function HomeScreen() {
   const addToCart = useAppStore((state) => state.addToCart);
   const loadCatalog = useAppStore((state) => state.loadCatalog);
 
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const initials = member?.fullName?.trim().charAt(0).toUpperCase() ?? "P";
   const featuredProducts = (
     products.filter((product) => product.isFeatured).length > 0
@@ -192,19 +191,7 @@ export function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.rightGroup}>
-          <PointsPill />
-          <Pressable onPress={() => navigation.navigate("Cart")} style={styles.cartButton}>
-            <MaterialIcons name="shopping-bag" size={21} color={colors.primaryDark} />
-            {cartCount > 0 ? (
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeText}>
-                  {cartCount > 99 ? "99+" : cartCount}
-                </Text>
-              </View>
-            ) : null}
-          </Pressable>
-        </View>
+        <PointsPill />
       </View>
 
       <Pressable
@@ -518,43 +505,6 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontFamily: fonts.extraBold,
     color: "#163222",
-  },
-  rightGroup: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  cartButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#f3faf5",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#ddece1",
-    shadowColor: "#244c35",
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 2,
-  },
-  cartBadge: {
-    position: "absolute",
-    top: -3,
-    right: -2,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: colors.primaryDark,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 4,
-  },
-  cartBadgeText: {
-    color: "#FFFFFF",
-    fontSize: 9,
-    fontFamily: fonts.bold,
   },
 
   searchBar: {
