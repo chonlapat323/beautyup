@@ -240,6 +240,7 @@ export function HomeScreen() {
                 </Text>
               </Pressable>
             ))}
+            <View style={styles.rowTrail} />
           </ScrollView>
         </>
       ) : null}
@@ -432,6 +433,7 @@ export function HomeScreen() {
                 </Pressable>
               </Pressable>
             ))}
+            <View style={styles.rowTrail} />
           </ScrollView>
         </>
       ) : null}
@@ -539,7 +541,6 @@ const styles = StyleSheet.create({
 
   categoryRow: {
     paddingLeft: 24,
-    paddingRight: 24,
     gap: 12,
     paddingBottom: 24,
   },
@@ -731,9 +732,12 @@ const styles = StyleSheet.create({
   },
 
   productRow: {
-    paddingHorizontal: spacing["2xl"],
+    paddingLeft: spacing["2xl"],
     gap: spacing.md,
     paddingBottom: spacing.xl,
+  },
+  rowTrail: {
+    width: 24,
   },
   productCard: {
     width: 166,

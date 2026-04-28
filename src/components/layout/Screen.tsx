@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   pillOverlay: {
     position: "absolute",
-    top: 16,
+    top: 32,
     right: 24,
   },
 });
