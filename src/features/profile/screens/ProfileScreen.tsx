@@ -219,7 +219,6 @@ const styles = StyleSheet.create({
   },
   referralHint: {
     color: colors.textMuted,
-    fontSize: 10,
     ...typography.caption,
   },
   menuButton: {
