@@ -80,7 +80,7 @@ export function HomeFeaturedSection({
                   <View style={styles.imageShell}>
                     <View style={styles.imageGlow} />
                     <CommerceImage
-                      resizeMode="contain"
+                      resizeMode="cover"
                       style={styles.image}
                       uri={product.imageUrl}
                     />
@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(219, 238, 223, 0.55)",
   },
   image: {
-    width: "78%",
-    height: "78%",
+    width: "100%",
+    height: "100%",
   },
   badgeWrap: {
     position: "absolute",
