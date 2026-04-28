@@ -23,13 +23,14 @@ export function ShadeSelectionScreen() {
   const [shades, setShades] = useState<Shade[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [activeGroup, setActiveGroup] = useState<string>("");
+  const [activeGroup, setActiveGroup] = useState("");
 
-  const category = categories.find((c) => c.id === route.params.categoryId);
+  const category = categories.find((entry) => entry.id === route.params.categoryId);
 
   useEffect(() => {
     setIsLoading(true);
     setError(false);
+
     fetchShades(route.params.categoryId)
       .then(setShades)
       .catch(() => setError(true))
@@ -37,13 +38,18 @@ export function ShadeSelectionScreen() {
   }, [route.params.categoryId]);
 
   const groups = useMemo(() => {
-    const map = new Map<string, Shade[]>();
+    const shadeMap = new Map<string, Shade[]>();
+
     for (const shade of shades) {
       const key = shade.groupName;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(shade);
+      if (!shadeMap.has(key)) shadeMap.set(key, []);
+      shadeMap.get(key)!.push(shade);
     }
-    return Array.from(map.entries()).map(([groupName, items]) => ({ groupName, items }));
+
+    return Array.from(shadeMap.entries()).map(([groupName, items]) => ({
+      groupName,
+      items,
+    }));
   }, [shades]);
 
   useEffect(() => {
@@ -91,14 +97,15 @@ export function ShadeSelectionScreen() {
               showsHorizontalScrollIndicator={false}
             >
               {groups.map((group) => {
-                const active = group.groupName === activeGroup;
+                const isActive = group.groupName === activeGroup;
+
                 return (
                   <Pressable
                     key={group.groupName}
                     onPress={() => setActiveGroup(group.groupName)}
-                    style={[styles.groupChip, active && styles.groupChipActive]}
+                    style={[styles.groupChip, isActive && styles.groupChipActive]}
                   >
-                    <Text style={[styles.groupChipText, active && styles.groupChipTextActive]}>
+                    <Text style={[styles.groupChipText, isActive && styles.groupChipTextActive]}>
                       {group.groupName}
                     </Text>
                   </Pressable>
@@ -115,6 +122,7 @@ export function ShadeSelectionScreen() {
           <View style={styles.grid}>
             {filteredShades.map((shade) => {
               const selected = selectedShadeId === shade.id;
+
               return (
                 <Pressable
                   key={shade.id}
@@ -136,6 +144,7 @@ export function ShadeSelectionScreen() {
                       </View>
                     ) : null}
                   </View>
+
                   <View style={styles.footer}>
                     <View style={styles.copy}>
                       <Text style={styles.name}>{shade.name}</Text>

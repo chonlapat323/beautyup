@@ -16,6 +16,7 @@ import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
+import { HomeCategoriesSection } from "@/features/home/components/HomeCategoriesSection";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, fonts, spacing } from "@/theme";
@@ -83,8 +84,8 @@ export function HomeScreen() {
   const heroSlides = (banners.length > 0 ? banners : []).slice(0, 4);
 
   const horizontalPadding = width < 360 ? 18 : width >= 430 ? 28 : 24;
+  const categoryCardWidth = width < 360 ? 136 : width >= 430 ? 152 : 144;
   const heroHeight = Math.round(width * (width < 380 ? 0.66 : 0.58));
-  const editorialTitleSize = width < 360 ? 24 : width >= 430 ? 30 : 28;
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const heroScrollRef = useRef<ScrollView>(null);
   const pulse = useRef(new Animated.Value(0)).current;
@@ -174,73 +175,13 @@ export function HomeScreen() {
       contentContainerStyle={styles.content}
       onRefresh={loadCatalog}
     >
-      <View style={[styles.editorialCard, { marginHorizontal: horizontalPadding }]}>
-        <View style={styles.editorialGlowTop} />
-        <View style={styles.editorialGlowBottom} />
-        <Text style={styles.editorialEyebrow}>Daily Ritual</Text>
-        <Text
-          style={[
-            styles.editorialTitle,
-            {
-              fontSize: editorialTitleSize,
-              lineHeight: editorialTitleSize + 6,
-            },
-          ]}
-        >
-          Calm care. Clean finish.
-        </Text>
-        <Text style={styles.editorialBody}>
-          Soft green tones, calm spacing, and a premium start to every session.
-        </Text>
-      </View>
-
-      {categories.length > 0 ? (
-        <>
-          <SectionHeader
-            horizontalPadding={horizontalPadding}
-            onViewAll={() => navigation.navigate("Categories")}
-            title="Categories"
-          />
-
-          <ScrollView
-            contentContainerStyle={[
-              styles.categoryRow,
-              { paddingLeft: horizontalPadding, paddingRight: horizontalPadding },
-            ]}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {categories.slice(0, 6).map((category) => (
-              <Pressable
-                key={category.id}
-                onPress={() =>
-                  openCategory(category.id, category.requiresShadeSelection)
-                }
-                style={styles.categoryCard}
-              >
-                <View style={styles.categoryVisual}>
-                  <View style={styles.categoryGlow} />
-                  <View style={styles.categoryIconWrap}>
-                    <CommerceImage
-                      resizeMode="cover"
-                      style={styles.categoryIcon}
-                      uri={category.imageUrl}
-                    />
-                  </View>
-                </View>
-                <Text numberOfLines={2} style={styles.categoryLabel}>
-                  {category.title}
-                </Text>
-                <Text numberOfLines={1} style={styles.categoryCaption}>
-                  {category.requiresShadeSelection
-                    ? "Choose shade"
-                    : "Ready to shop"}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </>
-      ) : null}
+      <HomeCategoriesSection
+        categories={categories}
+        cardWidth={categoryCardWidth}
+        horizontalPadding={horizontalPadding}
+        onSelectCategory={openCategory}
+        onViewAll={() => navigation.navigate("Categories")}
+      />
 
       {heroSlides.length > 0 ? (
         <View style={styles.heroSection}>
@@ -446,126 +387,6 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 44,
     backgroundColor: "#F7FBF8",
-  },
-
-  editorialCard: {
-    overflow: "hidden",
-    borderRadius: 30,
-    backgroundColor: "#F1F7F2",
-    borderWidth: 1,
-    borderColor: "#D9E8DD",
-    paddingHorizontal: 22,
-    paddingVertical: 24,
-    gap: 8,
-    marginBottom: 26,
-    shadowColor: "#214530",
-    shadowOpacity: 0.07,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 3,
-  },
-  editorialGlowTop: {
-    position: "absolute",
-    top: -34,
-    right: -26,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(105, 149, 118, 0.18)",
-  },
-  editorialGlowBottom: {
-    position: "absolute",
-    bottom: -40,
-    left: -22,
-    width: 132,
-    height: 132,
-    borderRadius: 66,
-    backgroundColor: "rgba(183, 214, 194, 0.48)",
-  },
-  editorialEyebrow: {
-    fontSize: 11,
-    letterSpacing: 1.6,
-    textTransform: "uppercase",
-    fontFamily: fonts.semiBold,
-    color: "#527260",
-  },
-  editorialTitle: {
-    maxWidth: 240,
-    fontFamily: fonts.extraBold,
-    color: "#173022",
-  },
-  editorialBody: {
-    maxWidth: 260,
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: fonts.medium,
-    color: "#5E7767",
-  },
-
-  categoryRow: {
-    gap: 12,
-    paddingBottom: 24,
-  },
-  categoryCard: {
-    width: 122,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 26,
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#e8f1ea",
-    gap: 10,
-    shadowColor: "#2c5a3c",
-    shadowOpacity: 0.05,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 2,
-  },
-  categoryVisual: {
-    width: "100%",
-    height: 108,
-    borderRadius: 22,
-    backgroundColor: "#eff7f1",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    position: "relative",
-  },
-  categoryGlow: {
-    position: "absolute",
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    backgroundColor: "#d9ebdd",
-    opacity: 0.85,
-  },
-  categoryIconWrap: {
-    width: 70,
-    height: 70,
-    borderRadius: 21,
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#dbe9df",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  categoryIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-  },
-  categoryLabel: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: "#203628",
-    fontFamily: fonts.semiBold,
-  },
-  categoryCaption: {
-    fontSize: 11,
-    lineHeight: 14,
-    color: "#6d8677",
-    fontFamily: fonts.medium,
   },
 
   heroSection: {
