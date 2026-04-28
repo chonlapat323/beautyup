@@ -91,6 +91,15 @@ export function OrderDetailScreen() {
           <Text style={styles.heroLabel}>จำนวนสินค้า</Text>
           <Text style={styles.heroValue}>{order.itemCount}</Text>
         </View>
+        {order.pointEarned > 0 ? (
+          <>
+            <View style={styles.heroDivider} />
+            <View>
+              <Text style={styles.heroLabel}>แต้มที่ได้รับ</Text>
+              <Text style={[styles.heroValue, styles.pointValue]}>+{order.pointEarned}</Text>
+            </View>
+          </>
+        ) : null}
       </View>
 
       {(order.shippingName ?? order.shippingAddr) ? (
@@ -189,6 +198,9 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     backgroundColor: colors.borderSoft,
     marginHorizontal: spacing.xl,
+  },
+  pointValue: {
+    color: colors.primary,
   },
   section: {
     marginTop: spacing["2xl"],

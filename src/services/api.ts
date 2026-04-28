@@ -324,6 +324,7 @@ type ApiOrder = {
   shippingAmount: string;
   gatewayFee: string;
   totalAmount: string;
+  pointEarned: number;
   status: string;
   createdAt: string;
   shippingName?: string;
@@ -429,6 +430,7 @@ export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
       year: "numeric",
     }),
     gatewayFee: parseFloat(o.gatewayFee) || 0,
+    pointEarned: o.pointEarned ?? 0,
     items,
     shippingName: o.shippingName,
     shippingPhone: o.shippingPhone,

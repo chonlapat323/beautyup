@@ -26,6 +26,7 @@ export function PaymentScreen() {
   const token = useAppStore((state) => state.token);
   const clearCart = useAppStore((state) => state.clearCart);
   const loadOrders = useAppStore((state) => state.loadOrders);
+  const updateMemberPoints = useAppStore((state) => state.updateMemberPoints);
   const summary = getCartSummary(cart);
 
   const [method, setMethod] = useState<PaymentMethod>("card");
@@ -65,6 +66,7 @@ export function PaymentScreen() {
             clearCart();
             await loadOrders();
             const mapped = mapApiOrder(result.order);
+            updateMemberPoints(mapped.pointEarned);
             navigation.replace("OrderSuccess", { orderId: mapped.id });
           } else if (result.status === "failed" || result.status === "expired") {
             clearPolling();
@@ -129,6 +131,7 @@ export function PaymentScreen() {
       clearCart();
       await loadOrders();
       const mapped = mapApiOrder(order);
+      updateMemberPoints(mapped.pointEarned);
       setIsLoading(false);
       navigation.replace("OrderSuccess", { orderId: mapped.id });
     } catch (e) {

@@ -21,6 +21,7 @@ type AppStore = {
   catalogError: boolean;
   signIn: (token: string, member: MemberInfo) => void;
   signOut: () => void;
+  updateMemberPoints: (delta: number) => void;
   setSelectedShade: (shadeId?: string) => void;
   loadCatalog: () => Promise<void>;
   loadOrders: () => Promise<void>;
@@ -46,6 +47,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   signIn: (token, member) => set({ isAuthenticated: true, token, member }),
   signOut: () => set({ isAuthenticated: false, token: null, member: null, orders: [] }),
+  updateMemberPoints: (delta) =>
+    set((state) => ({
+      member: state.member ? { ...state.member, pointBalance: state.member.pointBalance + delta } : null,
+    })),
   setSelectedShade: (shadeId) => set({ selectedShadeId: shadeId }),
 
   loadCatalog: async () => {
