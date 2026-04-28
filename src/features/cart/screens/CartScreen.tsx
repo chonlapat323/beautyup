@@ -74,6 +74,12 @@ export function CartScreen() {
         <Row label="Subtotal" value={`THB ${summary.subtotal.toFixed(0)}`} />
         <Row label="Gateway fee" value={`THB ${summary.gatewayFee.toFixed(0)}`} />
         <Row label="Total" strong value={`THB ${summary.total.toFixed(0)}`} />
+        {summary.pointsPreview > 0 && (
+          <View style={styles.pointsRow}>
+            <Text style={styles.pointsLabel}>แต้มที่จะได้รับ</Text>
+            <Text style={styles.pointsValue}>+{summary.pointsPreview} แต้ม</Text>
+          </View>
+        )}
       </View>
 
       <Pressable
@@ -187,6 +193,22 @@ const styles = StyleSheet.create({
   },
   strongText: {
     ...typography.title,
+  },
+  pointsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderSoft,
+  },
+  pointsLabel: {
+    color: colors.primary,
+    ...typography.caption,
+  },
+  pointsValue: {
+    color: colors.primary,
+    ...typography.caption,
+    fontWeight: "600",
   },
   button: {
     marginTop: spacing["2xl"],

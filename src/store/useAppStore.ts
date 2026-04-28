@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import { fetchBanners, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders } from "@/services/api";
+import type { PointTier } from "@/services/api";
 import type { Banner, CartItem, Category, Order, Product } from "@/types/domain";
 
 type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; referralCode: string | null };
@@ -16,6 +17,7 @@ type AppStore = {
   products: Product[];
   banners: Banner[];
   gatewayFee: number;
+  pointTiers: PointTier[];
   isLoadingCatalog: boolean;
   isLoadingOrders: boolean;
   catalogError: boolean;
@@ -41,6 +43,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   products: [],
   banners: [],
   gatewayFee: 20,
+  pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }],
   isLoadingCatalog: false,
   isLoadingOrders: false,
   catalogError: false,
@@ -56,12 +59,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
   loadCatalog: async () => {
     set({ isLoadingCatalog: true, catalogError: false });
     try {
+      const defaultConfig = { gatewayFee: 20, pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }] };
       const [{ categories, products }, banners, config] = await Promise.all([
         loadCatalogFromApi(),
         fetchBanners().catch(() => [] as Banner[]),
-        fetchMobileConfig().catch(() => ({ gatewayFee: 20 })),
+        fetchMobileConfig().catch(() => defaultConfig),
       ]);
-      set({ categories, products, banners, gatewayFee: config.gatewayFee, catalogError: false });
+      set({ categories, products, banners, gatewayFee: config.gatewayFee, pointTiers: config.pointTiers ?? defaultConfig.pointTiers, catalogError: false });
     } catch {
       set({ catalogError: true });
     } finally {
@@ -110,10 +114,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
 }));
 
 export function getCartSummary(cart: CartItem[]) {
-  const { products, gatewayFee } = useAppStore.getState();
+  const { products, gatewayFee, pointTiers } = useAppStore.getState();
   const subtotal = cart.reduce((sum, item) => {
     const product = products.find((p) => p.id === item.productId);
     return sum + (product?.price ?? 0) * item.quantity;
   }, 0);
-  return { subtotal, gatewayFee, total: subtotal + gatewayFee };
+  const sorted = [...pointTiers].sort((a, b) => b.minSpend - a.minSpend);
+  const pointsPreview = sorted.find((t) => subtotal >= t.minSpend)?.points ?? 0;
+  return { subtotal, gatewayFee, total: subtotal + gatewayFee, pointsPreview };
 }

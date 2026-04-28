@@ -162,12 +162,14 @@ export async function loadCatalogFromApi(): Promise<{
 
 // ─── Mobile config ────────────────────────────────────────────────────────────
 
-export async function fetchMobileConfig(): Promise<{ gatewayFee: number }> {
+export type PointTier = { minSpend: number; points: number };
+
+export async function fetchMobileConfig(): Promise<{ gatewayFee: number; pointTiers: PointTier[] }> {
   const res = await fetch(`${API_BASE}/mobile/config`, {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error("Config fetch failed");
-  return res.json() as Promise<{ gatewayFee: number }>;
+  return res.json() as Promise<{ gatewayFee: number; pointTiers: PointTier[] }>;
 }
 
 // ─── Mobile auth ──────────────────────────────────────────────────────────────
