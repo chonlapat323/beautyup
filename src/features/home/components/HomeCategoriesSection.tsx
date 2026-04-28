@@ -7,7 +7,6 @@ import type { Category } from "@/types/domain";
 
 type HomeCategoriesSectionProps = {
   categories: Category[];
-  cardWidth: number;
   horizontalPadding: number;
   onSelectCategory: (categoryId: string, requiresShadeSelection: boolean) => void;
   onViewAll: () => void;
