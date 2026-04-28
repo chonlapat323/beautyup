@@ -59,11 +59,7 @@ export function ShadeSelectionScreen() {
   );
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader
-        title="เลือกเฉดสี"
-        subtitle={category?.title ?? "Color & Bleach"}
-      />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="เลือกเฉดสี" subtitle={category?.title ?? "Color & Bleach"} />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigation.navigate("Home") },

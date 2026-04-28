@@ -11,8 +11,7 @@ type PlaceholderScreenProps = {
 
 export function PlaceholderScreen({ title, subtitle }: PlaceholderScreenProps) {
   return (
-    <Screen>
-      <AppHeader title={title} subtitle={subtitle} />
+    <Screen header={<AppHeader title={title} subtitle={subtitle} />}>
       <View style={styles.card}>
         <Text style={styles.label}>Coming next</Text>
         <Text style={styles.text}>

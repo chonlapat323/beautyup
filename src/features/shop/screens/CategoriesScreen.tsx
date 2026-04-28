@@ -18,11 +18,7 @@ export function CategoriesScreen() {
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader
-        title="Curated collections"
-        subtitle={`Choose a category to start shopping through the ${BRAND_NAME} demo flow.`}
-      />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Curated collections" subtitle={`Choose a category to start shopping through the ${BRAND_NAME} demo flow.`} />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigation.navigate("Home") },

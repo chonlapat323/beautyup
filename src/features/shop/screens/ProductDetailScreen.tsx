@@ -29,8 +29,7 @@ export function ProductDetailScreen() {
   const imageHeight = Math.round(width * 0.9);
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title={product.name} />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title={product.name} />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigation.navigate("Home") },

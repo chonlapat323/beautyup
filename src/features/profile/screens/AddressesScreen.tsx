@@ -69,8 +69,7 @@ export function AddressesScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="ที่อยู่ของฉัน" subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า" />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="ที่อยู่ของฉัน" subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า" />}>
 
       {isLoading ? (
         <Text style={styles.placeholder}>กำลังโหลด...</Text>

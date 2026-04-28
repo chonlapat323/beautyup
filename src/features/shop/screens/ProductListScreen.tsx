@@ -28,11 +28,7 @@ export function ProductListScreen() {
   );
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader
-        title={category?.title ?? "สินค้า"}
-        subtitle={shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้า"}
-      />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title={category?.title ?? "สินค้า"} subtitle={shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้า"} />}>
       <Breadcrumbs
         items={
           shadeName

@@ -55,8 +55,7 @@ export function OrderDetailScreen() {
 
   if (!order) {
     return (
-      <Screen contentContainerStyle={styles.content}>
-        <AppHeader title="Order details" subtitle="ไม่พบรายการสั่งซื้อ" />
+      <Screen contentContainerStyle={styles.content} header={<AppHeader title="Order details" subtitle="ไม่พบรายการสั่งซื้อ" />}>
         <Breadcrumbs
           items={[
             { label: "Home", onPress: () => navigateToHome(navigation) },
@@ -71,8 +70,7 @@ export function OrderDetailScreen() {
   const subtotal = order.total - order.gatewayFee;
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title={order.id} subtitle={`Placed on ${order.placedAt}`} />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title={order.id} subtitle={`Placed on ${order.placedAt}`} />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigateToHome(navigation) },

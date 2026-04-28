@@ -43,8 +43,7 @@ export function ProfileScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="Profile" subtitle="จัดการบัญชีและติดตามออเดอร์ของคุณ" />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Profile" subtitle="จัดการบัญชีและติดตามออเดอร์ของคุณ" />}>
 
       <View style={styles.card}>
         <Text style={styles.name}>{member?.fullName ?? "-"}</Text>

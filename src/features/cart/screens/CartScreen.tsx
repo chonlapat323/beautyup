@@ -28,8 +28,7 @@ export function CartScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="Your cart" subtitle="ตรวจสอบสินค้าก่อนชำระเงิน" />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Your cart" subtitle="ตรวจสอบสินค้าก่อนชำระเงิน" />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigateToHome(navigation) },

@@ -1,14 +1,14 @@
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, ReactNode, useState } from "react";
 import { RefreshControl, ScrollView, ScrollViewProps, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { PointsPill } from "@/components/ui/PointsPill";
 import { colors } from "@/theme";
 
 type ScreenProps = PropsWithChildren<{
   scrollable?: boolean;
   contentContainerStyle?: ScrollViewProps["contentContainerStyle"];
   onRefresh?: () => Promise<void> | void;
+  header?: ReactNode;
 }>;
 
 export function Screen({
@@ -16,6 +16,7 @@ export function Screen({
   scrollable = true,
   contentContainerStyle,
   onRefresh,
+  header,
 }: ScreenProps) {
   const [refreshing, setRefreshing] = useState(false);
 
@@ -29,17 +30,17 @@ export function Screen({
   if (!scrollable) {
     return (
       <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
+        {header}
         <View style={styles.content}>{children}</View>
-        <View style={styles.pillOverlay} pointerEvents="box-none">
-          <PointsPill />
-        </View>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
+      {header}
       <ScrollView
+        style={styles.scrollArea}
         contentContainerStyle={[styles.content, contentContainerStyle]}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -55,9 +56,6 @@ export function Screen({
       >
         {children}
       </ScrollView>
-      <View style={styles.pillOverlay} pointerEvents="box-none">
-        <PointsPill />
-      </View>
     </SafeAreaView>
   );
 }
@@ -67,13 +65,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  scrollArea: {
+    flex: 1,
+  },
   content: {
     flexGrow: 1,
     backgroundColor: colors.background,
-  },
-  pillOverlay: {
-    position: "absolute",
-    top: 32,
-    right: 24,
   },
 });

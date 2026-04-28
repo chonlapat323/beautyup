@@ -107,8 +107,7 @@ export function AddressFormScreen() {
 
   if (isLoading) {
     return (
-      <Screen contentContainerStyle={styles.content}>
-        <AppHeader title={addressId ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่"} />
+      <Screen contentContainerStyle={styles.content} header={<AppHeader title={addressId ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่"} />}>
         <Text style={styles.loading}>กำลังโหลด...</Text>
       </Screen>
     );

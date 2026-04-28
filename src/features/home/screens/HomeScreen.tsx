@@ -14,6 +14,7 @@ import {
 
 import { Screen } from "@/components/layout/Screen";
 import { CommerceImage } from "@/components/ui/CommerceImage";
+import { PointsPill } from "@/components/ui/PointsPill";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
@@ -78,7 +79,6 @@ export function HomeScreen() {
   const banners = useAppStore((state) => state.banners);
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
   const member = useAppStore((state) => state.member);
-  const cart = useAppStore((state) => state.cart);
   const addToCart = useAppStore((state) => state.addToCart);
   const loadCatalog = useAppStore((state) => state.loadCatalog);
 
@@ -90,8 +90,8 @@ export function HomeScreen() {
   ).slice(0, 8);
   const heroSlides = (banners.length > 0 ? banners : []).slice(0, 4);
 
-  const heroWidth = width - spacing["2xl"] * 2;
-  const heroHeight = Math.round(heroWidth * 0.9);
+  const heroWidth = width;
+  const heroHeight = Math.round(width * 0.58);
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const heroScrollRef = useRef<ScrollView>(null);
   const pulse = useRef(new Animated.Value(0)).current;
@@ -164,34 +164,35 @@ export function HomeScreen() {
     navigation.navigate("Categories");
   }
 
+  const homeHeader = (
+    <View style={styles.header}>
+      <View style={styles.profileGroup}>
+        <View style={styles.avatarShell}>
+          <View style={styles.avatarWrap}>
+            <Text style={styles.avatarText}>{initials}</Text>
+          </View>
+        </View>
+        <View style={styles.profileCopy}>
+          <Text style={styles.greeting}>{getGreeting()}</Text>
+          <Text numberOfLines={1} style={styles.memberName}>
+            {member?.fullName ?? "Pao"}
+          </Text>
+        </View>
+      </View>
+      <PointsPill />
+    </View>
+  );
+
   if (isLoading) {
     return (
-      <Screen contentContainerStyle={styles.content}>
+      <Screen header={homeHeader} contentContainerStyle={styles.content}>
         <HomeSkeleton />
       </Screen>
     );
   }
 
   return (
-    <Screen contentContainerStyle={styles.content} onRefresh={loadCatalog}>
-      <View style={styles.header}>
-        <View style={styles.profileGroup}>
-          <View style={styles.avatarShell}>
-            <View style={styles.avatarWrap}>
-              <Text style={styles.avatarText}>{initials}</Text>
-            </View>
-          </View>
-
-          <View style={styles.profileCopy}>
-            <Text style={styles.greeting}>{getGreeting()}</Text>
-            <Text numberOfLines={1} style={styles.memberName}>
-              {member?.fullName ?? "Pao"}
-            </Text>
-          </View>
-        </View>
-
-      </View>
-
+    <Screen header={homeHeader} contentContainerStyle={styles.content} onRefresh={loadCatalog}>
       <Pressable
         onPress={() => navigation.navigate("Search")}
         style={styles.searchBar}
@@ -454,6 +455,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 18,
     paddingBottom: 16,
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(15, 40, 25, 0.06)",
+    shadowColor: "#1f5236",
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
   profileGroup: {
     flexDirection: "row",
@@ -610,20 +619,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing["2xl"],
   },
   heroScrollContent: {
-    paddingHorizontal: spacing["2xl"],
   },
   heroCard: {
-    borderRadius: 34,
     overflow: "hidden",
     backgroundColor: "#dbe8dc",
     position: "relative",
-    marginRight: spacing.md,
     justifyContent: "flex-end",
-    shadowColor: "#234d35",
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 6,
   },
   heroBackdropLayer: {
     ...StyleSheet.absoluteFillObject,

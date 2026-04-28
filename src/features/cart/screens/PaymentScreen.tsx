@@ -159,8 +159,7 @@ export function PaymentScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="ชำระเงิน" />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="ชำระเงิน" />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigateToHome(navigation) },

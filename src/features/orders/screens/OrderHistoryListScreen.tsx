@@ -32,8 +32,7 @@ export function OrderHistoryListScreen() {
   const orders = useAppStore((state) => state.orders);
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="Order history" subtitle="ประวัติคำสั่งซื้อของคุณ" />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Order history" subtitle="ประวัติคำสั่งซื้อของคุณ" />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigation.getParent()?.navigate("Discover") },

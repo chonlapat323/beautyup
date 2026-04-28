@@ -39,8 +39,7 @@ export function OrderHistoryScreen() {
   useEffect(() => { void loadOrders(); }, [loadOrders]);
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="Order history" subtitle="ประวัติคำสั่งซื้อของคุณ" />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Order history" subtitle="ประวัติคำสั่งซื้อของคุณ" />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigateToHome(navigation) },

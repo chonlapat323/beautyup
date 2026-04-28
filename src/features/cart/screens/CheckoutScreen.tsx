@@ -60,8 +60,7 @@ export function CheckoutScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <AppHeader title="Checkout" subtitle="เลือกที่อยู่จัดส่งและยืนยันคำสั่งซื้อ" />
+    <Screen contentContainerStyle={styles.content} header={<AppHeader title="Checkout" subtitle="เลือกที่อยู่จัดส่งและยืนยันคำสั่งซื้อ" />}>
       <Breadcrumbs
         items={[
           { label: "Home", onPress: () => navigateToHome(navigation) },
