@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -34,6 +35,7 @@ export function ProductListScreen() {
   const products = useAppStore((state) => state.products);
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
 
+  const addToCart = useAppStore((state) => state.addToCart);
   const { categoryId, shadeId, shadeName } = route.params;
   const category = categories.find((item) => item.id === categoryId);
   const [sort, setSort] = useState<SortKey>("all");
@@ -110,12 +112,24 @@ export function ProductListScreen() {
             }
             style={styles.card}
           >
-            <CommerceImage style={styles.preview} uri={product.imageUrl} />
-            {product.originalPrice != null ? (
-              <View style={styles.saleBadge}>
-                <Text style={styles.saleBadgeText}>Sale</Text>
-              </View>
-            ) : null}
+            <View style={styles.imageWrap}>
+              <CommerceImage style={styles.preview} uri={product.imageUrl} />
+              {product.originalPrice != null ? (
+                <View style={styles.saleBadge}>
+                  <Text style={styles.saleBadgeText}>Sale</Text>
+                </View>
+              ) : null}
+              <Pressable
+                style={styles.cartBtn}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  addToCart(product.id);
+                }}
+                hitSlop={4}
+              >
+                <MaterialIcons name="add-shopping-cart" size={16} color="#FFFFFF" />
+              </Pressable>
+            </View>
             <Text style={styles.meta}>{product.subtitle}</Text>
             <Text style={styles.name}>{product.name}</Text>
             <View style={styles.priceRow}>
@@ -199,6 +213,9 @@ const styles = StyleSheet.create({
     width: "47%",
     gap: spacing.sm,
   },
+  imageWrap: {
+    position: "relative",
+  },
   preview: {
     width: "100%",
     aspectRatio: 0.85,
@@ -218,6 +235,22 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 10,
     fontWeight: "700",
+  },
+  cartBtn: {
+    position: "absolute",
+    bottom: spacing.sm,
+    right: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   meta: {
     color: colors.textMuted,
