@@ -50,6 +50,11 @@ export function HomeCategoriesSection({
                 <View style={styles.iconWrap}>
                   <CommerceImage resizeMode="cover" style={styles.icon} uri={category.imageUrl} />
                 </View>
+                {category.requiresShadeSelection ? (
+                  <View style={styles.shadeBadge}>
+                    <MaterialIcons name="palette" size={9} color="#FFFFFF" />
+                  </View>
+                ) : null}
               </View>
 
               <Text numberOfLines={2} style={styles.label}>
@@ -166,6 +171,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
+    position: "relative",
+  },
+  shadeBadge: {
+    position: "absolute",
+    bottom: 4,
+    right: 4,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
   },
   iconWrap: {
     width: 58,

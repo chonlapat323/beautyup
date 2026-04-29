@@ -36,6 +36,8 @@ export function ProductListScreen() {
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
 
   const addToCart = useAppStore((state) => state.addToCart);
+  const favoriteIds = useAppStore((state) => state.favoriteIds);
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
   const { categoryId, shadeId, shadeName } = route.params;
   const category = categories.find((item) => item.id === categoryId);
   const [sort, setSort] = useState<SortKey>("all");
@@ -120,11 +122,19 @@ export function ProductListScreen() {
                 </View>
               ) : null}
               <Pressable
+                style={styles.favoriteBtn}
+                onPress={(e) => { e.stopPropagation(); toggleFavorite(product.id); }}
+                hitSlop={4}
+              >
+                <MaterialIcons
+                  name={favoriteIds.includes(product.id) ? "favorite" : "favorite-border"}
+                  size={15}
+                  color={favoriteIds.includes(product.id) ? "#E85C7A" : "#FFFFFF"}
+                />
+              </Pressable>
+              <Pressable
                 style={styles.cartBtn}
-                onPress={(e) => {
-                  e.stopPropagation();
-                  addToCart(product.id);
-                }}
+                onPress={(e) => { e.stopPropagation(); addToCart(product.id); }}
                 hitSlop={4}
               >
                 <MaterialIcons name="add-shopping-cart" size={16} color="#FFFFFF" />
@@ -235,6 +245,17 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 10,
     fontWeight: "700",
+  },
+  favoriteBtn: {
+    position: "absolute",
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   cartBtn: {
     position: "absolute",

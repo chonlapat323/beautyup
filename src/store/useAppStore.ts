@@ -27,6 +27,8 @@ type AppStore = {
   setSelectedShade: (shadeId?: string) => void;
   loadCatalog: () => Promise<void>;
   loadOrders: () => Promise<void>;
+  favoriteIds: string[];
+  toggleFavorite: (productId: string) => void;
   addToCart: (productId: string, quantity?: number) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -44,6 +46,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   banners: [],
   gatewayFee: 20,
   pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }],
+  favoriteIds: [],
   isLoadingCatalog: false,
   isLoadingOrders: false,
   catalogError: false,
@@ -86,6 +89,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
       set({ isLoadingOrders: false });
     }
   },
+
+  toggleFavorite: (productId) =>
+    set((state) => ({
+      favoriteIds: state.favoriteIds.includes(productId)
+        ? state.favoriteIds.filter((id) => id !== productId)
+        : [...state.favoriteIds, productId],
+    })),
 
   addToCart: (productId, quantity = 1) =>
     set((state) => {

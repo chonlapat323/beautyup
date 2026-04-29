@@ -20,18 +20,26 @@ import { colors, fonts, radius, spacing, typography } from "@/theme";
 export function SearchScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const products = useAppStore((s) => s.products);
+  const categories = useAppStore((s) => s.categories);
 
   const [query, setQuery] = useState("");
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const inputRef = useRef<TextInput>(null);
 
   const trimmed = query.trim().toLowerCase();
-  const results = trimmed.length === 0
+  const results = trimmed.length === 0 && selectedCategoryId === null
     ? []
-    : products.filter((p) => p.name.toLowerCase().includes(trimmed));
+    : products.filter((p) => {
+        const matchesQuery = trimmed.length === 0 || p.name.toLowerCase().includes(trimmed);
+        const matchesCategory = selectedCategoryId === null || p.categoryId === selectedCategoryId;
+        return matchesQuery && matchesCategory;
+      });
+
+  const hasFilter = selectedCategoryId !== null;
 
   return (
     <Screen contentContainerStyle={styles.content}>
-      {/* ── Search bar row ─────────────────────────────────────── */}
       <View style={styles.bar}>
         <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
           <MaterialIcons name="arrow-back" size={24} color={colors.textPrimary} />
@@ -55,10 +63,49 @@ export function SearchScreen() {
             </Pressable>
           )}
         </View>
+        <Pressable
+          onPress={() => setShowFilter((v) => !v)}
+          style={[styles.filterBtn, (showFilter || hasFilter) && styles.filterBtnActive]}
+          hitSlop={8}
+        >
+          <MaterialIcons
+            name="tune"
+            size={20}
+            color={(showFilter || hasFilter) ? "#FFFFFF" : colors.textSecondary}
+          />
+          {hasFilter ? <View style={styles.filterDot} /> : null}
+        </Pressable>
       </View>
 
-      {/* ── Results ────────────────────────────────────────────── */}
-      {trimmed.length === 0 ? (
+      {showFilter ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterChips}
+        >
+          <Pressable
+            onPress={() => setSelectedCategoryId(null)}
+            style={[styles.chip, selectedCategoryId === null && styles.chipActive]}
+          >
+            <Text style={[styles.chipText, selectedCategoryId === null && styles.chipTextActive]}>
+              ทั้งหมด
+            </Text>
+          </Pressable>
+          {categories.map((cat) => (
+            <Pressable
+              key={cat.id}
+              onPress={() => setSelectedCategoryId(cat.id === selectedCategoryId ? null : cat.id)}
+              style={[styles.chip, selectedCategoryId === cat.id && styles.chipActive]}
+            >
+              <Text style={[styles.chipText, selectedCategoryId === cat.id && styles.chipTextActive]}>
+                {cat.title}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      ) : null}
+
+      {trimmed.length === 0 && selectedCategoryId === null ? (
         <View style={styles.hint}>
           <MaterialIcons name="search" size={48} color={colors.borderSoft} />
           <Text style={styles.hintText}>พิมพ์ชื่อสินค้าที่ต้องการ</Text>
@@ -66,7 +113,7 @@ export function SearchScreen() {
       ) : results.length === 0 ? (
         <View style={styles.hint}>
           <MaterialIcons name="search-off" size={48} color={colors.borderSoft} />
-          <Text style={styles.hintText}>ไม่พบสินค้าที่ตรงกับ "{query}"</Text>
+          <Text style={styles.hintText}>ไม่พบสินค้าที่ตรงกับเงื่อนไข</Text>
         </View>
       ) : (
         <ScrollView
@@ -125,6 +172,57 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.textPrimary,
     padding: 0,
+  },
+  filterBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  filterBtnActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  filterDot: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "#E85C7A",
+    borderWidth: 1.5,
+    borderColor: "#FFFFFF",
+  },
+  filterChips: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+    gap: spacing.sm,
+    flexDirection: "row",
+  },
+  chip: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.surface,
+  },
+  chipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  chipText: {
+    fontSize: 13,
+    fontFamily: fonts.medium,
+    color: colors.textSecondary,
+  },
+  chipTextActive: {
+    color: "#FFFFFF",
   },
   hint: {
     flex: 1,
