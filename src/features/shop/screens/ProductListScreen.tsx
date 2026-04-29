@@ -140,8 +140,8 @@ export function ProductListScreen() {
                 <MaterialIcons name="add-shopping-cart" size={16} color="#FFFFFF" />
               </Pressable>
             </View>
-            <Text style={styles.meta}>{product.subtitle}</Text>
-            <Text style={styles.name}>{product.name}</Text>
+            <Text style={styles.meta} numberOfLines={1}>{product.subtitle}</Text>
+            <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
             <View style={styles.priceRow}>
               <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>
               {product.originalPrice != null ? (

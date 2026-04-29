@@ -31,7 +31,7 @@ export function Screen({
     return (
       <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
         {header}
-        <View style={styles.content}>{children}</View>
+        <View style={[styles.fixed, contentContainerStyle]}>{children}</View>
       </SafeAreaView>
     );
   }
@@ -70,6 +70,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
+    backgroundColor: colors.background,
+  },
+  fixed: {
+    flex: 1,
     backgroundColor: colors.background,
   },
 });
