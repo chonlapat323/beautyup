@@ -23,11 +23,13 @@ export function ProductDetailScreen() {
 
   const { width } = useWindowDimensions();
   const [activeSlide, setActiveSlide] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const carouselRef = useRef<ScrollView>(null);
 
   if (!foundProduct) return null;
 
   const product = foundProduct;
+  const shadeName = route.params.shadeName;
   const images =
     product.images && product.images.length > 0
       ? product.images
@@ -38,7 +40,7 @@ export function ProductDetailScreen() {
   const bottomBarHeight = 88 + insets.bottom;
 
   function handleAddToCart() {
-    addToCart(product.id);
+    addToCart(product.id, quantity);
     navigation.navigate("Cart");
   }
 
@@ -100,13 +102,40 @@ export function ProductDetailScreen() {
               <Text style={styles.originalPrice}>THB {product.originalPrice.toFixed(0)}</Text>
             ) : null}
           </View>
+
+          {shadeName ? (
+            <View style={styles.shadeRow}>
+              <View style={styles.shadeDot} />
+              <Text style={styles.shadeName}>{shadeName}</Text>
+            </View>
+          ) : null}
+
           {product.description ? <Text style={styles.description}>{product.description}</Text> : null}
+
+          <View style={styles.quantityBlock}>
+            <Text style={styles.quantityLabel}>จำนวน</Text>
+            <View style={styles.stepper}>
+              <Pressable
+                onPress={() => setQuantity((q) => Math.max(1, q - 1))}
+                style={styles.stepperBtn}
+              >
+                <Text style={styles.stepperBtnText}>−</Text>
+              </Pressable>
+              <Text style={styles.stepperCount}>{quantity}</Text>
+              <Pressable
+                onPress={() => setQuantity((q) => q + 1)}
+                style={styles.stepperBtn}
+              >
+                <Text style={styles.stepperBtnText}>+</Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
       </Screen>
 
       <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         <Pressable onPress={handleAddToCart} style={styles.button}>
-          <Text style={styles.buttonText}>เพิ่มลงตะกร้า</Text>
+          <Text style={styles.buttonText}>เพิ่มลงตะกร้า {quantity > 1 ? `(${quantity})` : ""}</Text>
         </Pressable>
       </View>
     </View>
@@ -162,9 +191,62 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textDecorationLine: "line-through",
   },
+  shadeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  shadeDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary,
+  },
+  shadeName: {
+    color: colors.primaryStrong,
+    ...typography.caption,
+    fontWeight: "600",
+  },
   description: {
     color: colors.textSecondary,
     ...typography.body,
+  },
+  quantityBlock: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: spacing.sm,
+  },
+  quantityLabel: {
+    color: colors.textSecondary,
+    ...typography.body,
+  },
+  stepper: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    borderRadius: radius.md,
+    overflow: "hidden",
+  },
+  stepperBtn: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surface,
+  },
+  stepperBtnText: {
+    fontSize: 20,
+    color: colors.primary,
+    fontWeight: "600",
+    lineHeight: 24,
+  },
+  stepperCount: {
+    width: 44,
+    textAlign: "center",
+    color: colors.textPrimary,
+    ...typography.title,
   },
   bottomBar: {
     position: "absolute",

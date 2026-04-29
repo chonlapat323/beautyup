@@ -1,4 +1,5 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -10,6 +11,21 @@ import { navigateToCategories, navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
+import type { Product } from "@/types/domain";
+
+type SortKey = "all" | "sale" | "newest";
+
+const SORT_TABS: { key: SortKey; label: string }[] = [
+  { key: "all", label: "ทั้งหมด" },
+  { key: "newest", label: "มาใหม่" },
+  { key: "sale", label: "ลดราคา" },
+];
+
+function sortProducts(products: Product[], sort: SortKey): Product[] {
+  if (sort === "sale") return products.filter((p) => p.originalPrice != null);
+  if (sort === "newest") return [...products].reverse();
+  return products;
+}
 
 export function ProductListScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
@@ -20,12 +36,14 @@ export function ProductListScreen() {
 
   const { categoryId, shadeId, shadeName } = route.params;
   const category = categories.find((item) => item.id === categoryId);
+  const [sort, setSort] = useState<SortKey>("all");
 
   const filteredProducts = products.filter(
     (item) =>
       item.categoryId === categoryId &&
       (shadeId ? item.shadeId === shadeId : true),
   );
+  const displayProducts = sortProducts(filteredProducts, sort);
 
   return (
     <Screen
@@ -48,31 +66,64 @@ export function ProductListScreen() {
         />
       }
     >
-      {shadeName ? (
-        <View style={styles.filterPill}>
-          <Text style={styles.filterText}>{shadeName}</Text>
+      <View style={styles.toolbar}>
+        {shadeName ? (
+          <View style={styles.filterPill}>
+            <Text style={styles.filterText}>{shadeName}</Text>
+          </View>
+        ) : <View />}
+
+        <View style={styles.sortTabs}>
+          {SORT_TABS.map((tab) => (
+            <Pressable
+              key={tab.key}
+              onPress={() => setSort(tab.key)}
+              style={[styles.sortTab, sort === tab.key && styles.sortTabActive]}
+            >
+              <Text style={[styles.sortTabText, sort === tab.key && styles.sortTabTextActive]}>
+                {tab.label}
+              </Text>
+            </Pressable>
+          ))}
         </View>
-      ) : null}
+      </View>
 
       {isLoading ? (
         <ProductGridSkeleton />
-      ) : filteredProducts.length === 0 ? (
+      ) : displayProducts.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>ไม่พบสินค้าในหมวดหมู่นี้</Text>
+          <Text style={styles.emptyText}>
+            {sort === "sale" ? "ยังไม่มีสินค้าลดราคา" : "ไม่พบสินค้าในหมวดหมู่นี้"}
+          </Text>
         </View>
       ) : null}
 
       <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
-        {filteredProducts.map((product) => (
+        {displayProducts.map((product) => (
           <Pressable
             key={product.id}
-            onPress={() => navigation.navigate("ProductDetail", { productId: product.id })}
+            onPress={() =>
+              navigation.navigate("ProductDetail", {
+                productId: product.id,
+                shadeName: shadeName,
+              })
+            }
             style={styles.card}
           >
             <CommerceImage style={styles.preview} uri={product.imageUrl} />
+            {product.originalPrice != null ? (
+              <View style={styles.saleBadge}>
+                <Text style={styles.saleBadgeText}>Sale</Text>
+              </View>
+            ) : null}
             <Text style={styles.meta}>{product.subtitle}</Text>
             <Text style={styles.name}>{product.name}</Text>
-            <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>
+            <View style={styles.priceRow}>
+              <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>
+              {product.originalPrice != null ? (
+                <Text style={styles.originalPrice}>THB {product.originalPrice.toFixed(0)}</Text>
+              ) : null}
+            </View>
           </Pressable>
         ))}
       </ScrollView>
@@ -85,20 +136,50 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingBottom: spacing["2xl"],
   },
+  toolbar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing["2xl"],
+    marginBottom: spacing.lg,
+    gap: spacing.md,
+  },
   filterPill: {
-    marginHorizontal: spacing["2xl"],
-    marginBottom: spacing.xl,
     alignSelf: "flex-start",
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
     borderRadius: radius.pill,
   },
   filterText: {
     color: colors.primaryStrong,
     ...typography.caption,
+  },
+  sortTabs: {
+    flexDirection: "row",
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    overflow: "hidden",
+  },
+  sortTab: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.background,
+  },
+  sortTabActive: {
+    backgroundColor: colors.primary,
+  },
+  sortTabText: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  sortTabTextActive: {
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   empty: {
     alignItems: "center",
@@ -124,6 +205,20 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     backgroundColor: colors.surfaceMuted,
   },
+  saleBadge: {
+    position: "absolute",
+    top: spacing.sm,
+    left: spacing.sm,
+    backgroundColor: colors.primary,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
+  saleBadgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "700",
+  },
   meta: {
     color: colors.textMuted,
     ...typography.caption,
@@ -133,8 +228,18 @@ const styles = StyleSheet.create({
     minHeight: 44,
     ...typography.body,
   },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: spacing.sm,
+  },
   price: {
     color: colors.primaryStrong,
     ...typography.title,
+  },
+  originalPrice: {
+    color: colors.textMuted,
+    fontSize: 12,
+    textDecorationLine: "line-through",
   },
 });

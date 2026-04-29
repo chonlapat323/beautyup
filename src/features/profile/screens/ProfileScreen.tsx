@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useEffect, useState } from "react";
 import { Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
@@ -7,6 +8,7 @@ import { BrandLockup } from "@/components/ui/BrandLockup";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ProfileStackParamList } from "@/navigation/types";
+import { mobileGetCommissionSummary } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -14,8 +16,23 @@ export function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
   const member = useAppStore((state) => state.member);
+  const token = useAppStore((state) => state.token);
   const orders = useAppStore((state) => state.orders);
   const signOut = useAppStore((state) => state.signOut);
+
+  const [commission, setCommission] = useState<{
+    pendingAmount: number;
+    pendingCount: number;
+    paidAmount: number;
+    paidCount: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!token) return;
+    mobileGetCommissionSummary(token)
+      .then(setCommission)
+      .catch(() => null);
+  }, [token]);
 
   const totalSpend = orders.reduce((sum, order) => sum + order.total, 0);
   const memberTypeLabel = member?.memberType === "SALON" ? "Salon Member" : "Regular Member";
@@ -75,6 +92,27 @@ export function ProfileScreen() {
             <Text style={styles.referralCode}>{member.referralCode}</Text>
             <Text style={styles.referralHint}>แตะเพื่อแชร์</Text>
           </Pressable>
+        ) : null}
+
+        {commission && (commission.pendingAmount > 0 || commission.paidAmount > 0) ? (
+          <View style={styles.commissionBox}>
+            <Text style={styles.commissionTitle}>Commission ของคุณ</Text>
+            <View style={styles.commissionRow}>
+              <View style={styles.commissionItem}>
+                <Text style={styles.commissionAmount}>
+                  ฿{commission.pendingAmount.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
+                </Text>
+                <Text style={styles.commissionLabel}>รอจ่าย ({commission.pendingCount})</Text>
+              </View>
+              <View style={styles.commissionDivider} />
+              <View style={styles.commissionItem}>
+                <Text style={styles.commissionAmount}>
+                  ฿{commission.paidAmount.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
+                </Text>
+                <Text style={styles.commissionLabel}>จ่ายแล้ว ({commission.paidCount})</Text>
+              </View>
+            </View>
+          </View>
         ) : null}
 
         <View style={styles.statsRow}>
@@ -231,6 +269,44 @@ const styles = StyleSheet.create({
   referralHint: {
     color: colors.textMuted,
     ...typography.caption,
+  },
+  commissionBox: {
+    marginTop: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: "#F5F0FF",
+    borderWidth: 1,
+    borderColor: "#DDD0F5",
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  commissionTitle: {
+    color: "#5B3FA0",
+    ...typography.caption,
+    fontWeight: "600",
+  },
+  commissionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  commissionItem: {
+    flex: 1,
+    alignItems: "center",
+    gap: 2,
+  },
+  commissionDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: "#DDD0F5",
+  },
+  commissionAmount: {
+    color: "#3D2875",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  commissionLabel: {
+    color: "#7A5CB8",
+    ...typography.caption,
+    fontSize: 10,
   },
   menuButton: {
     marginTop: spacing.lg,

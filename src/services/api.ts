@@ -396,6 +396,19 @@ export async function mobileCheckPromptPay(
   return res.json() as Promise<{ status: string; order?: ApiOrder }>;
 }
 
+export async function mobileGetCommissionSummary(token: string): Promise<{
+  pendingAmount: number;
+  pendingCount: number;
+  paidAmount: number;
+  paidCount: number;
+}> {
+  const res = await fetch(`${API_BASE}/mobile/me/commissions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดข้อมูล commission ไม่สำเร็จ");
+  return res.json() as Promise<{ pendingAmount: number; pendingCount: number; paidAmount: number; paidCount: number }>;
+}
+
 export async function mobileGetOrders(token: string): Promise<ApiOrder[]> {
   const res = await fetch(`${API_BASE}/mobile/orders`, {
     headers: { Authorization: `Bearer ${token}` },
