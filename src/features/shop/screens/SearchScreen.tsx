@@ -28,15 +28,18 @@ export function SearchScreen() {
   const inputRef = useRef<TextInput>(null);
 
   const trimmed = query.trim().toLowerCase();
-  const results = trimmed.length === 0 && selectedCategoryId === null
+
+  const isFilterMode = showFilter;
+  const hasActiveCategory = selectedCategoryId !== null;
+  const hasFilter = hasActiveCategory;
+
+  const results = !isFilterMode && trimmed.length === 0
     ? []
     : products.filter((p) => {
         const matchesQuery = trimmed.length === 0 || p.name.toLowerCase().includes(trimmed);
-        const matchesCategory = selectedCategoryId === null || p.categoryId === selectedCategoryId;
+        const matchesCategory = !isFilterMode || !hasActiveCategory || p.categoryId === selectedCategoryId;
         return matchesQuery && matchesCategory;
       });
-
-  const hasFilter = selectedCategoryId !== null;
 
   return (
     <Screen contentContainerStyle={styles.content}>
@@ -105,7 +108,7 @@ export function SearchScreen() {
         </ScrollView>
       ) : null}
 
-      {trimmed.length === 0 && selectedCategoryId === null ? (
+      {!isFilterMode && trimmed.length === 0 ? (
         <View style={styles.hint}>
           <MaterialIcons name="search" size={48} color={colors.borderSoft} />
           <Text style={styles.hintText}>พิมพ์ชื่อสินค้าที่ต้องการ</Text>
@@ -116,11 +119,7 @@ export function SearchScreen() {
           <Text style={styles.hintText}>ไม่พบสินค้าที่ตรงกับเงื่อนไข</Text>
         </View>
       ) : (
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.grid}
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={styles.grid}>
           {results.map((product) => (
             <Pressable
               key={product.id}
@@ -132,7 +131,7 @@ export function SearchScreen() {
               <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>
             </Pressable>
           ))}
-        </ScrollView>
+        </View>
       )}
     </Screen>
   );
@@ -201,7 +200,6 @@ const styles = StyleSheet.create({
   filterChips: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
-    gap: spacing.sm,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -212,6 +210,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderSoft,
     backgroundColor: colors.surface,
+    marginRight: spacing.sm,
   },
   chipActive: {
     backgroundColor: colors.primary,
@@ -240,13 +239,13 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: spacing.lg,
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing.md,
+    justifyContent: "space-between",
   },
   card: {
     width: "47%",
-    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
   preview: {
     width: "100%",
