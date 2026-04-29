@@ -203,6 +203,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
     gap: spacing.sm,
     flexDirection: "row",
+    alignItems: "center",
   },
   chip: {
     paddingHorizontal: spacing.lg,
