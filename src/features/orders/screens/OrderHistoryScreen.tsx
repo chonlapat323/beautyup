@@ -3,6 +3,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { OrderListSkeleton } from "@/components/ui/Skeleton";
@@ -54,6 +55,14 @@ export function OrderHistoryScreen() {
       }
     >
       {isLoadingOrders ? <OrderListSkeleton /> : null}
+
+      {!isLoadingOrders && orders.length === 0 && (
+        <View style={styles.empty}>
+          <Text style={styles.emptyIcon}>📦</Text>
+          <Text style={styles.emptyText}>ยังไม่มีคำสั่งซื้อ</Text>
+          <Text style={styles.emptyCaption}>คำสั่งซื้อของคุณจะปรากฏที่นี่</Text>
+        </View>
+      )}
 
       <View style={styles.list}>
         {!isLoadingOrders &&
@@ -117,6 +126,23 @@ const styles = StyleSheet.create({
     ...typography.body,
   },
   date: {
+    color: colors.textMuted,
+    ...typography.caption,
+  },
+  empty: {
+    alignItems: "center",
+    paddingVertical: spacing["3xl"],
+    paddingHorizontal: spacing["2xl"],
+    gap: spacing.sm,
+  },
+  emptyIcon: {
+    fontSize: 48,
+  },
+  emptyText: {
+    color: colors.textPrimary,
+    ...typography.title,
+  },
+  emptyCaption: {
     color: colors.textMuted,
     ...typography.caption,
   },

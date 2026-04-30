@@ -1,4 +1,4 @@
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { CommonActions, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -6,11 +6,14 @@ import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
+import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
 export function OrderSuccessScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const route = useRoute<RouteProp<ShopStackParamList, "OrderSuccess">>();
+  const orderId = route.params.orderId;
+  const order = useAppStore((state) => state.orders.find((o) => o.id === orderId));
 
   return (
     <Screen
@@ -29,9 +32,15 @@ export function OrderSuccessScreen() {
       }
     >
       <View style={styles.hero}>
-        <Text style={styles.label}>Order Confirmed</Text>
+        <Text style={styles.label}>ยืนยันคำสั่งซื้อแล้ว</Text>
         <Text style={styles.title}>ขอบคุณสำหรับคำสั่งซื้อ</Text>
-        <Text style={styles.subtitle}>เลขที่คำสั่งซื้อ: {route.params.orderId}</Text>
+        <Text style={styles.subtitle}>เลขที่: {orderId}</Text>
+        {order && (
+          <>
+            <Text style={styles.subtitle}>ยอดชำระ: THB {order.total.toFixed(2)}</Text>
+            <Text style={styles.subtitle}>วันที่: {order.placedAt}</Text>
+          </>
+        )}
         <Text style={styles.caption}>ทีมงานได้รับรายการแล้ว และกำลังเตรียมสินค้าสำหรับจัดส่ง</Text>
       </View>
 
@@ -41,10 +50,12 @@ export function OrderSuccessScreen() {
         </Pressable>
         <Pressable
           onPress={() =>
-            (navigation.getParent() as any)?.navigate("Profile", {
-              screen: "OrderDetail",
-              params: { orderId: route.params.orderId },
-            })
+            navigation.dispatch(
+              CommonActions.navigate("Profile", {
+                screen: "OrderDetail",
+                params: { orderId },
+              }),
+            )
           }
           style={styles.secondaryButton}
         >

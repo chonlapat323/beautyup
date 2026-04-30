@@ -3,22 +3,33 @@
     "name": "Beauty Up",
     "slug": "beauty-up",
     "scheme": "beautyup",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./src/logo/logo.png",
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.beautyup.app"
     },
     "android": {
+      "package": "com.beautyup.app",
+      "versionCode": 2,
       "adaptiveIcon": {
+        "foregroundImage": "./src/logo/logo.png",
         "backgroundColor": "#FFF8F7"
       }
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8724d0b5-11d1-4caa-81ff-4796c76efe21"
+      }
+    },
+    "owner": "saberakito"
   }
 }

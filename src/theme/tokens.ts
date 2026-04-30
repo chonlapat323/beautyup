@@ -48,25 +48,25 @@ export const typography = {
   eyebrow: {
     fontSize: 11,
     letterSpacing: 1.8,
-    fontWeight: "600" as const,
+    fontFamily: fonts.semiBold,
   },
   title: {
     fontSize: 18,
-    fontWeight: "600" as const,
+    fontFamily: fonts.semiBold,
   },
   headline: {
     fontSize: 28,
     lineHeight: 34,
-    fontWeight: "600" as const,
+    fontFamily: fonts.semiBold,
   },
   body: {
     fontSize: 15,
     lineHeight: 22,
-    fontWeight: "400" as const,
+    fontFamily: fonts.regular,
   },
   caption: {
     fontSize: 13,
     lineHeight: 18,
-    fontWeight: "500" as const,
+    fontFamily: fonts.medium,
   },
 } as const;
