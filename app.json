@@ -16,7 +16,7 @@
     },
     "android": {
       "package": "com.beautyup.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./src/logo/logo.png",
         "backgroundColor": "#FFF8F7"
