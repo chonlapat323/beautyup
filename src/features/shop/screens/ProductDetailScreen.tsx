@@ -37,7 +37,7 @@ export function ProductDetailScreen() {
         ? [product.imageUrl]
         : [];
   const imageHeight = Math.round(width * 0.9);
-  const bottomBarHeight = 88 + insets.bottom;
+  const bottomBarHeight = 140 + insets.bottom;
 
   function handleAddToCart() {
     addToCart(product.id, quantity);
@@ -51,21 +51,19 @@ export function ProductDetailScreen() {
           styles.content,
           { paddingBottom: bottomBarHeight + spacing.xl },
         ]}
-        header={
-          <AppHeader
-            title={product.name}
-            breadcrumbs={[
-              { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
-              { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
-              {
-                label: "สินค้า",
-                onPress: () => navigation.navigate("ProductList", { categoryId: product.categoryId }),
-              },
-              { label: "รายละเอียดสินค้า" },
-            ]}
-          />
-        }
       >
+        <AppHeader
+          title={product.name}
+          breadcrumbs={[
+            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
+            {
+              label: "สินค้า",
+              onPress: () => navigation.navigate("ProductList", { categoryId: product.categoryId }),
+            },
+            { label: "รายละเอียดสินค้า" },
+          ]}
+        />
         <View style={[styles.carouselWrap, { height: imageHeight }]}>
           <ScrollView
             ref={carouselRef}
@@ -136,6 +134,9 @@ export function ProductDetailScreen() {
       <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         <Pressable onPress={handleAddToCart} style={styles.button}>
           <Text style={styles.buttonText}>เพิ่มลงตะกร้า {quantity > 1 ? `(${quantity})` : ""}</Text>
+        </Pressable>
+        <Pressable onPress={() => navigation.navigate("Cart")} style={styles.secondaryButton}>
+          <Text style={styles.secondaryButtonText}>ไปที่ตะกร้าสินค้า</Text>
         </Pressable>
       </View>
     </View>
@@ -255,6 +256,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingTop: spacing.md,
     paddingHorizontal: spacing["2xl"],
+    gap: spacing.sm,
+    backgroundColor: colors.background,
   },
   button: {
     borderRadius: radius.pill,
@@ -269,6 +272,18 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
+    ...typography.title,
+  },
+  secondaryButton: {
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.surface,
+    paddingVertical: spacing.lg,
+    alignItems: "center",
+  },
+  secondaryButtonText: {
+    color: colors.primaryStrong,
     ...typography.title,
   },
 });

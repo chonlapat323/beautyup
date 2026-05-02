@@ -235,6 +235,7 @@ export async function mobileLogin(
 export type MemberAddress = {
   id: string;
   label?: string | null;
+  storeName?: string | null;
   recipient: string;
   phone: string;
   addressLine1: string;
@@ -247,6 +248,7 @@ export type MemberAddress = {
 
 type AddressPayload = {
   label?: string;
+  storeName?: string;
   recipient: string;
   phone: string;
   addressLine1: string;

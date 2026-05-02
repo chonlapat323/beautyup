@@ -15,6 +15,7 @@ type Props = NativeStackScreenProps<ProfileStackParamList, "AddressForm">;
 
 type FormState = {
   label: string;
+  storeName: string;
   recipient: string;
   phone: string;
   addressLine1: string;
@@ -26,6 +27,7 @@ type FormState = {
 
 const EMPTY: FormState = {
   label: "",
+  storeName: "",
   recipient: "",
   phone: "",
   addressLine1: "",
@@ -55,6 +57,7 @@ export function AddressFormScreen() {
         if (addr) {
           setForm({
             label: addr.label ?? "",
+            storeName: addr.storeName ?? "",
             recipient: addr.recipient,
             phone: addr.phone,
             addressLine1: addr.addressLine1,
@@ -84,6 +87,7 @@ export function AddressFormScreen() {
     try {
       const payload = {
         label: form.label || undefined,
+        storeName: form.storeName || undefined,
         recipient: form.recipient,
         phone: form.phone,
         addressLine1: form.addressLine1,
@@ -135,6 +139,12 @@ export function AddressFormScreen() {
           placeholder="บ้าน"
           value={form.label}
           onChangeText={(value) => update({ label: value })}
+        />
+        <Field
+          label="ชื่อร้าน (ถ้ามี)"
+          placeholder="ชื่อร้าน / บริษัท"
+          value={form.storeName}
+          onChangeText={(value) => update({ storeName: value })}
         />
         <Field
           label="ชื่อผู้รับ *"

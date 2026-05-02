@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { CommerceImage } from "@/components/ui/CommerceImage";
-import { navigateToHome } from "@/navigation/helpers";
+import { navigateToCategories, navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -91,6 +91,10 @@ export function CartScreen() {
         style={[styles.button, cart.length === 0 && styles.buttonDisabled]}
       >
         <Text style={styles.buttonText}>ดำเนินการชำระเงิน</Text>
+      </Pressable>
+
+      <Pressable onPress={() => navigateToCategories(navigation)} style={styles.secondaryButton}>
+        <Text style={styles.secondaryButtonText}>เลือกสินค้าต่อ</Text>
       </Pressable>
     </Screen>
   );
@@ -227,6 +231,20 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
+    ...typography.title,
+  },
+  secondaryButton: {
+    marginTop: spacing.md,
+    marginHorizontal: spacing["2xl"],
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.surface,
+    paddingVertical: spacing.lg,
+    alignItems: "center",
+  },
+  secondaryButtonText: {
+    color: colors.primaryStrong,
     ...typography.title,
   },
 });
