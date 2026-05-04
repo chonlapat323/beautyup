@@ -19,8 +19,16 @@ export function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleLogin() {
-    if (!identifier || !password) {
-      Alert.alert("กรุณากรอกข้อมูลให้ครบ");
+    if (!identifier.trim()) {
+      Alert.alert("กรุณากรอกอีเมลหรือเบอร์โทร");
+      return;
+    }
+    if (!password) {
+      Alert.alert("กรุณากรอกรหัสผ่าน");
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
       return;
     }
     setIsLoading(true);

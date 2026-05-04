@@ -77,8 +77,24 @@ export function AddressFormScreen() {
   }
 
   async function handleSave() {
-    if (!form.recipient || !form.phone || !form.addressLine1) {
-      Alert.alert("กรุณากรอกชื่อผู้รับ เบอร์โทร และที่อยู่");
+    if (!form.recipient.trim()) {
+      Alert.alert("กรุณากรอกชื่อผู้รับ");
+      return;
+    }
+    if (!form.phone.trim()) {
+      Alert.alert("กรุณากรอกเบอร์โทร");
+      return;
+    }
+    if (!/^\d{10}$/.test(form.phone.trim())) {
+      Alert.alert("เบอร์โทรต้องเป็นตัวเลข 10 หลัก");
+      return;
+    }
+    if (!form.addressLine1.trim()) {
+      Alert.alert("กรุณากรอกที่อยู่");
+      return;
+    }
+    if (form.postalCode && !/^\d{5}$/.test(form.postalCode.trim())) {
+      Alert.alert("รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก");
       return;
     }
     if (!token) return;

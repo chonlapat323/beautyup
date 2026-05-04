@@ -25,8 +25,28 @@ export function RegisterScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleRegister() {
-    if (!fullName || (!email && !phone) || !password) {
-      Alert.alert("กรุณากรอกชื่อ, อีเมลหรือเบอร์โทร และรหัสผ่าน");
+    if (!fullName.trim()) {
+      Alert.alert("กรุณากรอกชื่อ-นามสกุล");
+      return;
+    }
+    if (!email.trim() && !phone.trim()) {
+      Alert.alert("กรุณากรอกอีเมลหรือเบอร์โทรอย่างน้อย 1 อย่าง");
+      return;
+    }
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      Alert.alert("รูปแบบอีเมลไม่ถูกต้อง");
+      return;
+    }
+    if (phone.trim() && !/^\d{10}$/.test(phone.trim())) {
+      Alert.alert("เบอร์โทรต้องเป็นตัวเลข 10 หลัก");
+      return;
+    }
+    if (!password) {
+      Alert.alert("กรุณากรอกรหัสผ่าน");
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
       return;
     }
     if (password !== confirmPassword) {
