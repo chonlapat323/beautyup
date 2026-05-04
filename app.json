@@ -3,7 +3,7 @@
     "name": "Beauty Up",
     "slug": "beauty-up",
     "scheme": "beautyup",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./src/logo/logo.png",
