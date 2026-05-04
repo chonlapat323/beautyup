@@ -411,6 +411,36 @@ export async function mobileGetCommissionSummary(token: string): Promise<{
   return res.json() as Promise<{ pendingAmount: number; pendingCount: number; paidAmount: number; paidCount: number }>;
 }
 
+// ─── Mobile rewards ───────────────────────────────────────────────────────────
+
+export type RewardProduct = {
+  id: string;
+  name: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  pointCost: number;
+  stock: number;
+};
+
+export async function mobileGetRewardProducts(token: string): Promise<RewardProduct[]> {
+  const res = await fetch(`${API_BASE}/mobile/rewards`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดสินค้าแลกแต้มไม่สำเร็จ");
+  return res.json() as Promise<RewardProduct[]>;
+}
+
+export async function mobileRedeemReward(token: string, rewardProductId: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/mobile/rewards/${rewardProductId}/redeem`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "แลกแต้มไม่สำเร็จ");
+  }
+}
+
 export async function mobileGetOrders(token: string): Promise<ApiOrder[]> {
   const res = await fetch(`${API_BASE}/mobile/orders`, {
     headers: { Authorization: `Bearer ${token}` },

@@ -13,6 +13,7 @@ export type ProfileStackParamList = {
   AddressForm: { addressId?: string };
   OrderHistory: undefined;
   OrderDetail: { orderId: string };
+  Rewards: undefined;
 };
 
 export type ShopStackParamList = {

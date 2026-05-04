@@ -132,6 +132,10 @@ export function ProfileScreen() {
           </View>
         </View>
 
+        <Pressable onPress={() => navigation.navigate("Rewards")} style={styles.menuButton}>
+          <Text style={styles.menuButtonText}>แลกแต้ม</Text>
+        </Pressable>
+
         <Pressable onPress={() => navigation.navigate("OrderHistory")} style={styles.menuButton}>
           <Text style={styles.menuButtonText}>ประวัติคำสั่งซื้อ</Text>
         </Pressable>

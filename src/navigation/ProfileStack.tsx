@@ -7,6 +7,7 @@ import { AddressesScreen } from "@/features/profile/screens/AddressesScreen";
 import { AddressFormScreen } from "@/features/profile/screens/AddressFormScreen";
 import { OrderHistoryScreen } from "@/features/orders/screens/OrderHistoryScreen";
 import { OrderDetailScreen } from "@/features/orders/screens/OrderDetailScreen";
+import { RewardsScreen } from "@/features/profile/screens/RewardsScreen";
 import type { ProfileStackParamList } from "@/navigation/types";
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -21,6 +22,7 @@ export function ProfileStack() {
       <Stack.Screen name="AddressForm" component={AddressFormScreen} />
       <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+      <Stack.Screen name="Rewards" component={RewardsScreen} />
     </Stack.Navigator>
   );
 }
