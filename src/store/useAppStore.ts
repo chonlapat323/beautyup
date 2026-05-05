@@ -1,6 +1,7 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist } from "zustand/middleware";
+
+import { storage } from "./storage";
 
 import { fetchBanners, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders } from "@/services/api";
 import type { PointTier } from "@/services/api";
@@ -128,7 +129,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: "beautyup-store",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage,
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         token: state.token,
