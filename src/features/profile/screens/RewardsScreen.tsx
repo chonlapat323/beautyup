@@ -78,12 +78,6 @@ export function RewardsScreen() {
         />
       }
     >
-      <View style={styles.pointBanner}>
-        <Text style={styles.pointLabel}>แต้มของคุณ</Text>
-        <Text style={styles.pointValue}>{(member?.pointBalance ?? 0).toLocaleString()}</Text>
-        <Text style={styles.pointUnit}>แต้ม</Text>
-      </View>
-
       {isLoading ? (
         <ActivityIndicator style={styles.loader} color={colors.primary} />
       ) : rewards.length === 0 ? (
@@ -132,29 +126,6 @@ export function RewardsScreen() {
 }
 
 const styles = StyleSheet.create({
-  pointBanner: {
-    marginHorizontal: spacing["2xl"],
-    marginBottom: spacing.lg,
-    borderRadius: radius.lg,
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.lg,
-    alignItems: "center",
-    gap: 2,
-  },
-  pointLabel: {
-    color: "rgba(255,255,255,0.75)",
-    ...typography.caption,
-  },
-  pointValue: {
-    color: "#fff",
-    fontSize: 36,
-    fontWeight: "700",
-    lineHeight: 42,
-  },
-  pointUnit: {
-    color: "rgba(255,255,255,0.75)",
-    ...typography.caption,
-  },
   loader: {
     marginTop: spacing["3xl"],
   },
