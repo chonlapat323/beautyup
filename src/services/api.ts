@@ -418,6 +418,7 @@ export type RewardProduct = {
   name: string;
   description?: string | null;
   imageUrl?: string | null;
+  images?: { id: string; url: string; sortOrder: number }[];
   pointCost: number;
   stock: number;
 };
