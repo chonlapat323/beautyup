@@ -6,13 +6,28 @@ type Props = {
   title: string;
   message?: string;
   confirmLabel?: string;
+  cancelLabel?: string;
   onConfirm: () => void;
-  type?: "error" | "success" | "info";
+  onCancel?: () => void;
+  type?: "error" | "success" | "info" | "confirm";
 };
 
-export function AppModal({ visible, title, message, confirmLabel = "ตกลง", onConfirm, type = "error" }: Props) {
-  const iconColor = type === "success" ? colors.primary : type === "error" ? "#dc2626" : colors.textSecondary;
-  const icon = type === "success" ? "✓" : type === "error" ? "✕" : "i";
+export function AppModal({
+  visible,
+  title,
+  message,
+  confirmLabel = "ตกลง",
+  cancelLabel = "ยกเลิก",
+  onConfirm,
+  onCancel,
+  type = "error",
+}: Props) {
+  const iconColor =
+    type === "success" ? colors.primary :
+    type === "error"   ? "#dc2626" :
+    type === "confirm" ? colors.primary :
+    colors.textSecondary;
+  const icon = type === "success" ? "✓" : type === "error" ? "✕" : type === "confirm" ? "?" : "i";
 
   return (
     <Modal transparent animationType="fade" visible={visible} statusBarTranslucent>
@@ -23,9 +38,16 @@ export function AppModal({ visible, title, message, confirmLabel = "ตกลง
           </View>
           <Text style={styles.title}>{title}</Text>
           {message ? <Text style={styles.message}>{message}</Text> : null}
-          <Pressable style={styles.button} onPress={onConfirm}>
-            <Text style={styles.buttonText}>{confirmLabel}</Text>
-          </Pressable>
+          <View style={onCancel ? styles.buttonRow : styles.buttonSingle}>
+            {onCancel ? (
+              <Pressable style={styles.cancelButton} onPress={onCancel}>
+                <Text style={styles.cancelButtonText}>{cancelLabel}</Text>
+              </Pressable>
+            ) : null}
+            <Pressable style={[styles.confirmButton, onCancel && styles.confirmButtonFlex]} onPress={onConfirm}>
+              <Text style={styles.confirmButtonText}>{confirmLabel}</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </Modal>
@@ -76,15 +98,41 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
   },
-  button: {
+  buttonRow: {
     marginTop: spacing.md,
+    flexDirection: "row",
+    gap: spacing.sm,
+    width: "100%",
+  },
+  buttonSingle: {
+    marginTop: spacing.md,
+    width: "100%",
+  },
+  cancelButton: {
+    flex: 1,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.md,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.background,
+  },
+  cancelButtonText: {
+    color: colors.textSecondary,
+    ...typography.title,
+  },
+  confirmButton: {
     width: "100%",
     backgroundColor: colors.primary,
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
     alignItems: "center",
   },
-  buttonText: {
+  confirmButtonFlex: {
+    flex: 1,
+    width: undefined,
+  },
+  confirmButtonText: {
     color: "#fff",
     ...typography.title,
   },

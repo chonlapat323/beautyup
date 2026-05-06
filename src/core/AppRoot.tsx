@@ -22,6 +22,7 @@ import { RootNavigator } from "@/navigation/RootNavigator";
 import { useAppStore } from "@/store/useAppStore";
 import { colors } from "@/theme";
 
+
 SplashScreen.preventAutoHideAsync();
 
 const navigationTheme = {
@@ -38,6 +39,8 @@ const navigationTheme = {
 
 export function AppRoot() {
   const loadCatalog = useAppStore((state) => state.loadCatalog);
+  const refreshProfile = useAppStore((state) => state.refreshProfile);
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
   const catalogError = useAppStore((state) => state.catalogError);
 
   const [fontsLoaded] = useFonts({
@@ -60,6 +63,11 @@ export function AppRoot() {
   useEffect(() => {
     void loadCatalog();
   }, [loadCatalog]);
+
+  // Refresh member points from server every time the app starts (if logged in)
+  useEffect(() => {
+    if (isAuthenticated) void refreshProfile();
+  }, [isAuthenticated, refreshProfile]);
 
   if (!fontsLoaded) return null;
 

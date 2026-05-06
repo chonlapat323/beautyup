@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 import { storage } from "./storage";
 
-import { fetchBanners, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders } from "@/services/api";
+import { fetchBanners, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders, mobileGetProfile } from "@/services/api";
 import type { PointTier } from "@/services/api";
 import type { Banner, CartItem, Category, Order, Product } from "@/types/domain";
 
@@ -27,6 +27,7 @@ type AppStore = {
   signIn: (token: string, member: MemberInfo) => void;
   signOut: () => void;
   updateMemberPoints: (delta: number) => void;
+  refreshProfile: () => Promise<void>;
   setSelectedShade: (shadeId?: string) => void;
   loadCatalog: () => Promise<void>;
   loadOrders: () => Promise<void>;
@@ -62,6 +63,16 @@ export const useAppStore = create<AppStore>()(
         set((state) => ({
           member: state.member ? { ...state.member, pointBalance: state.member.pointBalance + delta } : null,
         })),
+      refreshProfile: async () => {
+        const { token } = get();
+        if (!token) return;
+        try {
+          const fresh = await mobileGetProfile(token);
+          set((state) => ({ member: state.member ? { ...state.member, ...fresh } : null }));
+        } catch {
+          // keep existing member data on error
+        }
+      },
       setSelectedShade: (shadeId) => set({ selectedShadeId: shadeId }),
 
       loadCatalog: async () => {

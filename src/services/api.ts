@@ -423,6 +423,22 @@ export type RewardProduct = {
   stock: number;
 };
 
+export async function mobileGetProfile(token: string): Promise<{
+  id: string;
+  fullName: string;
+  email: string | null;
+  phone: string | null;
+  memberType: string;
+  pointBalance: number;
+  referralCode: string | null;
+}> {
+  const res = await fetch(`${API_BASE}/mobile/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดข้อมูลสมาชิกไม่สำเร็จ");
+  return res.json();
+}
+
 export async function mobileGetRewardProducts(token: string): Promise<RewardProduct[]> {
   const res = await fetch(`${API_BASE}/mobile/rewards`, {
     headers: { Authorization: `Bearer ${token}` },

@@ -1,6 +1,7 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
@@ -19,6 +20,14 @@ export function ProfileScreen() {
   const token = useAppStore((state) => state.token);
   const orders = useAppStore((state) => state.orders);
   const signOut = useAppStore((state) => state.signOut);
+  const refreshProfile = useAppStore((state) => state.refreshProfile);
+
+  // Refresh points every time this screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      void refreshProfile();
+    }, [refreshProfile]),
+  );
 
   const [commission, setCommission] = useState<{
     pendingAmount: number;
