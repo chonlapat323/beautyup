@@ -428,8 +428,18 @@ export type WithdrawalRequest = {
   amount: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   note: string | null;
+  bankName: string | null;
+  bankAccountNumber: string | null;
+  bankAccountName: string | null;
   processedAt: string | null;
   createdAt: string;
+};
+
+export type WithdrawalPayload = {
+  amount: number;
+  bankName: string;
+  bankAccountNumber: string;
+  bankAccountName: string;
 };
 
 export async function mobileGetCreditTransactions(token: string): Promise<CreditTransaction[]> {
@@ -440,11 +450,11 @@ export async function mobileGetCreditTransactions(token: string): Promise<Credit
   return res.json() as Promise<CreditTransaction[]>;
 }
 
-export async function mobileRequestWithdrawal(token: string, amount: number): Promise<WithdrawalRequest> {
+export async function mobileRequestWithdrawal(token: string, payload: WithdrawalPayload): Promise<WithdrawalRequest> {
   const res = await fetch(`${API_BASE}/mobile/me/withdraw`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ amount }),
+    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };
