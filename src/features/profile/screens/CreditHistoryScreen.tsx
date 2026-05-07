@@ -37,6 +37,16 @@ function formatAmt(v: string) {
   return `฿${Number(v).toLocaleString("th-TH", { minimumFractionDigits: 2 })}`;
 }
 
+function formatNote(note: string | null): string {
+  if (!note) return "—";
+  const match = note.match(/^Commission จากออเดอร์ (.+)$/);
+  if (match) {
+    const ref = match[1];
+    return ref.startsWith("BU-") ? note : "Commission";
+  }
+  return note;
+}
+
 export function CreditHistoryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const token = useAppStore((s) => s.token);
@@ -76,7 +86,7 @@ export function CreditHistoryScreen() {
             <Text style={[styles.badgeText, { color: cfg.color }]}>{cfg.label}</Text>
           </View>
           <View style={styles.cardMid}>
-            <Text style={styles.cardNote} numberOfLines={2}>{tx.note ?? "—"}</Text>
+            <Text style={styles.cardNote} numberOfLines={2}>{formatNote(tx.note)}</Text>
             <Text style={styles.cardDate}>{formatDate(tx.createdAt)}</Text>
           </View>
           <Text style={[styles.cardAmount, { color: cfg.color }]}>
