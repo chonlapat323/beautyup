@@ -42,7 +42,10 @@ export function WithdrawalScreen() {
   const refreshProfile = useAppStore((s) => s.refreshProfile);
 
   const creditBalance = member?.creditBalance ?? 0;
+  const hasSavedBank = !!(member?.bankName && member.bankAccountNumber && member.bankAccountName);
+
   const [amount, setAmount] = useState("");
+  const [editingBank, setEditingBank] = useState(!hasSavedBank);
   const [bankName, setBankName] = useState(member?.bankName ?? "");
   const [bankAccountNumber, setBankAccountNumber] = useState(member?.bankAccountNumber ?? "");
   const [bankAccountName, setBankAccountName] = useState(member?.bankAccountName ?? "");
@@ -95,6 +98,7 @@ export function WithdrawalScreen() {
       }
     >
       <View style={styles.card}>
+        {/* Balance */}
         <View style={styles.balanceBox}>
           <Text style={styles.balanceLabel}>Credit คงเหลือ</Text>
           <Text style={styles.balanceAmount}>
@@ -111,10 +115,7 @@ export function WithdrawalScreen() {
             <Text style={styles.successBody}>
               Admin จะตรวจสอบและดำเนินการภายใน 1–3 วันทำการ
             </Text>
-            <Pressable
-              style={styles.primaryButton}
-              onPress={() => navigation.navigate("CreditHistory")}
-            >
+            <Pressable style={styles.primaryButton} onPress={() => navigation.navigate("CreditHistory")}>
               <Text style={styles.primaryButtonText}>ดูประวัติการถอน</Text>
             </Pressable>
             <Pressable style={styles.outlineButton} onPress={() => navigation.goBack()}>
@@ -133,52 +134,77 @@ export function WithdrawalScreen() {
               placeholder="เช่น 500"
               placeholderTextColor={colors.textMuted}
             />
-            <Pressable
-              style={styles.maxBtn}
-              onPress={() => setAmount(String(creditBalance))}
-            >
+            <Pressable style={styles.maxBtn} onPress={() => setAmount(String(creditBalance))}>
               <Text style={styles.maxBtnText}>
                 ถอนทั้งหมด ฿{creditBalance.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
               </Text>
             </Pressable>
 
-            {/* Divider */}
             <View style={styles.divider} />
-            <Text style={styles.sectionLabel}>บัญชีที่ต้องการรับเงิน</Text>
 
-            {/* Bank name picker */}
-            <Text style={styles.label}>ธนาคาร</Text>
-            <TouchableOpacity
-              style={[styles.input, styles.pickerBtn]}
-              onPress={() => setShowBankPicker(true)}
-              activeOpacity={0.7}
-            >
-              <Text style={bankName ? styles.pickerText : styles.pickerPlaceholder}>
-                {bankName || "เลือกธนาคาร"}
-              </Text>
-              <Text style={styles.pickerChevron}>▼</Text>
-            </TouchableOpacity>
+            {/* Bank account section */}
+            <View style={styles.bankSectionHeader}>
+              <Text style={styles.sectionLabel}>บัญชีที่ต้องการรับเงิน</Text>
+              {!editingBank && (
+                <Pressable onPress={() => setEditingBank(true)}>
+                  <Text style={styles.changeBtn}>เปลี่ยนบัญชี</Text>
+                </Pressable>
+              )}
+            </View>
 
-            {/* Account number */}
-            <Text style={styles.label}>เลขที่บัญชี</Text>
-            <TextInput
-              style={styles.input}
-              value={bankAccountNumber}
-              onChangeText={(v) => { setBankAccountNumber(v); setError(null); }}
-              keyboardType="numeric"
-              placeholder="เช่น 0001234567"
-              placeholderTextColor={colors.textMuted}
-            />
+            {!editingBank ? (
+              /* Show saved bank account — no need to re-enter */
+              <View style={styles.savedBankCard}>
+                <Text style={styles.savedBankName}>{member?.bankName}</Text>
+                <Text style={styles.savedBankNumber}>{member?.bankAccountNumber}</Text>
+                <Text style={styles.savedBankHolder}>{member?.bankAccountName}</Text>
+              </View>
+            ) : (
+              /* Bank form — first time or when changing account */
+              <>
+                <Text style={styles.label}>ธนาคาร</Text>
+                <TouchableOpacity
+                  style={[styles.input, styles.pickerBtn]}
+                  onPress={() => setShowBankPicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={bankName ? styles.pickerText : styles.pickerPlaceholder}>
+                    {bankName || "เลือกธนาคาร"}
+                  </Text>
+                  <Text style={styles.pickerChevron}>▼</Text>
+                </TouchableOpacity>
 
-            {/* Account name */}
-            <Text style={styles.label}>ชื่อบัญชี (ชื่อ-นามสกุล)</Text>
-            <TextInput
-              style={styles.input}
-              value={bankAccountName}
-              onChangeText={(v) => { setBankAccountName(v); setError(null); }}
-              placeholder="ชื่อ นามสกุล ตามบัญชีธนาคาร"
-              placeholderTextColor={colors.textMuted}
-            />
+                <Text style={styles.label}>เลขที่บัญชี</Text>
+                <TextInput
+                  style={styles.input}
+                  value={bankAccountNumber}
+                  onChangeText={(v) => { setBankAccountNumber(v); setError(null); }}
+                  keyboardType="numeric"
+                  placeholder="เช่น 0001234567"
+                  placeholderTextColor={colors.textMuted}
+                />
+
+                <Text style={styles.label}>ชื่อบัญชี (ชื่อ-นามสกุล)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={bankAccountName}
+                  onChangeText={(v) => { setBankAccountName(v); setError(null); }}
+                  placeholder="ชื่อ นามสกุล ตามบัญชีธนาคาร"
+                  placeholderTextColor={colors.textMuted}
+                />
+
+                {hasSavedBank && (
+                  <Pressable onPress={() => {
+                    setBankName(member?.bankName ?? "");
+                    setBankAccountNumber(member?.bankAccountNumber ?? "");
+                    setBankAccountName(member?.bankAccountName ?? "");
+                    setEditingBank(false);
+                  }}>
+                    <Text style={styles.cancelChangeBtn}>ยกเลิกการเปลี่ยนบัญชี</Text>
+                  </Pressable>
+                )}
+              </>
+            )}
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -193,9 +219,7 @@ export function WithdrawalScreen() {
               }
             </Pressable>
 
-            <Text style={styles.note}>
-              * credit จะถูกหักทันที และจะคืนหากถูกปฏิเสธ
-            </Text>
+            <Text style={styles.note}>* credit จะถูกหักทันที และจะคืนหากถูกปฏิเสธ</Text>
           </>
         )}
       </View>
@@ -217,7 +241,7 @@ export function WithdrawalScreen() {
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.bankOption, bankName === item && styles.bankOptionSelected]}
+                  style={styles.bankOption}
                   onPress={() => { setBankName(item); setShowBankPicker(false); setError(null); }}
                   activeOpacity={0.7}
                 >
@@ -237,10 +261,7 @@ export function WithdrawalScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing["3xl"],
-  },
+  content: { paddingTop: spacing.lg, paddingBottom: spacing["3xl"] },
   card: {
     marginHorizontal: spacing["2xl"],
     borderRadius: radius.lg,
@@ -259,33 +280,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: spacing.sm,
   },
-  balanceLabel: {
-    color: colors.textSecondary,
-    ...typography.caption,
+  balanceLabel: { color: colors.textSecondary, ...typography.caption },
+  balanceAmount: { color: colors.primary, fontSize: 24, fontWeight: "700", marginTop: 4 },
+  divider: { height: 1, backgroundColor: colors.borderSoft, marginVertical: spacing.xs },
+  bankSectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  sectionLabel: { color: colors.textPrimary, fontWeight: "700", fontSize: 13 },
+  changeBtn: { color: colors.primary, fontSize: 13, fontWeight: "600" },
+  cancelChangeBtn: { color: colors.textMuted, fontSize: 13, textDecorationLine: "underline", alignSelf: "flex-start" },
+  savedBankCard: {
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMuted,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    padding: spacing.md,
+    gap: 3,
   },
-  balanceAmount: {
-    color: colors.primary,
-    fontSize: 24,
-    fontWeight: "700",
-    marginTop: 4,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.borderSoft,
-    marginVertical: spacing.xs,
-  },
-  sectionLabel: {
-    color: colors.textPrimary,
-    fontWeight: "700",
-    fontSize: 13,
-    letterSpacing: 0.5,
-  },
-  label: {
-    color: colors.textPrimary,
-    ...typography.body,
-    fontWeight: "600",
-    marginBottom: -spacing.xs,
-  },
+  savedBankName: { color: colors.textPrimary, fontWeight: "700", fontSize: 15 },
+  savedBankNumber: { color: colors.textSecondary, fontFamily: "monospace", fontSize: 14 },
+  savedBankHolder: { color: colors.textMuted, fontSize: 13 },
+  label: { color: colors.textPrimary, ...typography.body, fontWeight: "600", marginBottom: -spacing.xs },
   input: {
     height: 52,
     borderRadius: radius.md,
@@ -296,36 +309,13 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 16,
   },
-  pickerBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  pickerText: {
-    color: colors.textPrimary,
-    fontSize: 16,
-  },
-  pickerPlaceholder: {
-    color: colors.textMuted,
-    fontSize: 16,
-  },
-  pickerChevron: {
-    color: colors.textMuted,
-    fontSize: 11,
-  },
-  maxBtn: {
-    alignSelf: "flex-start",
-    marginTop: -spacing.xs,
-  },
-  maxBtnText: {
-    color: colors.primary,
-    ...typography.caption,
-    fontWeight: "600",
-  },
-  errorText: {
-    color: "#c84b44",
-    ...typography.caption,
-  },
+  pickerBtn: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  pickerText: { color: colors.textPrimary, fontSize: 16 },
+  pickerPlaceholder: { color: colors.textMuted, fontSize: 16 },
+  pickerChevron: { color: colors.textMuted, fontSize: 11 },
+  maxBtn: { alignSelf: "flex-start", marginTop: -spacing.xs },
+  maxBtnText: { color: colors.primary, ...typography.caption, fontWeight: "600" },
+  errorText: { color: "#c84b44", ...typography.caption },
   primaryButton: {
     height: 52,
     borderRadius: radius.pill,
@@ -334,13 +324,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: spacing.sm,
   },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  primaryButtonText: {
-    color: "#FFFFFF",
-    ...typography.title,
-  },
+  disabledButton: { opacity: 0.6 },
+  primaryButtonText: { color: "#FFFFFF", ...typography.title },
   outlineButton: {
     height: 52,
     borderRadius: radius.pill,
@@ -349,47 +334,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  outlineButtonText: {
-    color: colors.textSecondary,
-    ...typography.title,
-  },
-  note: {
-    color: colors.textMuted,
-    fontSize: 11,
-    lineHeight: 16,
-  },
-  successBox: {
-    gap: spacing.md,
-    alignItems: "center",
-  },
+  outlineButtonText: { color: colors.textSecondary, ...typography.title },
+  note: { color: colors.textMuted, fontSize: 11, lineHeight: 16 },
+  successBox: { gap: spacing.md, alignItems: "center" },
   successIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#E8F5EE",
-    alignItems: "center",
-    justifyContent: "center",
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: "#E8F5EE", alignItems: "center", justifyContent: "center",
   },
-  successIconText: {
-    color: colors.primary,
-    fontSize: 24,
-    fontWeight: "700",
-  },
-  successTitle: {
-    color: colors.primary,
-    ...typography.headline,
-  },
-  successBody: {
-    color: colors.textSecondary,
-    ...typography.body,
-    textAlign: "center",
-  },
-  // Bank picker modal
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",
-  },
+  successIconText: { color: colors.primary, fontSize: 24, fontWeight: "700" },
+  successTitle: { color: colors.primary, ...typography.headline },
+  successBody: { color: colors.textSecondary, ...typography.body, textAlign: "center" },
+  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
   modalSheet: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: 24,
@@ -399,43 +354,13 @@ const styles = StyleSheet.create({
     maxHeight: "70%",
   },
   modalHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.borderSoft,
-    alignSelf: "center",
-    marginVertical: spacing.md,
+    width: 40, height: 4, borderRadius: 2,
+    backgroundColor: colors.borderSoft, alignSelf: "center", marginVertical: spacing.md,
   },
-  modalTitle: {
-    color: colors.textPrimary,
-    fontWeight: "700",
-    fontSize: 16,
-    marginBottom: spacing.md,
-  },
-  bankOption: {
-    paddingVertical: spacing.md,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  bankOptionSelected: {
-    // no background, just checkmark
-  },
-  bankOptionText: {
-    color: colors.textPrimary,
-    fontSize: 15,
-  },
-  bankOptionTextSelected: {
-    color: colors.primary,
-    fontWeight: "600",
-  },
-  checkmark: {
-    color: colors.primary,
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  bankSeparator: {
-    height: 1,
-    backgroundColor: colors.borderSoft,
-  },
+  modalTitle: { color: colors.textPrimary, fontWeight: "700", fontSize: 16, marginBottom: spacing.md },
+  bankOption: { paddingVertical: spacing.md, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  bankOptionText: { color: colors.textPrimary, fontSize: 15 },
+  bankOptionTextSelected: { color: colors.primary, fontWeight: "600" },
+  checkmark: { color: colors.primary, fontWeight: "700", fontSize: 16 },
+  bankSeparator: { height: 1, backgroundColor: colors.borderSoft },
 });
