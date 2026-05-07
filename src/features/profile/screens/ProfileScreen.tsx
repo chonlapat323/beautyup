@@ -165,7 +165,7 @@ export function ProfileScreen() {
         <View style={styles.bankBox}>
           <View style={styles.bankHeader}>
             <Text style={styles.bankTitle}>บัญชีธนาคารสำหรับรับเงิน</Text>
-            <Pressable onPress={() => navigation.navigate("Withdrawal")}>
+            <Pressable onPress={() => navigation.navigate("BankAccount")}>
               <Text style={styles.bankEditBtn}>แก้ไข</Text>
             </Pressable>
           </View>
@@ -175,7 +175,7 @@ export function ProfileScreen() {
               <Text style={styles.bankSub}>{member.bankAccountNumber} · {member.bankAccountName}</Text>
             </View>
           ) : (
-            <Pressable onPress={() => navigation.navigate("Withdrawal")}>
+            <Pressable onPress={() => navigation.navigate("BankAccount")}>
               <Text style={styles.bankEmpty}>ยังไม่มีบัญชี — แตะเพื่อเพิ่ม</Text>
             </Pressable>
           )}

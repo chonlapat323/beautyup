@@ -3,37 +3,19 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  FlatList,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import type { ProfileStackParamList } from "@/navigation/types";
-import { mobileRequestWithdrawal, mobileUpdateBankAccount } from "@/services/api";
+import { mobileRequestWithdrawal } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
-
-const THAI_BANKS = [
-  "ธนาคารกสิกรไทย (KBank)",
-  "ธนาคารไทยพาณิชย์ (SCB)",
-  "ธนาคารกรุงเทพ (BBL)",
-  "ธนาคารกรุงไทย (KTB)",
-  "ธนาคารกรุงศรีอยุธยา (BAY)",
-  "ธนาคารทหารไทยธนชาต (TTB)",
-  "ธนาคารออมสิน",
-  "ธนาคารอาคารสงเคราะห์ (GHB)",
-  "ธนาคารเกียรตินาคินภัทร (KKP)",
-  "ธนาคารซีไอเอ็มบีไทย (CIMB)",
-  "ธนาคารยูโอบี (UOB)",
-  "พร้อมเพย์ (PromptPay)",
-];
 
 export function WithdrawalScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
@@ -45,11 +27,6 @@ export function WithdrawalScreen() {
   const hasSavedBank = !!(member?.bankName && member.bankAccountNumber && member.bankAccountName);
 
   const [amount, setAmount] = useState("");
-  const [editingBank, setEditingBank] = useState(!hasSavedBank);
-  const [bankName, setBankName] = useState(member?.bankName ?? "");
-  const [bankAccountNumber, setBankAccountNumber] = useState(member?.bankAccountNumber ?? "");
-  const [bankAccountName, setBankAccountName] = useState(member?.bankAccountName ?? "");
-  const [showBankPicker, setShowBankPicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -58,20 +35,16 @@ export function WithdrawalScreen() {
     const num = parseFloat(amount);
     if (!num || num <= 0) { setError("กรุณากรอกจำนวนที่ถูกต้อง"); return; }
     if (num > creditBalance) { setError("ยอด Credit ไม่เพียงพอ"); return; }
-    if (!bankName) { setError("กรุณาเลือกธนาคาร"); return; }
-    if (!bankAccountNumber.trim()) { setError("กรุณากรอกเลขที่บัญชี"); return; }
-    if (!bankAccountName.trim()) { setError("กรุณากรอกชื่อบัญชี"); return; }
     if (!token) return;
 
     setIsLoading(true);
     setError(null);
     try {
-      await mobileUpdateBankAccount(token, bankName, bankAccountNumber.trim(), bankAccountName.trim());
       await mobileRequestWithdrawal(token, {
         amount: num,
-        bankName,
-        bankAccountNumber: bankAccountNumber.trim(),
-        bankAccountName: bankAccountName.trim(),
+        bankName: member!.bankName!,
+        bankAccountNumber: member!.bankAccountNumber!,
+        bankAccountName: member!.bankAccountName!,
       });
       await refreshProfile();
       setSuccess(true);
@@ -122,6 +95,17 @@ export function WithdrawalScreen() {
               <Text style={styles.outlineButtonText}>กลับ</Text>
             </Pressable>
           </View>
+        ) : !hasSavedBank ? (
+          /* No bank account saved — redirect to BankAccount screen */
+          <View style={styles.noBankBox}>
+            <Text style={styles.noBankTitle}>ยังไม่มีบัญชีธนาคาร</Text>
+            <Text style={styles.noBankBody}>
+              กรุณาเพิ่มบัญชีธนาคารก่อนทำการถอน Credit
+            </Text>
+            <Pressable style={styles.primaryButton} onPress={() => navigation.navigate("BankAccount")}>
+              <Text style={styles.primaryButtonText}>เพิ่มบัญชีธนาคาร</Text>
+            </Pressable>
+          </View>
         ) : (
           <>
             {/* Amount */}
@@ -142,69 +126,18 @@ export function WithdrawalScreen() {
 
             <View style={styles.divider} />
 
-            {/* Bank account section */}
+            {/* Saved bank (read-only) */}
             <View style={styles.bankSectionHeader}>
               <Text style={styles.sectionLabel}>บัญชีที่ต้องการรับเงิน</Text>
-              {!editingBank && (
-                <Pressable onPress={() => setEditingBank(true)}>
-                  <Text style={styles.changeBtn}>เปลี่ยนบัญชี</Text>
-                </Pressable>
-              )}
+              <Pressable onPress={() => navigation.navigate("BankAccount")}>
+                <Text style={styles.changeBtn}>เปลี่ยนบัญชี</Text>
+              </Pressable>
             </View>
-
-            {!editingBank ? (
-              /* Show saved bank account — no need to re-enter */
-              <View style={styles.savedBankCard}>
-                <Text style={styles.savedBankName}>{member?.bankName}</Text>
-                <Text style={styles.savedBankNumber}>{member?.bankAccountNumber}</Text>
-                <Text style={styles.savedBankHolder}>{member?.bankAccountName}</Text>
-              </View>
-            ) : (
-              /* Bank form — first time or when changing account */
-              <>
-                <Text style={styles.label}>ธนาคาร</Text>
-                <TouchableOpacity
-                  style={[styles.input, styles.pickerBtn]}
-                  onPress={() => setShowBankPicker(true)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={bankName ? styles.pickerText : styles.pickerPlaceholder}>
-                    {bankName || "เลือกธนาคาร"}
-                  </Text>
-                  <Text style={styles.pickerChevron}>▼</Text>
-                </TouchableOpacity>
-
-                <Text style={styles.label}>เลขที่บัญชี</Text>
-                <TextInput
-                  style={styles.input}
-                  value={bankAccountNumber}
-                  onChangeText={(v) => { setBankAccountNumber(v); setError(null); }}
-                  keyboardType="numeric"
-                  placeholder="เช่น 0001234567"
-                  placeholderTextColor={colors.textMuted}
-                />
-
-                <Text style={styles.label}>ชื่อบัญชี (ชื่อ-นามสกุล)</Text>
-                <TextInput
-                  style={styles.input}
-                  value={bankAccountName}
-                  onChangeText={(v) => { setBankAccountName(v); setError(null); }}
-                  placeholder="ชื่อ นามสกุล ตามบัญชีธนาคาร"
-                  placeholderTextColor={colors.textMuted}
-                />
-
-                {hasSavedBank && (
-                  <Pressable onPress={() => {
-                    setBankName(member?.bankName ?? "");
-                    setBankAccountNumber(member?.bankAccountNumber ?? "");
-                    setBankAccountName(member?.bankAccountName ?? "");
-                    setEditingBank(false);
-                  }}>
-                    <Text style={styles.cancelChangeBtn}>ยกเลิกการเปลี่ยนบัญชี</Text>
-                  </Pressable>
-                )}
-              </>
-            )}
+            <View style={styles.savedBankCard}>
+              <Text style={styles.savedBankName}>{member?.bankName}</Text>
+              <Text style={styles.savedBankNumber}>{member?.bankAccountNumber}</Text>
+              <Text style={styles.savedBankHolder}>{member?.bankAccountName}</Text>
+            </View>
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -223,39 +156,6 @@ export function WithdrawalScreen() {
           </>
         )}
       </View>
-
-      {/* Bank picker modal */}
-      <Modal
-        visible={showBankPicker}
-        transparent
-        animationType="slide"
-        statusBarTranslucent
-        onRequestClose={() => setShowBankPicker(false)}
-      >
-        <Pressable style={styles.modalBackdrop} onPress={() => setShowBankPicker(false)}>
-          <Pressable style={styles.modalSheet} onPress={() => undefined}>
-            <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>เลือกธนาคาร</Text>
-            <FlatList
-              data={THAI_BANKS}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.bankOption}
-                  onPress={() => { setBankName(item); setShowBankPicker(false); setError(null); }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.bankOptionText, bankName === item && styles.bankOptionTextSelected]}>
-                    {item}
-                  </Text>
-                  {bankName === item && <Text style={styles.checkmark}>✓</Text>}
-                </TouchableOpacity>
-              )}
-              ItemSeparatorComponent={() => <View style={styles.bankSeparator} />}
-            />
-          </Pressable>
-        </Pressable>
-      </Modal>
     </Screen>
   );
 }
@@ -286,7 +186,6 @@ const styles = StyleSheet.create({
   bankSectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   sectionLabel: { color: colors.textPrimary, fontWeight: "700", fontSize: 13 },
   changeBtn: { color: colors.primary, fontSize: 13, fontWeight: "600" },
-  cancelChangeBtn: { color: colors.textMuted, fontSize: 13, textDecorationLine: "underline", alignSelf: "flex-start" },
   savedBankCard: {
     borderRadius: radius.md,
     backgroundColor: colors.surfaceMuted,
@@ -309,10 +208,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 16,
   },
-  pickerBtn: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  pickerText: { color: colors.textPrimary, fontSize: 16 },
-  pickerPlaceholder: { color: colors.textMuted, fontSize: 16 },
-  pickerChevron: { color: colors.textMuted, fontSize: 11 },
   maxBtn: { alignSelf: "flex-start", marginTop: -spacing.xs },
   maxBtnText: { color: colors.primary, ...typography.caption, fontWeight: "600" },
   errorText: { color: "#c84b44", ...typography.caption },
@@ -336,6 +231,9 @@ const styles = StyleSheet.create({
   },
   outlineButtonText: { color: colors.textSecondary, ...typography.title },
   note: { color: colors.textMuted, fontSize: 11, lineHeight: 16 },
+  noBankBox: { alignItems: "center", gap: spacing.md, paddingVertical: spacing.lg },
+  noBankTitle: { color: colors.textPrimary, fontWeight: "700", fontSize: 16 },
+  noBankBody: { color: colors.textSecondary, ...typography.body, textAlign: "center" },
   successBox: { gap: spacing.md, alignItems: "center" },
   successIcon: {
     width: 56, height: 56, borderRadius: 28,
@@ -344,23 +242,4 @@ const styles = StyleSheet.create({
   successIconText: { color: colors.primary, fontSize: 24, fontWeight: "700" },
   successTitle: { color: colors.primary, ...typography.headline },
   successBody: { color: colors.textSecondary, ...typography.body, textAlign: "center" },
-  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
-  modalSheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: spacing["2xl"],
-    paddingBottom: spacing["3xl"],
-    maxHeight: "70%",
-  },
-  modalHandle: {
-    width: 40, height: 4, borderRadius: 2,
-    backgroundColor: colors.borderSoft, alignSelf: "center", marginVertical: spacing.md,
-  },
-  modalTitle: { color: colors.textPrimary, fontWeight: "700", fontSize: 16, marginBottom: spacing.md },
-  bankOption: { paddingVertical: spacing.md, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  bankOptionText: { color: colors.textPrimary, fontSize: 15 },
-  bankOptionTextSelected: { color: colors.primary, fontWeight: "600" },
-  checkmark: { color: colors.primary, fontWeight: "700", fontSize: 16 },
-  bankSeparator: { height: 1, backgroundColor: colors.borderSoft },
 });

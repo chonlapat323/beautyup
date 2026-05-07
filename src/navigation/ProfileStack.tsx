@@ -10,6 +10,7 @@ import { OrderDetailScreen } from "@/features/orders/screens/OrderDetailScreen";
 import { RewardsScreen } from "@/features/profile/screens/RewardsScreen";
 import { WithdrawalScreen } from "@/features/profile/screens/WithdrawalScreen";
 import { CreditHistoryScreen } from "@/features/profile/screens/CreditHistoryScreen";
+import { BankAccountScreen } from "@/features/profile/screens/BankAccountScreen";
 import type { ProfileStackParamList } from "@/navigation/types";
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -27,6 +28,7 @@ export function ProfileStack() {
       <Stack.Screen name="Rewards" component={RewardsScreen} />
       <Stack.Screen name="Withdrawal" component={WithdrawalScreen} />
       <Stack.Screen name="CreditHistory" component={CreditHistoryScreen} />
+      <Stack.Screen name="BankAccount" component={BankAccountScreen} />
     </Stack.Navigator>
   );
 }

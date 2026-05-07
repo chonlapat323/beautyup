@@ -16,6 +16,7 @@ export type ProfileStackParamList = {
   Rewards: undefined;
   Withdrawal: undefined;
   CreditHistory: undefined;
+  BankAccount: undefined;
 };
 
 export type ShopStackParamList = {
