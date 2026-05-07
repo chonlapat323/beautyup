@@ -16,7 +16,7 @@ import {
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import type { ProfileStackParamList } from "@/navigation/types";
-import { mobileRequestWithdrawal } from "@/services/api";
+import { mobileRequestWithdrawal, mobileUpdateBankAccount } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -43,9 +43,9 @@ export function WithdrawalScreen() {
 
   const creditBalance = member?.creditBalance ?? 0;
   const [amount, setAmount] = useState("");
-  const [bankName, setBankName] = useState("");
-  const [bankAccountNumber, setBankAccountNumber] = useState("");
-  const [bankAccountName, setBankAccountName] = useState("");
+  const [bankName, setBankName] = useState(member?.bankName ?? "");
+  const [bankAccountNumber, setBankAccountNumber] = useState(member?.bankAccountNumber ?? "");
+  const [bankAccountName, setBankAccountName] = useState(member?.bankAccountName ?? "");
   const [showBankPicker, setShowBankPicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +63,7 @@ export function WithdrawalScreen() {
     setIsLoading(true);
     setError(null);
     try {
+      await mobileUpdateBankAccount(token, bankName, bankAccountNumber.trim(), bankAccountName.trim());
       await mobileRequestWithdrawal(token, {
         amount: num,
         bankName,

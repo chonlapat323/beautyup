@@ -161,6 +161,26 @@ export function ProfileScreen() {
           </View>
         ) : null}
 
+        {/* Bank account section */}
+        <View style={styles.bankBox}>
+          <View style={styles.bankHeader}>
+            <Text style={styles.bankTitle}>บัญชีธนาคารสำหรับรับเงิน</Text>
+            <Pressable onPress={() => navigation.navigate("Withdrawal")}>
+              <Text style={styles.bankEditBtn}>แก้ไข</Text>
+            </Pressable>
+          </View>
+          {member?.bankName ? (
+            <View style={styles.bankDetail}>
+              <Text style={styles.bankValue}>{member.bankName}</Text>
+              <Text style={styles.bankSub}>{member.bankAccountNumber} · {member.bankAccountName}</Text>
+            </View>
+          ) : (
+            <Pressable onPress={() => navigation.navigate("Withdrawal")}>
+              <Text style={styles.bankEmpty}>ยังไม่มีบัญชี — แตะเพื่อเพิ่ม</Text>
+            </Pressable>
+          )}
+        </View>
+
         <Pressable onPress={() => navigation.navigate("Rewards")} style={styles.menuButton}>
           <Text style={styles.menuButtonText}>แลกแต้ม</Text>
         </Pressable>
@@ -340,6 +360,46 @@ const styles = StyleSheet.create({
     color: "#7A5CB8",
     ...typography.caption,
     fontSize: 10,
+  },
+  bankBox: {
+    marginTop: spacing.lg,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.surfaceMuted,
+    padding: spacing.md,
+    gap: spacing.xs,
+  },
+  bankHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  bankTitle: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  bankEditBtn: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  bankDetail: {
+    gap: 2,
+  },
+  bankValue: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  bankSub: {
+    color: colors.textSecondary,
+    fontSize: 12,
+  },
+  bankEmpty: {
+    color: colors.primary,
+    fontSize: 13,
   },
   menuButton: {
     marginTop: spacing.lg,

@@ -185,6 +185,9 @@ type AuthResponse = {
     pointBalance: number;
     creditBalance: number;
     referralCode: string | null;
+    bankName: string | null;
+    bankAccountNumber: string | null;
+    bankAccountName: string | null;
   };
 };
 
@@ -492,12 +495,29 @@ export async function mobileGetProfile(token: string): Promise<{
   pointBalance: number;
   creditBalance: number;
   referralCode: string | null;
+  bankName: string | null;
+  bankAccountNumber: string | null;
+  bankAccountName: string | null;
 }> {
   const res = await fetch(`${API_BASE}/mobile/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error("โหลดข้อมูลสมาชิกไม่สำเร็จ");
   return res.json();
+}
+
+export async function mobileUpdateBankAccount(
+  token: string,
+  bankName: string,
+  bankAccountNumber: string,
+  bankAccountName: string,
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/mobile/me/bank-account`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ bankName, bankAccountNumber, bankAccountName }),
+  });
+  if (!res.ok) throw new Error("บันทึกบัญชีธนาคารไม่สำเร็จ");
 }
 
 export async function mobileGetRewardProducts(token: string): Promise<RewardProduct[]> {
