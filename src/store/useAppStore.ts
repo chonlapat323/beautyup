@@ -7,7 +7,7 @@ import { fetchBanners, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobil
 import type { PointTier } from "@/services/api";
 import type { Banner, CartItem, Category, Order, Product } from "@/types/domain";
 
-type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; referralCode: string | null };
+type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; creditBalance: number; referralCode: string | null };
 
 type AppStore = {
   isAuthenticated: boolean;

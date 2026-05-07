@@ -14,6 +14,8 @@ export type ProfileStackParamList = {
   OrderHistory: undefined;
   OrderDetail: { orderId: string };
   Rewards: undefined;
+  Withdrawal: undefined;
+  CreditHistory: undefined;
 };
 
 export type ShopStackParamList = {

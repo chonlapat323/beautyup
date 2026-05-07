@@ -103,22 +103,15 @@ export function ProfileScreen() {
           </Pressable>
         ) : null}
 
-        {commission && (commission.pendingAmount > 0 || commission.paidAmount > 0) ? (
+        {commission && commission.paidAmount > 0 ? (
           <View style={styles.commissionBox}>
             <Text style={styles.commissionTitle}>Commission ของคุณ</Text>
             <View style={styles.commissionRow}>
               <View style={styles.commissionItem}>
                 <Text style={styles.commissionAmount}>
-                  ฿{commission.pendingAmount.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
-                </Text>
-                <Text style={styles.commissionLabel}>รอจ่าย ({commission.pendingCount})</Text>
-              </View>
-              <View style={styles.commissionDivider} />
-              <View style={styles.commissionItem}>
-                <Text style={styles.commissionAmount}>
                   ฿{commission.paidAmount.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
                 </Text>
-                <Text style={styles.commissionLabel}>จ่ายแล้ว ({commission.paidCount})</Text>
+                <Text style={styles.commissionLabel}>ได้รับทั้งหมด ({commission.paidCount} รายการ)</Text>
               </View>
             </View>
           </View>
@@ -140,6 +133,33 @@ export function ProfileScreen() {
             <Text style={styles.statLabel}>ยอดซื้อรวม</Text>
           </View>
         </View>
+
+        {(member?.creditBalance ?? 0) >= 0 ? (
+          <View style={styles.creditBox}>
+            <View style={styles.creditRow}>
+              <View>
+                <Text style={styles.creditLabel}>Credit คงเหลือ</Text>
+                <Text style={styles.creditAmount}>
+                  ฿{(member?.creditBalance ?? 0).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                </Text>
+              </View>
+              <View style={styles.creditActions}>
+                <Pressable
+                  style={styles.creditBtn}
+                  onPress={() => navigation.navigate("CreditHistory")}
+                >
+                  <Text style={styles.creditBtnText}>ประวัติ</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.creditBtn, styles.creditBtnPrimary]}
+                  onPress={() => navigation.navigate("Withdrawal")}
+                >
+                  <Text style={[styles.creditBtnText, styles.creditBtnPrimaryText]}>ถอน</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        ) : null}
 
         <Pressable onPress={() => navigation.navigate("Rewards")} style={styles.menuButton}>
           <Text style={styles.menuButtonText}>แลกแต้ม</Text>
@@ -347,5 +367,50 @@ const styles = StyleSheet.create({
   signOutText: {
     color: colors.textSecondary,
     ...typography.title,
+  },
+  creditBox: {
+    marginTop: spacing.lg,
+    borderRadius: radius.md,
+    backgroundColor: "#F0FAF4",
+    borderWidth: 1,
+    borderColor: "#B7DDC7",
+    padding: spacing.md,
+  },
+  creditRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  creditLabel: {
+    color: colors.textSecondary,
+    ...typography.caption,
+  },
+  creditAmount: {
+    color: colors.primary,
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  creditActions: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  creditBtn: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  creditBtnPrimary: {
+    backgroundColor: colors.primary,
+  },
+  creditBtnText: {
+    color: colors.primary,
+    ...typography.caption,
+    fontWeight: "600",
+  },
+  creditBtnPrimaryText: {
+    color: "#FFFFFF",
   },
 });

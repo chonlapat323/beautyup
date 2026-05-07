@@ -411,6 +411,53 @@ export async function mobileGetCommissionSummary(token: string): Promise<{
   return res.json() as Promise<{ pendingAmount: number; pendingCount: number; paidAmount: number; paidCount: number }>;
 }
 
+export type CreditTransaction = {
+  id: string;
+  type: "EARN" | "USE" | "WITHDRAW";
+  amount: string;
+  note: string | null;
+  refId: string | null;
+  createdAt: string;
+};
+
+export type WithdrawalRequest = {
+  id: string;
+  amount: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  note: string | null;
+  processedAt: string | null;
+  createdAt: string;
+};
+
+export async function mobileGetCreditTransactions(token: string): Promise<CreditTransaction[]> {
+  const res = await fetch(`${API_BASE}/mobile/me/credit-transactions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดประวัติ credit ไม่สำเร็จ");
+  return res.json() as Promise<CreditTransaction[]>;
+}
+
+export async function mobileRequestWithdrawal(token: string, amount: number): Promise<WithdrawalRequest> {
+  const res = await fetch(`${API_BASE}/mobile/me/withdraw`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ amount }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "ขอถอน credit ไม่สำเร็จ");
+  }
+  return res.json() as Promise<WithdrawalRequest>;
+}
+
+export async function mobileGetWithdrawals(token: string): Promise<WithdrawalRequest[]> {
+  const res = await fetch(`${API_BASE}/mobile/me/withdrawals`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดรายการถอนไม่สำเร็จ");
+  return res.json() as Promise<WithdrawalRequest[]>;
+}
+
 // ─── Mobile rewards ───────────────────────────────────────────────────────────
 
 export type RewardProduct = {
@@ -430,6 +477,7 @@ export async function mobileGetProfile(token: string): Promise<{
   phone: string | null;
   memberType: string;
   pointBalance: number;
+  creditBalance: number;
   referralCode: string | null;
 }> {
   const res = await fetch(`${API_BASE}/mobile/profile`, {
