@@ -344,12 +344,13 @@ export async function mobileCheckout(
   shippingName: string,
   shippingPhone: string,
   shippingAddr: string,
-  omiseToken: string,
+  omiseToken?: string,
+  creditAmount?: number,
 ): Promise<ApiOrder> {
   const res = await fetch(`${API_BASE}/mobile/checkout`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr, omiseToken }),
+    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr, omiseToken, creditAmount }),
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };
@@ -375,11 +376,12 @@ export async function mobileInitiatePromptPay(
   shippingName: string,
   shippingPhone: string,
   shippingAddr: string,
+  creditAmount?: number,
 ): Promise<{ chargeId: string; svgContent: string; expiresAt: string }> {
   const res = await fetch(`${API_BASE}/mobile/promptpay`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr }),
+    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr, creditAmount }),
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };

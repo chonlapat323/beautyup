@@ -11,12 +11,19 @@ import type { MemberAddress } from "@/services/api";
 import { mobileGetAddresses } from "@/services/api";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
+import { Switch } from "react-native";
 
 export function CheckoutScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const cart = useAppStore((state) => state.cart);
   const token = useAppStore((state) => state.token);
+  const member = useAppStore((state) => state.member);
   const summary = getCartSummary(cart);
+
+  const creditBalance = member?.creditBalance ?? 0;
+  const [useCredit, setUseCredit] = useState(false);
+  const creditUsed = useCredit ? Math.min(creditBalance, summary.total) : 0;
+  const remaining = Math.max(0, summary.total - creditUsed);
 
   const [addresses, setAddresses] = useState<MemberAddress[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -56,6 +63,7 @@ export function CheckoutScreen() {
       shippingName: selected.recipient,
       shippingPhone: selected.phone,
       shippingAddr: addrLines,
+      creditAmount: creditUsed > 0 ? creditUsed : undefined,
     });
   }
 
@@ -134,11 +142,38 @@ export function CheckoutScreen() {
         )}
       </View>
 
+      {creditBalance > 0 && (
+        <View style={styles.creditToggleCard}>
+          <View style={styles.creditToggleRow}>
+            <View style={styles.creditToggleLeft}>
+              <Text style={styles.creditToggleTitle}>ใช้ Credit</Text>
+              <Text style={styles.creditToggleSub}>
+                มี ฿{creditBalance.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+              </Text>
+            </View>
+            <Switch
+              value={useCredit}
+              onValueChange={setUseCredit}
+              trackColor={{ true: colors.primary, false: colors.borderSoft }}
+              thumbColor="#fff"
+            />
+          </View>
+          {useCredit && (
+            <Text style={styles.creditUsedText}>
+              หักออก ฿{creditUsed.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+            </Text>
+          )}
+        </View>
+      )}
+
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>สรุปยอดชำระ</Text>
         <Row label="ยอดสินค้า" value={`THB ${summary.subtotal.toFixed(0)}`} />
         <Row label="ค่าธรรมเนียม" value={`THB ${summary.gatewayFee.toFixed(0)}`} />
-        <Row label="ยอดชำระทั้งหมด" value={`THB ${summary.total.toFixed(0)}`} strong />
+        {creditUsed > 0 && (
+          <Row label="หัก Credit" value={`-THB ${creditUsed.toFixed(0)}`} credit />
+        )}
+        <Row label={remaining === 0 ? "ยอดชำระ (Credit ครอบคลุม)" : "ยอดที่ต้องชำระเพิ่ม"} value={`THB ${remaining.toFixed(0)}`} strong />
       </View>
 
       <Pressable
@@ -152,11 +187,11 @@ export function CheckoutScreen() {
   );
 }
 
-function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+function Row({ label, value, strong = false, credit = false }: { label: string; value: string; strong?: boolean; credit?: boolean }) {
   return (
     <View style={styles.row}>
-      <Text style={[styles.rowLabel, strong && styles.strongText]}>{label}</Text>
-      <Text style={[styles.rowValue, strong && styles.strongText]}>{value}</Text>
+      <Text style={[styles.rowLabel, strong && styles.strongText, credit && styles.creditText]}>{label}</Text>
+      <Text style={[styles.rowValue, strong && styles.strongText, credit && styles.creditText]}>{value}</Text>
     </View>
   );
 }
@@ -293,6 +328,26 @@ const styles = StyleSheet.create({
   strongText: {
     ...typography.title,
   },
+  creditToggleCard: {
+    marginTop: spacing["2xl"],
+    marginHorizontal: spacing["2xl"],
+    borderRadius: radius.lg,
+    backgroundColor: "#F0FAF4",
+    borderWidth: 1,
+    borderColor: "#B7DDC7",
+    padding: spacing.lg,
+    gap: spacing.xs,
+  },
+  creditToggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  creditToggleLeft: { gap: 2 },
+  creditToggleTitle: { color: colors.primary, ...typography.body, fontWeight: "700" },
+  creditToggleSub: { color: colors.textSecondary, ...typography.caption },
+  creditUsedText: { color: colors.primary, ...typography.caption, fontWeight: "600" },
+  creditText: { color: colors.primary },
   button: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],

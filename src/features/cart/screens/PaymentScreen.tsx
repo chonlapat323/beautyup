@@ -25,7 +25,11 @@ export function PaymentScreen() {
   const token = useAppStore((state) => state.token);
   const clearCart = useAppStore((state) => state.clearCart);
   const loadOrders = useAppStore((state) => state.loadOrders);
+  const refreshProfile = useAppStore((state) => state.refreshProfile);
   const summary = getCartSummary(cart);
+  const creditAmount = route.params.creditAmount ?? 0;
+  const chargeAmount = Math.max(0, summary.total - creditAmount);
+  const isCreditOnly = chargeAmount === 0;
 
   const [method, setMethod] = useState<PaymentMethod>("card");
   const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
@@ -44,10 +48,10 @@ export function PaymentScreen() {
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (method !== "qr" || qrData || isCreatingQR) return;
+    if (isCreditOnly || method !== "qr" || qrData || isCreatingQR) return;
     void handleCreateQR();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [method]);
+  }, [method, isCreditOnly]);
 
   useEffect(() => {
     if (!qrData || !token) return;
@@ -98,6 +102,30 @@ export function PaymentScreen() {
     return digits;
   }
 
+  async function handleCreditOnlyPay() {
+    if (!token) return;
+    setIsLoading(true);
+    try {
+      const order = await mobileCheckout(
+        token,
+        cart.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+        shippingName,
+        shippingPhone,
+        shippingAddr,
+        undefined,
+        creditAmount,
+      );
+      clearCart();
+      await Promise.all([loadOrders(), refreshProfile()]);
+      const mapped = mapApiOrder(order);
+      navigation.replace("OrderSuccess", { orderId: mapped.id });
+    } catch (error) {
+      setModal({ title: "ชำระเงินไม่สำเร็จ", message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง" });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   async function handlePay() {
     const [expMonth, expYear] = expiry.split("/").map(Number);
     if (!cardNumber || !cardName || !expMonth || !expYear || !cvv) {
@@ -126,10 +154,11 @@ export function PaymentScreen() {
         shippingPhone,
         shippingAddr,
         omiseToken,
+        creditAmount > 0 ? creditAmount : undefined,
       );
 
       clearCart();
-      await loadOrders();
+      await Promise.all([loadOrders(), refreshProfile()]);
       const mapped = mapApiOrder(order);
       navigation.replace("OrderSuccess", { orderId: mapped.id });
     } catch (error) {
@@ -152,6 +181,7 @@ export function PaymentScreen() {
         shippingName,
         shippingPhone,
         shippingAddr,
+        creditAmount > 0 ? creditAmount : undefined,
       );
       setQrData(result);
     } catch (error) {
@@ -180,28 +210,31 @@ export function PaymentScreen() {
         />
       }
     >
-      <View style={styles.toggle}>
-        <Pressable
-          style={[styles.toggleBtn, method === "card" && styles.toggleBtnActive]}
-          onPress={() => {
-            setMethod("card");
-            setQrData(null);
-            clearPolling();
-          }}
-        >
-          <Text style={[styles.toggleText, method === "card" && styles.toggleTextActive]}>
-            บัตรเครดิต
+      {creditAmount > 0 && (
+        <View style={styles.creditSummaryBox}>
+          <Text style={styles.creditSummaryText}>
+            ใช้ Credit ฿{creditAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+            {isCreditOnly ? " (ครอบคลุมทั้งหมด)" : ` — ชำระเพิ่มอีก ฿${chargeAmount.toFixed(0)}`}
           </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.toggleBtn, method === "qr" && styles.toggleBtnActive]}
-          onPress={() => setMethod("qr")}
-        >
-          <Text style={[styles.toggleText, method === "qr" && styles.toggleTextActive]}>
-            PromptPay QR
-          </Text>
-        </Pressable>
-      </View>
+        </View>
+      )}
+
+      {!isCreditOnly && (
+        <View style={styles.toggle}>
+          <Pressable
+            style={[styles.toggleBtn, method === "card" && styles.toggleBtnActive]}
+            onPress={() => { setMethod("card"); setQrData(null); clearPolling(); }}
+          >
+            <Text style={[styles.toggleText, method === "card" && styles.toggleTextActive]}>บัตรเครดิต</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.toggleBtn, method === "qr" && styles.toggleBtnActive]}
+            onPress={() => setMethod("qr")}
+          >
+            <Text style={[styles.toggleText, method === "qr" && styles.toggleTextActive]}>PromptPay QR</Text>
+          </Pressable>
+        </View>
+      )}
 
       {method === "card" ? (
         <View style={styles.card}>
@@ -291,10 +324,18 @@ export function PaymentScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>ยอดชำระทั้งหมด</Text>
-        <Text style={styles.summaryAmount}>THB {summary.total.toFixed(0)}</Text>
+        <Text style={styles.summaryAmount}>THB {chargeAmount.toFixed(0)}</Text>
       </View>
 
-      {method === "card" ? (
+      {isCreditOnly ? (
+        <Pressable
+          onPress={() => void handleCreditOnlyPay()}
+          disabled={isLoading}
+          style={[styles.button, isLoading && styles.buttonDisabled]}
+        >
+          <Text style={styles.buttonText}>จ่ายด้วย Credit</Text>
+        </Pressable>
+      ) : method === "card" ? (
         <Pressable
           onPress={() => void handlePay()}
           disabled={isLoading}
@@ -467,5 +508,20 @@ const styles = StyleSheet.create({
   loadingText: {
     color: colors.textPrimary,
     ...typography.body,
+  },
+  creditSummaryBox: {
+    marginHorizontal: spacing["2xl"],
+    marginBottom: spacing.lg,
+    backgroundColor: "#F0FAF4",
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: "#B7DDC7",
+    padding: spacing.md,
+  },
+  creditSummaryText: {
+    color: colors.primary,
+    ...typography.caption,
+    fontWeight: "600",
+    textAlign: "center",
   },
 });
