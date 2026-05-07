@@ -117,39 +117,55 @@ export function CreditHistoryScreen() {
     );
   }
 
-  return (
-    <Screen
-      header={
-        <AppHeader
-          title="ประวัติ Credit"
-          subtitle="รายการ EARN / USE / ถอน"
-          breadcrumbs={[
-            { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
-            { label: "ประวัติ Credit" },
-          ]}
-        />
-      }
-    >
-      {isLoading ? (
+  const header = (
+    <AppHeader
+      title="ประวัติ Credit"
+      subtitle="รายการ EARN / USE / ถอน"
+      breadcrumbs={[
+        { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
+        { label: "ประวัติ Credit" },
+      ]}
+    />
+  );
+
+  if (isLoading) {
+    return (
+      <Screen scrollable={false} header={header}>
         <ActivityIndicator style={{ marginTop: spacing["3xl"] }} color={colors.primary} />
-      ) : error ? (
+      </Screen>
+    );
+  }
+
+  if (error) {
+    return (
+      <Screen scrollable={false} header={header}>
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>{error}</Text>
           <Pressable style={styles.retryBtn} onPress={load}>
             <Text style={styles.retryBtnText}>ลองใหม่</Text>
           </Pressable>
         </View>
-      ) : items.length === 0 ? (
+      </Screen>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <Screen scrollable={false} header={header}>
         <Text style={styles.empty}>ยังไม่มีรายการ credit</Text>
-      ) : (
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item.data.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.list}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
-      )}
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen scrollable={false} header={header}>
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item.data.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
     </Screen>
   );
 }
