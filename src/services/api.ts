@@ -183,6 +183,7 @@ type AuthResponse = {
     phone: string | null;
     memberType: string;
     pointBalance: number;
+    creditBalance: number;
     referralCode: string | null;
   };
 };
