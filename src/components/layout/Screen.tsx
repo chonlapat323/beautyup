@@ -39,7 +39,7 @@ export function Screen({
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
         {header}
