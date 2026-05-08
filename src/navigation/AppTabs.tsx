@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialIcons } from "@expo/vector-icons";
 import { View, Text, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ProfileStack } from "@/navigation/ProfileStack";
 import { CartScreen } from "@/features/cart/screens/CartScreen";
@@ -43,6 +44,7 @@ export function AppTabs() {
   const cartCount = useAppStore((state) =>
     state.cart.reduce((sum, item) => sum + item.quantity, 0),
   );
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -52,7 +54,8 @@ export function AppTabs() {
           backgroundColor: colors.surface,
           borderTopColor: colors.borderSoft,
           paddingTop: 8,
-          paddingBottom: 10,
+          paddingBottom: bottom > 0 ? bottom : 10,
+          height: 56 + (bottom > 0 ? bottom : 10),
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
