@@ -18,6 +18,8 @@ import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
 import { RootNavigator } from "@/navigation/RootNavigator";
 import { useAppStore } from "@/store/useAppStore";
 import { colors } from "@/theme";
@@ -73,6 +75,7 @@ export function AppRoot() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+    <SafeAreaProvider>
     <NavigationContainer theme={navigationTheme}>
       <StatusBar style="dark" />
       {catalogError ? (
@@ -84,6 +87,7 @@ export function AppRoot() {
       ) : null}
       <RootNavigator />
     </NavigationContainer>
+    </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
