@@ -424,6 +424,26 @@ export async function mobileInitiateKBankCardPayment(
   return res.json() as Promise<{ redirectURL: string; partnerPaymentID: string }>;
 }
 
+export async function mobileInitiateKBankQRPayment(
+  token: string,
+  items: CheckoutItem[],
+  shippingName: string,
+  shippingPhone: string,
+  shippingAddr: string,
+  creditAmount?: number,
+): Promise<{ qrImage: string; partnerPaymentID: string }> {
+  const res = await fetch(`${API_BASE}/mobile/kbank-qr`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr, creditAmount }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "สร้าง KBank QR ไม่สำเร็จ");
+  }
+  return res.json() as Promise<{ qrImage: string; partnerPaymentID: string }>;
+}
+
 export async function mobileCheckKBankPayment(
   token: string,
   partnerPaymentID: string,

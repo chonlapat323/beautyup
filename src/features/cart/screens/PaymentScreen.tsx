@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, AppState, Linking, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, AppState, Image, Linking, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -9,12 +9,12 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileCheckKBankPayment, mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankCardPayment, mobileInitiateKBankPayment, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
+import { mobileCheckKBankPayment, mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankCardPayment, mobileInitiateKBankPayment, mobileInitiateKBankQRPayment, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
 import { createOmiseToken } from "@/services/omise";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
-type PaymentMethod = "card" | "qr" | "kplus" | "kcard";
+type PaymentMethod = "card" | "qr" | "kplus" | "kcard" | "kqr";
 
 export function PaymentScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
@@ -44,11 +44,13 @@ export function PaymentScreen() {
   const [isCreatingQR, setIsCreatingQR] = useState(false);
   const [isKBankLoading, setIsKBankLoading] = useState(false);
   const [kbankPaymentID, setKbankPaymentID] = useState<string | null>(null);
+  const [kbankQRData, setKbankQRData] = useState<{ qrImage: string; partnerPaymentID: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState<{ title: string; message?: string } | null>(null);
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const kbankPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const kbankQRPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (isCreditOnly || method !== "qr" || qrData || isCreatingQR) return;
@@ -151,11 +153,55 @@ export function PaymentScreen() {
     }
   }
 
+  useEffect(() => {
+    if (!kbankQRData || !token) return;
+    const { partnerPaymentID } = kbankQRData;
+    kbankQRPollingRef.current = setInterval(() => {
+      void (async () => {
+        try {
+          const result = await mobileCheckKBankPayment(token, partnerPaymentID);
+          if (result.status === "successful" && result.order) {
+            clearKBankQRPolling();
+            clearCart();
+            await loadOrders();
+            const mapped = mapApiOrder(result.order);
+            navigation.replace("OrderSuccess", { orderId: mapped.id });
+          } else if (["failed", "expired", "cancelled"].includes(result.status)) {
+            clearKBankQRPolling();
+            setKbankQRData(null);
+            setModal({ title: "ชำระเงินไม่สำเร็จ", message: "การชำระเงิน KBank QR ไม่สำเร็จ กรุณาลองใหม่" });
+          }
+        } catch {
+          // Ignore transient poll errors.
+        }
+      })();
+    }, 3000);
+    return clearKBankQRPolling;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kbankQRData?.partnerPaymentID]);
+
   function clearKBankPolling() {
     if (kbankPollingRef.current) {
       clearInterval(kbankPollingRef.current);
       kbankPollingRef.current = null;
     }
+  }
+
+  function clearKBankQRPolling() {
+    if (kbankQRPollingRef.current) {
+      clearInterval(kbankQRPollingRef.current);
+      kbankQRPollingRef.current = null;
+    }
+  }
+
+  function handleMethodChange(newMethod: PaymentMethod) {
+    setMethod(newMethod);
+    setQrData(null);
+    clearPolling();
+    clearKBankPolling();
+    clearKBankQRPolling();
+    setKbankPaymentID(null);
+    setKbankQRData(null);
   }
 
   function formatCardNumber(value: string) {
@@ -294,6 +340,24 @@ export function PaymentScreen() {
     }
   }
 
+  async function handleKBankQRPay() {
+    if (!token) return;
+    setIsKBankLoading(true);
+    try {
+      const result = await mobileInitiateKBankQRPayment(
+        token,
+        cart.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+        shippingName, shippingPhone, shippingAddr,
+        creditAmount > 0 ? creditAmount : undefined,
+      );
+      setKbankQRData(result);
+    } catch (error) {
+      setModal({ title: "สร้าง KBank QR ไม่สำเร็จ", message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง" });
+    } finally {
+      setIsKBankLoading(false);
+    }
+  }
+
   async function handleCreateQR() {
     if (!token) return;
     setIsCreatingQR(true);
@@ -343,31 +407,22 @@ export function PaymentScreen() {
       )}
 
       {!isCreditOnly && (
-        <View style={styles.toggle}>
-          <Pressable
-            style={[styles.toggleBtn, method === "card" && styles.toggleBtnActive]}
-            onPress={() => { setMethod("card"); setQrData(null); clearPolling(); }}
-          >
-            <Text style={[styles.toggleText, method === "card" && styles.toggleTextActive]}>บัตรเครดิต</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.toggleBtn, method === "qr" && styles.toggleBtnActive]}
-            onPress={() => setMethod("qr")}
-          >
-            <Text style={[styles.toggleText, method === "qr" && styles.toggleTextActive]}>PromptPay QR</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.toggleBtn, method === "kplus" && styles.toggleBtnActive]}
-            onPress={() => { setMethod("kplus"); setQrData(null); clearPolling(); }}
-          >
-            <Text style={[styles.toggleText, method === "kplus" && styles.toggleTextActive]}>K+</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.toggleBtn, method === "kcard" && styles.toggleBtnActive]}
-            onPress={() => { setMethod("kcard"); setQrData(null); clearPolling(); }}
-          >
-            <Text style={[styles.toggleText, method === "kcard" && styles.toggleTextActive]}>KBank บัตร</Text>
-          </Pressable>
+        <View style={styles.methodList}>
+          {([
+            { key: "card",  label: "บัตรเครดิต / เดบิต" },
+            { key: "qr",    label: "PromptPay QR" },
+            { key: "kplus", label: "KBank K+" },
+            { key: "kcard", label: "KBank บัตรเครดิต" },
+            { key: "kqr",   label: "KBank QR" },
+          ] as { key: PaymentMethod; label: string }[]).map(({ key, label }) => (
+            <Pressable
+              key={key}
+              style={[styles.methodBtn, method === key && styles.methodBtnActive]}
+              onPress={() => handleMethodChange(key)}
+            >
+              <Text style={[styles.methodBtnText, method === key && styles.methodBtnTextActive]}>{label}</Text>
+            </Pressable>
+          ))}
         </View>
       )}
 
@@ -485,6 +540,36 @@ export function PaymentScreen() {
         </View>
       )}
 
+      {method === "kqr" && (
+        <View style={styles.qrCard}>
+          <Text style={styles.sectionTitle}>KBank QR Payment</Text>
+          {isKBankLoading ? (
+            <>
+              <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: spacing["2xl"] }} />
+              <Text style={styles.qrHint}>กำลังสร้าง QR Code...</Text>
+            </>
+          ) : kbankQRData ? (
+            <>
+              {kbankQRData.qrImage ? (
+                <Image
+                  source={{ uri: kbankQRData.qrImage.startsWith("http") ? kbankQRData.qrImage : `data:image/png;base64,${kbankQRData.qrImage}` }}
+                  style={{ width: 240, height: 240 }}
+                  resizeMode="contain"
+                />
+              ) : (
+                <Text style={styles.qrHint}>ไม่สามารถโหลด QR Code ได้</Text>
+              )}
+              <View style={styles.pollingRow}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={styles.pollingText}>รอการสแกน QR...</Text>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.qrHint}>กดปุ่มด้านล่างเพื่อสร้าง QR Code ชำระเงิน</Text>
+          )}
+        </View>
+      )}
+
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>ยอดชำระทั้งหมด</Text>
         <Text style={styles.summaryAmount}>THB {chargeAmount.toFixed(0)}</Text>
@@ -522,6 +607,14 @@ export function PaymentScreen() {
         >
           <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด..." : kbankPaymentID ? "รอการยืนยัน..." : "ชำระเงินด้วย KBank Card"}</Text>
         </Pressable>
+      ) : method === "kqr" && !kbankQRData ? (
+        <Pressable
+          onPress={() => void handleKBankQRPay()}
+          disabled={isKBankLoading}
+          style={[styles.button, isKBankLoading && styles.buttonDisabled]}
+        >
+          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังสร้าง QR..." : "สร้าง QR ชำระเงิน"}</Text>
+        </Pressable>
       ) : null}
 
       <AppModal
@@ -557,29 +650,28 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingBottom: spacing["3xl"],
   },
-  toggle: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+  methodList: {
     marginHorizontal: spacing["2xl"],
+    gap: spacing.sm,
+  },
+  methodBtn: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    overflow: "hidden",
-  },
-  toggleBtn: {
-    width: "50%",
-    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
     alignItems: "center",
-    backgroundColor: colors.background,
   },
-  toggleBtnActive: {
+  methodBtnActive: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
-  toggleText: {
+  methodBtnText: {
     color: colors.textSecondary,
     ...typography.body,
   },
-  toggleTextActive: {
+  methodBtnTextActive: {
     color: "#FFF",
     fontWeight: "600",
   },
