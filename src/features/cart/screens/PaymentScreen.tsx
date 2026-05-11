@@ -9,12 +9,12 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileCheckKBankPayment, mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankCardPayment, mobileInitiateKBankPayment, mobileInitiateKBankQRPayment, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
+import { mobileCheckKBankPayment, mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankCardPayment, mobileInitiateKBankPayment, mobileInitiateKBankQRPayment, mobileInitiatePromptPay, mobileInitiateTrueMoney, mapApiOrder } from "@/services/api";
 import { createOmiseToken } from "@/services/omise";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
-type PaymentMethod = "card" | "qr" | "kplus" | "kcard" | "kqr";
+type PaymentMethod = "card" | "qr" | "kplus" | "kcard" | "kqr" | "truemoney";
 
 export function PaymentScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
@@ -48,9 +48,14 @@ export function PaymentScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState<{ title: string; message?: string } | null>(null);
 
+  const [trueMoneyPhone, setTrueMoneyPhone] = useState("");
+  const [trueMoneyChargeId, setTrueMoneyChargeId] = useState<string | null>(null);
+  const [isTrueMoneyLoading, setIsTrueMoneyLoading] = useState(false);
+
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const kbankPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const kbankQRPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const trueMoneyPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (isCreditOnly || method !== "qr" || qrData || isCreatingQR) return;
@@ -194,14 +199,23 @@ export function PaymentScreen() {
     }
   }
 
+  function clearTrueMoneyPolling() {
+    if (trueMoneyPollingRef.current) {
+      clearInterval(trueMoneyPollingRef.current);
+      trueMoneyPollingRef.current = null;
+    }
+  }
+
   function handleMethodChange(newMethod: PaymentMethod) {
     setMethod(newMethod);
     setQrData(null);
     clearPolling();
     clearKBankPolling();
     clearKBankQRPolling();
+    clearTrueMoneyPolling();
     setKbankPaymentID(null);
     setKbankQRData(null);
+    setTrueMoneyChargeId(null);
   }
 
   function formatCardNumber(value: string) {
@@ -358,6 +372,52 @@ export function PaymentScreen() {
     }
   }
 
+  async function handleTrueMoneyPay() {
+    if (!token || !trueMoneyPhone) return;
+    setIsTrueMoneyLoading(true);
+    try {
+      const result = await mobileInitiateTrueMoney(
+        token,
+        cart.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+        shippingName, shippingPhone, shippingAddr,
+        trueMoneyPhone,
+        creditAmount > 0 ? creditAmount : undefined,
+      );
+      setTrueMoneyChargeId(result.chargeId);
+      await Linking.openURL(result.authorizeUri);
+    } catch (error) {
+      setModal({ title: "TrueMoney ไม่สำเร็จ", message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง" });
+    } finally {
+      setIsTrueMoneyLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!trueMoneyChargeId || !token) return;
+    trueMoneyPollingRef.current = setInterval(() => {
+      void (async () => {
+        try {
+          const result = await mobileCheckPromptPay(token, trueMoneyChargeId);
+          if (result.status === "successful" && result.order) {
+            clearTrueMoneyPolling();
+            clearCart();
+            await loadOrders();
+            const mapped = mapApiOrder(result.order);
+            navigation.replace("OrderSuccess", { orderId: mapped.id });
+          } else if (result.status === "failed" || result.status === "expired") {
+            clearTrueMoneyPolling();
+            setTrueMoneyChargeId(null);
+            setModal({ title: "ชำระเงินไม่สำเร็จ", message: "TrueMoney ไม่สำเร็จ กรุณาลองใหม่" });
+          }
+        } catch {
+          // Ignore transient poll errors.
+        }
+      })();
+    }, 3000);
+    return clearTrueMoneyPolling;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trueMoneyChargeId]);
+
   async function handleCreateQR() {
     if (!token) return;
     setIsCreatingQR(true);
@@ -411,9 +471,10 @@ export function PaymentScreen() {
           {([
             { key: "card",  label: "บัตรเครดิต / เดบิต" },
             { key: "qr",    label: "PromptPay QR" },
-            { key: "kplus", label: "KBank K+" },
-            { key: "kcard", label: "KBank บัตรเครดิต" },
-            { key: "kqr",   label: "KBank QR" },
+            { key: "kplus",     label: "KBank K+" },
+            { key: "kcard",     label: "KBank บัตรเครดิต" },
+            { key: "kqr",       label: "KBank QR" },
+            { key: "truemoney", label: "True Money Wallet" },
           ] as { key: PaymentMethod; label: string }[]).map(({ key, label }) => (
             <Pressable
               key={key}
@@ -570,6 +631,30 @@ export function PaymentScreen() {
         </View>
       )}
 
+      {method === "truemoney" && (
+        <View style={styles.qrCard}>
+          <Text style={styles.sectionTitle}>True Money Wallet</Text>
+          {trueMoneyChargeId ? (
+            <View style={styles.pollingRow}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.pollingText}>รอการยืนยันจาก TrueMoney...</Text>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.qrHint}>กรอกเบอร์มือถือที่ผูกกับ True Money Wallet</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="เบอร์มือถือ (0812345678)"
+                keyboardType="phone-pad"
+                maxLength={10}
+                value={trueMoneyPhone}
+                onChangeText={setTrueMoneyPhone}
+              />
+            </>
+          )}
+        </View>
+      )}
+
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>ยอดชำระทั้งหมด</Text>
         <Text style={styles.summaryAmount}>THB {chargeAmount.toFixed(0)}</Text>
@@ -614,6 +699,14 @@ export function PaymentScreen() {
           style={[styles.button, isKBankLoading && styles.buttonDisabled]}
         >
           <Text style={styles.buttonText}>{isKBankLoading ? "กำลังสร้าง QR..." : "สร้าง QR ชำระเงิน"}</Text>
+        </Pressable>
+      ) : method === "truemoney" && !trueMoneyChargeId ? (
+        <Pressable
+          onPress={() => void handleTrueMoneyPay()}
+          disabled={isTrueMoneyLoading || trueMoneyPhone.length < 10}
+          style={[styles.button, (isTrueMoneyLoading || trueMoneyPhone.length < 10) && styles.buttonDisabled]}
+        >
+          <Text style={styles.buttonText}>{isTrueMoneyLoading ? "กำลังเปิด TrueMoney..." : "ชำระเงินด้วย TrueMoney"}</Text>
         </Pressable>
       ) : null}
 

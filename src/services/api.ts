@@ -478,6 +478,27 @@ export async function mobileInitiateKBankPayment(
   return res.json() as Promise<{ deepLink: string; partnerPaymentID: string }>;
 }
 
+export async function mobileInitiateTrueMoney(
+  token: string,
+  items: CheckoutItem[],
+  shippingName: string,
+  shippingPhone: string,
+  shippingAddr: string,
+  phoneNumber: string,
+  creditAmount?: number,
+): Promise<{ chargeId: string; authorizeUri: string }> {
+  const res = await fetch(`${API_BASE}/mobile/truemoney`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr, phoneNumber, creditAmount }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "สร้าง TrueMoney charge ไม่สำเร็จ");
+  }
+  return res.json() as Promise<{ chargeId: string; authorizeUri: string }>;
+}
+
 export async function mobileGetCommissionSummary(token: string): Promise<{
   pendingAmount: number;
   pendingCount: number;
