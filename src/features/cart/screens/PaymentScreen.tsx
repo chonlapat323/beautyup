@@ -475,6 +475,15 @@ export function PaymentScreen() {
         onConfirm={() => setModal(null)}
       />
 
+      <Modal visible={isKBankLoading || kbankPaymentID !== null} transparent animationType="fade" statusBarTranslucent>
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.loadingText}>{isKBankLoading ? "กำลังเปิด K+..." : "รอการยืนยันจาก K+..."}</Text>
+          </View>
+        </View>
+      </Modal>
+
       <Modal visible={isLoading} transparent animationType="fade" statusBarTranslucent>
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingBox}>
