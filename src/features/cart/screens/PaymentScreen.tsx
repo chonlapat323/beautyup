@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, AppState, Linking, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -9,7 +9,7 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankPayment, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
+import { mobileCheckKBankPayment, mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankPayment, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
 import { createOmiseToken } from "@/services/omise";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
@@ -43,10 +43,12 @@ export function PaymentScreen() {
   } | null>(null);
   const [isCreatingQR, setIsCreatingQR] = useState(false);
   const [isKBankLoading, setIsKBankLoading] = useState(false);
+  const [kbankPaymentID, setKbankPaymentID] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState<{ title: string; message?: string } | null>(null);
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const kbankPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (isCreditOnly || method !== "qr" || qrData || isCreatingQR) return;
@@ -85,10 +87,74 @@ export function PaymentScreen() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qrData?.chargeId]);
 
+  useEffect(() => {
+    if (!kbankPaymentID || !token) return;
+
+    kbankPollingRef.current = setInterval(() => {
+      void (async () => {
+        try {
+          const result = await mobileCheckKBankPayment(token, kbankPaymentID);
+          if (result.status === "successful" && result.order) {
+            clearKBankPolling();
+            clearCart();
+            await loadOrders();
+            const mapped = mapApiOrder(result.order);
+            navigation.replace("OrderSuccess", { orderId: mapped.id });
+          } else if (["failed", "expired", "cancelled"].includes(result.status)) {
+            clearKBankPolling();
+            setKbankPaymentID(null);
+            setModal({ title: "ชำระเงินไม่สำเร็จ", message: "การชำระเงิน K+ ไม่สำเร็จ กรุณาลองใหม่" });
+          }
+        } catch {
+          // Ignore transient poll errors.
+        }
+      })();
+    }, 3000);
+
+    return clearKBankPolling;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kbankPaymentID]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active" && kbankPaymentID && !kbankPollingRef.current && token) {
+        kbankPollingRef.current = setInterval(() => {
+          void (async () => {
+            try {
+              const result = await mobileCheckKBankPayment(token, kbankPaymentID);
+              if (result.status === "successful" && result.order) {
+                clearKBankPolling();
+                clearCart();
+                await loadOrders();
+                const mapped = mapApiOrder(result.order);
+                navigation.replace("OrderSuccess", { orderId: mapped.id });
+              } else if (["failed", "expired", "cancelled"].includes(result.status)) {
+                clearKBankPolling();
+                setKbankPaymentID(null);
+                setModal({ title: "ชำระเงินไม่สำเร็จ", message: "การชำระเงิน K+ ไม่สำเร็จ กรุณาลองใหม่" });
+              }
+            } catch {
+              // Ignore transient poll errors.
+            }
+          })();
+        }, 3000);
+      }
+    });
+    return () => sub.remove();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kbankPaymentID, token]);
+
   function clearPolling() {
     if (pollingRef.current) {
       clearInterval(pollingRef.current);
       pollingRef.current = null;
+    }
+  }
+
+  function clearKBankPolling() {
+    if (kbankPollingRef.current) {
+      clearInterval(kbankPollingRef.current);
+      kbankPollingRef.current = null;
     }
   }
 
@@ -185,6 +251,7 @@ export function PaymentScreen() {
         creditAmount > 0 ? creditAmount : undefined,
       );
       if (result.deepLink) {
+        setKbankPaymentID(result.partnerPaymentID);
         await Linking.openURL(result.deepLink);
       } else {
         setModal({ title: "ไม่พบ deepLink", message: "KBank ไม่ส่ง deepLink กลับมา กรุณาลองใหม่" });
@@ -359,7 +426,14 @@ export function PaymentScreen() {
       {method === "kplus" && (
         <View style={styles.qrCard}>
           <Text style={styles.sectionTitle}>ชำระเงินผ่าน K+</Text>
-          <Text style={styles.qrHint}>กดปุ่มด้านล่างเพื่อเปิดแอป K+ และยืนยันการชำระเงิน</Text>
+          {kbankPaymentID ? (
+            <View style={styles.pollingRow}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.pollingText}>รอการยืนยันจาก K+...</Text>
+            </View>
+          ) : (
+            <Text style={styles.qrHint}>กดปุ่มด้านล่างเพื่อเปิดแอป K+ และยืนยันการชำระเงิน</Text>
+          )}
         </View>
       )}
 
@@ -387,10 +461,10 @@ export function PaymentScreen() {
       ) : method === "kplus" ? (
         <Pressable
           onPress={() => void handleKBankPay()}
-          disabled={isKBankLoading}
-          style={[styles.button, isKBankLoading && styles.buttonDisabled]}
+          disabled={isKBankLoading || kbankPaymentID !== null}
+          style={[styles.button, (isKBankLoading || kbankPaymentID !== null) && styles.buttonDisabled]}
         >
-          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด K+..." : "ชำระเงินด้วย K+"}</Text>
+          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด K+..." : kbankPaymentID ? "รอการยืนยัน..." : "ชำระเงินด้วย K+"}</Text>
         </Pressable>
       ) : null}
 

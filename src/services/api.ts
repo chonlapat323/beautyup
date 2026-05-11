@@ -404,6 +404,20 @@ export async function mobileCheckPromptPay(
   return res.json() as Promise<{ status: string; order?: ApiOrder }>;
 }
 
+export async function mobileCheckKBankPayment(
+  token: string,
+  partnerPaymentID: string,
+): Promise<{ status: string; order?: ApiOrder }> {
+  const res = await fetch(`${API_BASE}/mobile/kbank-pay/${encodeURIComponent(partnerPaymentID)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "ตรวจสอบสถานะ KBank ไม่สำเร็จ");
+  }
+  return res.json() as Promise<{ status: string; order?: ApiOrder }>;
+}
+
 export async function mobileInitiateKBankPayment(
   token: string,
   items: CheckoutItem[],
