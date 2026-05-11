@@ -559,6 +559,7 @@ const styles = StyleSheet.create({
   },
   toggle: {
     flexDirection: "row",
+    flexWrap: "wrap",
     marginHorizontal: spacing["2xl"],
     borderRadius: radius.lg,
     borderWidth: 1,
@@ -566,7 +567,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   toggleBtn: {
-    flex: 1,
+    width: "50%",
     paddingVertical: spacing.md,
     alignItems: "center",
     backgroundColor: colors.background,
