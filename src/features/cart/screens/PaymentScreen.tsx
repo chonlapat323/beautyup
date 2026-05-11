@@ -552,7 +552,7 @@ export function PaymentScreen() {
             </View>
           </View>
         </View>
-      ) : (
+      ) : method === "qr" ? (
         <View style={styles.qrCard}>
           {isCreatingQR ? (
             <>
@@ -579,7 +579,7 @@ export function PaymentScreen() {
             </>
           ) : null}
         </View>
-      )}
+      ) : null}
 
       {method === "kplus" && (
         <View style={styles.qrCard}>
