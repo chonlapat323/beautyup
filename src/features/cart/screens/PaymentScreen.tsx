@@ -9,12 +9,12 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileCheckKBankPayment, mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankPayment, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
+import { mobileCheckKBankPayment, mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankCardPayment, mobileInitiateKBankPayment, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
 import { createOmiseToken } from "@/services/omise";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
-type PaymentMethod = "card" | "qr" | "kplus";
+type PaymentMethod = "card" | "qr" | "kplus" | "kcard";
 
 export function PaymentScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
@@ -266,6 +266,34 @@ export function PaymentScreen() {
     }
   }
 
+  async function handleKBankCardPay() {
+    if (!token) return;
+    setIsKBankLoading(true);
+    try {
+      const result = await mobileInitiateKBankCardPayment(
+        token,
+        cart.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+        shippingName,
+        shippingPhone,
+        shippingAddr,
+        creditAmount > 0 ? creditAmount : undefined,
+      );
+      if (result.redirectURL) {
+        setKbankPaymentID(result.partnerPaymentID);
+        await Linking.openURL(result.redirectURL);
+      } else {
+        setModal({ title: "ไม่พบ URL ชำระเงิน", message: "KBank ไม่ส่ง redirectURL กลับมา กรุณาลองใหม่" });
+      }
+    } catch (error) {
+      setModal({
+        title: "ชำระเงินผ่าน KBank Card ไม่สำเร็จ",
+        message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง",
+      });
+    } finally {
+      setIsKBankLoading(false);
+    }
+  }
+
   async function handleCreateQR() {
     if (!token) return;
     setIsCreatingQR(true);
@@ -333,6 +361,12 @@ export function PaymentScreen() {
             onPress={() => { setMethod("kplus"); setQrData(null); clearPolling(); }}
           >
             <Text style={[styles.toggleText, method === "kplus" && styles.toggleTextActive]}>K+</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.toggleBtn, method === "kcard" && styles.toggleBtnActive]}
+            onPress={() => { setMethod("kcard"); setQrData(null); clearPolling(); }}
+          >
+            <Text style={[styles.toggleText, method === "kcard" && styles.toggleTextActive]}>KBank บัตร</Text>
           </Pressable>
         </View>
       )}
@@ -437,6 +471,20 @@ export function PaymentScreen() {
         </View>
       )}
 
+      {method === "kcard" && (
+        <View style={styles.qrCard}>
+          <Text style={styles.sectionTitle}>ชำระเงินด้วยบัตร KBank</Text>
+          {kbankPaymentID ? (
+            <View style={styles.pollingRow}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.pollingText}>รอการยืนยัน 3D Secure...</Text>
+            </View>
+          ) : (
+            <Text style={styles.qrHint}>กดปุ่มด้านล่างเพื่อชำระเงินผ่านระบบ 3D Secure ของ KBank</Text>
+          )}
+        </View>
+      )}
+
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>ยอดชำระทั้งหมด</Text>
         <Text style={styles.summaryAmount}>THB {chargeAmount.toFixed(0)}</Text>
@@ -465,6 +513,14 @@ export function PaymentScreen() {
           style={[styles.button, (isKBankLoading || kbankPaymentID !== null) && styles.buttonDisabled]}
         >
           <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด K+..." : kbankPaymentID ? "รอการยืนยัน..." : "ชำระเงินด้วย K+"}</Text>
+        </Pressable>
+      ) : method === "kcard" ? (
+        <Pressable
+          onPress={() => void handleKBankCardPay()}
+          disabled={isKBankLoading || kbankPaymentID !== null}
+          style={[styles.button, (isKBankLoading || kbankPaymentID !== null) && styles.buttonDisabled]}
+        >
+          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด..." : kbankPaymentID ? "รอการยืนยัน..." : "ชำระเงินด้วย KBank Card"}</Text>
         </Pressable>
       ) : null}
 
