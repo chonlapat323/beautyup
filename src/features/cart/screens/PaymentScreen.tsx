@@ -820,6 +820,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     ...typography.body,
     backgroundColor: colors.background,
+    alignSelf: "stretch",
   },
   row: {
     flexDirection: "row",
