@@ -4,6 +4,8 @@ import { ActivityIndicator, AppState, Image, Linking, Modal, Pressable, StyleShe
 import { SvgXml } from "react-native-svg";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
@@ -469,18 +471,24 @@ export function PaymentScreen() {
       {!isCreditOnly && (
         <View style={styles.methodList}>
           {([
-            { key: "card",  label: "บัตรเครดิต / เดบิต" },
-            { key: "qr",    label: "PromptPay QR" },
-            { key: "kplus",     label: "KBank K+" },
-            { key: "kcard",     label: "KBank บัตรเครดิต" },
-            { key: "kqr",       label: "KBank QR" },
-            { key: "truemoney", label: "True Money Wallet" },
-          ] as { key: PaymentMethod; label: string }[]).map(({ key, label }) => (
+            { key: "card",      label: "บัตรเครดิต / เดบิต", icon: "credit-card-outline" },
+            { key: "qr",        label: "PromptPay QR",        icon: "qrcode-scan" },
+            { key: "kplus",     label: "KBank K+",            icon: "bank-outline" },
+            { key: "kcard",     label: "KBank บัตรเครดิต",   icon: "credit-card" },
+            { key: "kqr",       label: "KBank QR",            icon: "qrcode" },
+            { key: "truemoney", label: "True Money Wallet",   icon: "wallet-outline" },
+          ] as { key: PaymentMethod; label: string; icon: string }[]).map(({ key, label, icon }) => (
             <Pressable
               key={key}
               style={[styles.methodBtn, method === key && styles.methodBtnActive]}
               onPress={() => handleMethodChange(key)}
             >
+              <MaterialCommunityIcons
+                name={icon as React.ComponentProps<typeof MaterialCommunityIcons>["name"]}
+                size={20}
+                color={method === key ? colors.white : colors.textMuted}
+                style={{ marginRight: 10 }}
+              />
               <Text style={[styles.methodBtnText, method === key && styles.methodBtnTextActive]}>{label}</Text>
             </Pressable>
           ))}
@@ -754,6 +762,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderSoft,
     backgroundColor: colors.surface,
+    flexDirection: "row",
     alignItems: "center",
   },
   methodBtnActive: {
