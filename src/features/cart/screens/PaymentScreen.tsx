@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -9,12 +9,12 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
-import { mobileCheckPromptPay, mobileCheckout, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
+import { mobileCheckPromptPay, mobileCheckout, mobileInitiateKBankPayment, mobileInitiatePromptPay, mapApiOrder } from "@/services/api";
 import { createOmiseToken } from "@/services/omise";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
-type PaymentMethod = "card" | "qr";
+type PaymentMethod = "card" | "qr" | "kplus";
 
 export function PaymentScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
@@ -42,6 +42,7 @@ export function PaymentScreen() {
     expiresAt: string;
   } | null>(null);
   const [isCreatingQR, setIsCreatingQR] = useState(false);
+  const [isKBankLoading, setIsKBankLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState<{ title: string; message?: string } | null>(null);
 
@@ -171,6 +172,33 @@ export function PaymentScreen() {
     }
   }
 
+  async function handleKBankPay() {
+    if (!token) return;
+    setIsKBankLoading(true);
+    try {
+      const result = await mobileInitiateKBankPayment(
+        token,
+        cart.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+        shippingName,
+        shippingPhone,
+        shippingAddr,
+        creditAmount > 0 ? creditAmount : undefined,
+      );
+      if (result.deepLink) {
+        await Linking.openURL(result.deepLink);
+      } else {
+        setModal({ title: "ไม่พบ deepLink", message: "KBank ไม่ส่ง deepLink กลับมา กรุณาลองใหม่" });
+      }
+    } catch (error) {
+      setModal({
+        title: "ชำระเงินผ่าน K+ ไม่สำเร็จ",
+        message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง",
+      });
+    } finally {
+      setIsKBankLoading(false);
+    }
+  }
+
   async function handleCreateQR() {
     if (!token) return;
     setIsCreatingQR(true);
@@ -232,6 +260,12 @@ export function PaymentScreen() {
             onPress={() => setMethod("qr")}
           >
             <Text style={[styles.toggleText, method === "qr" && styles.toggleTextActive]}>PromptPay QR</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.toggleBtn, method === "kplus" && styles.toggleBtnActive]}
+            onPress={() => { setMethod("kplus"); setQrData(null); clearPolling(); }}
+          >
+            <Text style={[styles.toggleText, method === "kplus" && styles.toggleTextActive]}>K+</Text>
           </Pressable>
         </View>
       )}
@@ -322,6 +356,13 @@ export function PaymentScreen() {
         </View>
       )}
 
+      {method === "kplus" && (
+        <View style={styles.qrCard}>
+          <Text style={styles.sectionTitle}>ชำระเงินผ่าน K+</Text>
+          <Text style={styles.qrHint}>กดปุ่มด้านล่างเพื่อเปิดแอป K+ และยืนยันการชำระเงิน</Text>
+        </View>
+      )}
+
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>ยอดชำระทั้งหมด</Text>
         <Text style={styles.summaryAmount}>THB {chargeAmount.toFixed(0)}</Text>
@@ -342,6 +383,14 @@ export function PaymentScreen() {
           style={[styles.button, isLoading && styles.buttonDisabled]}
         >
           <Text style={styles.buttonText}>ชำระเงิน</Text>
+        </Pressable>
+      ) : method === "kplus" ? (
+        <Pressable
+          onPress={() => void handleKBankPay()}
+          disabled={isKBankLoading}
+          style={[styles.button, isKBankLoading && styles.buttonDisabled]}
+        >
+          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด K+..." : "ชำระเงินด้วย K+"}</Text>
         </Pressable>
       ) : null}
 
