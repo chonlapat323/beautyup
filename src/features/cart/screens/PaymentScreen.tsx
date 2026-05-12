@@ -486,7 +486,7 @@ export function PaymentScreen() {
               <MaterialCommunityIcons
                 name={icon as React.ComponentProps<typeof MaterialCommunityIcons>["name"]}
                 size={20}
-                color={method === key ? colors.white : colors.textMuted}
+                color={method === key ? "#fff" : colors.textMuted}
                 style={{ marginRight: 10 }}
               />
               <Text style={[styles.methodBtnText, method === key && styles.methodBtnTextActive]}>{label}</Text>
