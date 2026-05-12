@@ -3,7 +3,7 @@
     "name": "Beauty Up",
     "slug": "beauty-up",
     "scheme": "beautyup",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./src/logo/logo.png",
@@ -16,7 +16,7 @@
     },
     "android": {
       "package": "com.beautyup.app",
-      "versionCode": 39,
+      "versionCode": 40,
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./src/logo/logo.png",

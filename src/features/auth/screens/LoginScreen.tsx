@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
@@ -17,6 +18,7 @@ export function LoginScreen() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleLogin() {
     if (!identifier.trim()) {
@@ -64,14 +66,23 @@ export function LoginScreen() {
           style={styles.input}
           value={identifier}
         />
-        <TextInput
-          onChangeText={setPassword}
-          placeholder="รหัสผ่าน"
-          placeholderTextColor={colors.textMuted}
-          secureTextEntry
-          style={styles.input}
-          value={password}
-        />
+        <View style={styles.passwordRow}>
+          <TextInput
+            onChangeText={setPassword}
+            placeholder="รหัสผ่าน"
+            placeholderTextColor={colors.textMuted}
+            secureTextEntry={!showPassword}
+            style={styles.passwordInput}
+            value={password}
+          />
+          <Pressable onPress={() => setShowPassword((v) => !v)} style={styles.eyeBtn} hitSlop={8}>
+            <Ionicons
+              name={showPassword ? "eye-off-outline" : "eye-outline"}
+              size={20}
+              color={colors.textMuted}
+            />
+          </Pressable>
+        </View>
 
         <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleLogin()} disabled={isLoading}>
           <Text style={styles.buttonText}>{isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}</Text>
@@ -135,6 +146,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     color: colors.textPrimary,
     ...typography.body,
+  },
+  passwordRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    height: 56,
+    borderRadius: radius.md,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+  },
+  passwordInput: {
+    flex: 1,
+    height: "100%",
+    paddingHorizontal: spacing.lg,
+    color: colors.textPrimary,
+    ...typography.body,
+  },
+  eyeBtn: {
+    paddingHorizontal: spacing.lg,
+    justifyContent: "center",
+    alignItems: "center",
   },
   button: {
     height: 56,
