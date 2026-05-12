@@ -44,7 +44,7 @@ export function ProfileScreen() {
   }, [token]);
 
   const totalSpend = orders.reduce((sum, order) => sum + order.total, 0);
-  const memberTypeLabel = member?.memberType === "SALON" ? "Salon Member" : "Regular Member";
+  const memberTypeLabel = member?.memberType === "SALON" ? "สมาชิกซาลอน" : "สมาชิกทั่วไป";
 
   if (!isAuthenticated) {
     return (
@@ -77,7 +77,7 @@ export function ProfileScreen() {
           title="บัญชีของฉัน"
           subtitle="จัดการข้อมูลส่วนตัวและติดตามคำสั่งซื้อ"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "บัญชีของฉัน" },
           ]}
         />
@@ -105,7 +105,7 @@ export function ProfileScreen() {
 
         {commission && commission.paidAmount > 0 ? (
           <View style={styles.commissionBox}>
-            <Text style={styles.commissionTitle}>Commission ของคุณ</Text>
+            <Text style={styles.commissionTitle}>คอมมิชชันของคุณ</Text>
             <View style={styles.commissionRow}>
               <View style={styles.commissionItem}>
                 <Text style={styles.commissionAmount}>
@@ -138,7 +138,7 @@ export function ProfileScreen() {
           <View style={styles.creditBox}>
             <View style={styles.creditRow}>
               <View>
-                <Text style={styles.creditLabel}>Credit คงเหลือ</Text>
+                <Text style={styles.creditLabel}>เครดิตคงเหลือ</Text>
                 <Text style={styles.creditAmount}>
                   ฿{(member?.creditBalance ?? 0).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                 </Text>

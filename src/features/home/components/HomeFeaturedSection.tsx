@@ -47,9 +47,9 @@ export function HomeFeaturedSection({
           { paddingHorizontal: horizontalPadding },
         ]}
       >
-        <Text style={styles.title}>Featured</Text>
+        <Text style={styles.title}>สินค้าแนะนำ</Text>
         <Pressable hitSlop={8} onPress={onViewAll}>
-          <Text style={styles.viewAll}>View all &gt;</Text>
+          <Text style={styles.viewAll}>ดูทั้งหมด &gt;</Text>
         </Pressable>
       </View>
 
@@ -91,8 +91,8 @@ export function HomeFeaturedSection({
                     ) : null}
                     {product.tag === "BEST SELLER" ? (
                       <View style={styles.bestSellerBadge}>
-                        <Text style={styles.bestSellerText}>BEST</Text>
-                        <Text style={styles.bestSellerText}>SELLER</Text>
+                        <Text style={styles.bestSellerText}>ขาย</Text>
+                        <Text style={styles.bestSellerText}>ดี</Text>
                       </View>
                     ) : null}
                   </View>
@@ -107,10 +107,10 @@ export function HomeFeaturedSection({
                   </View>
 
                   <View style={styles.priceRow}>
-                    <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>
+                    <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
                     {product.originalPrice ? (
                       <Text style={styles.originalPrice}>
-                        THB {product.originalPrice.toFixed(0)}
+                        ฿{product.originalPrice.toFixed(0)}
                       </Text>
                     ) : null}
                   </View>
@@ -122,7 +122,7 @@ export function HomeFeaturedSection({
                     }}
                     style={styles.ctaButton}
                   >
-                    <Text style={styles.ctaText}>Add to cart</Text>
+                    <Text style={styles.ctaText}>ใส่ตะกร้า</Text>
                   </Pressable>
                 </Pressable>
               ))}

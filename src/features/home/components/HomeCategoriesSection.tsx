@@ -30,11 +30,11 @@ export function HomeCategoriesSection({
 
         <View style={styles.header}>
           <View style={styles.titleWrap}>
-            <Text style={styles.title}>Categories</Text>
+            <Text style={styles.title}>หมวดหมู่</Text>
           </View>
 
           <Pressable hitSlop={8} onPress={onViewAll} style={styles.viewAllLink}>
-            <Text style={styles.viewAllText}>View all</Text>
+            <Text style={styles.viewAllText}>ดูทั้งหมด</Text>
             <MaterialIcons color={colors.primaryDark} name="chevron-right" size={16} />
           </Pressable>
         </View>
@@ -64,7 +64,7 @@ export function HomeCategoriesSection({
                 onPress={() => onSelectCategory(category.id, category.requiresShadeSelection)}
                 style={styles.shopButton}
               >
-                <Text style={styles.shopButtonText}>Shop</Text>
+                <Text style={styles.shopButtonText}>ช้อป</Text>
               </Pressable>
             </Pressable>
           ))}

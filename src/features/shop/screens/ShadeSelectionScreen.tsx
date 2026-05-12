@@ -76,9 +76,9 @@ export function ShadeSelectionScreen() {
       header={
         <AppHeader
           title="เลือกเฉดสี"
-          subtitle={category?.title ?? "Color & Bleach"}
+          subtitle={category?.title ?? "สีผมและบลีช"}
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
             { label: "เลือกเฉดสี" },
           ]}

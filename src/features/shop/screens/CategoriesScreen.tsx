@@ -44,7 +44,7 @@ export function CategoriesScreen() {
         <AppHeader
           title="หมวดหมู่สินค้า"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "หมวดหมู่สินค้า" },
           ]}
         />

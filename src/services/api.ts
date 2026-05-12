@@ -44,12 +44,42 @@ type ApiShadeGroup = {
   }[];
 };
 
+const CATEGORY_NAME_TRANSLATIONS: Record<string, string> = {
+  "Color & Bleach": "สีผมและบลีช",
+  "Shampoo & Mask": "แชมพูและมาสก์",
+  "Leave In": "ลีฟอิน",
+};
+
+const CATEGORY_SUBTITLE_TRANSLATIONS: Record<string, string> = {
+  "Select shade first": "เลือกเฉดสีก่อนช้อป",
+  "Care essentials": "ดูแลเส้นผมขั้นพื้นฐาน",
+  "Finish & shine": "จัดแต่งและเพิ่มความเงางาม",
+};
+
+const BANNER_BUTTON_TRANSLATIONS: Record<string, string> = {
+  "Shop now": "ช้อปเลย",
+  "View all": "ดูทั้งหมด",
+};
+
+function translateCategoryName(value: string): string {
+  return CATEGORY_NAME_TRANSLATIONS[value] ?? value;
+}
+
+function translateCategorySubtitle(value?: string | null): string {
+  if (!value) return "";
+  return CATEGORY_SUBTITLE_TRANSLATIONS[value] ?? value;
+}
+
+function translateBannerButton(value: string): string {
+  return BANNER_BUTTON_TRANSLATIONS[value] ?? value;
+}
+
 function mapCategory(c: ApiCategory): Category {
   return {
     id: c.id,
-    title: c.name,
+    title: translateCategoryName(c.name),
     eyebrow: c.eyebrow ?? "",
-    subtitle: c.description ?? "",
+    subtitle: translateCategorySubtitle(c.description),
     requiresShadeSelection: c.requiresShadeSelection,
     slug: c.slug,
     imageUrl: c.imageUrl ?? undefined,
@@ -143,7 +173,7 @@ export async function fetchBanners(): Promise<Banner[]> {
     title: b.title,
     body: b.body ?? undefined,
     tag: b.tag ?? undefined,
-    buttonLabel: b.buttonLabel,
+    buttonLabel: translateBannerButton(b.buttonLabel),
     imageUrl: b.imageUrl ?? undefined,
     linkType: (b.linkType as Banner["linkType"]) ?? "none",
     linkId: b.linkId ?? undefined,
@@ -419,7 +449,7 @@ export async function mobileInitiateKBankCardPayment(
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };
-    throw new Error(err.message ?? "สร้างคำสั่งชำระเงิน KBank Card ไม่สำเร็จ");
+    throw new Error(err.message ?? "สร้างคำสั่งชำระเงินบัตรเครดิต KBank ไม่สำเร็จ");
   }
   return res.json() as Promise<{ redirectURL: string; partnerPaymentID: string }>;
 }
@@ -494,7 +524,7 @@ export async function mobileInitiateTrueMoney(
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };
-    throw new Error(err.message ?? "สร้าง TrueMoney charge ไม่สำเร็จ");
+    throw new Error(err.message ?? "สร้างคำสั่งชำระเงินทรูมันนี่ไม่สำเร็จ");
   }
   return res.json() as Promise<{ chargeId: string; authorizeUri: string }>;
 }
@@ -544,7 +574,7 @@ export async function mobileGetCreditTransactions(token: string): Promise<Credit
   const res = await fetch(`${API_BASE}/mobile/me/credit-transactions`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("โหลดประวัติ credit ไม่สำเร็จ");
+  if (!res.ok) throw new Error("โหลดประวัติเครดิตไม่สำเร็จ");
   return res.json() as Promise<CreditTransaction[]>;
 }
 
@@ -556,7 +586,7 @@ export async function mobileRequestWithdrawal(token: string, payload: Withdrawal
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };
-    throw new Error(err.message ?? "ขอถอน credit ไม่สำเร็จ");
+    throw new Error(err.message ?? "ขอถอนเครดิตไม่สำเร็จ");
   }
   return res.json() as Promise<WithdrawalRequest>;
 }

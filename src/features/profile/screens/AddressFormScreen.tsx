@@ -131,7 +131,7 @@ export function AddressFormScreen() {
     <AppHeader
       title={pageTitle}
       breadcrumbs={[
-        { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+        { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
         { label: "บัญชีของฉัน", onPress: () => navigateToProfileHome(navigation) },
         { label: "ที่อยู่ของฉัน", onPress: () => navigation.navigate("Addresses") },
         { label: pageTitle },

@@ -70,7 +70,7 @@ export function AppTabs() {
         name="Discover"
         component={ShopStack}
         options={{
-          title: "สำรวจ",
+          title: "หน้าหลัก",
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} name="home" />
           ),

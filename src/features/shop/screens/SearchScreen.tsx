@@ -29,7 +29,7 @@ export function SearchScreen() {
       >
         <CommerceImage style={styles.image} uri={item.imageUrl} />
         <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-        <Text style={styles.price}>THB {item.price.toFixed(0)}</Text>
+        <Text style={styles.price}>฿{item.price.toFixed(0)}</Text>
       </Pressable>
     );
   }

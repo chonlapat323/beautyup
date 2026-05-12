@@ -75,7 +75,7 @@ export function CheckoutScreen() {
           title="ตรวจสอบคำสั่งซื้อ"
           subtitle="เลือกที่อยู่จัดส่งและยืนยันรายการของคุณ"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
             { label: "ตรวจสอบคำสั่งซื้อ" },
           ]}
@@ -146,7 +146,7 @@ export function CheckoutScreen() {
         <View style={styles.creditToggleCard}>
           <View style={styles.creditToggleRow}>
             <View style={styles.creditToggleLeft}>
-              <Text style={styles.creditToggleTitle}>ใช้ Credit</Text>
+              <Text style={styles.creditToggleTitle}>ใช้เครดิต</Text>
               <Text style={styles.creditToggleSub}>
                 มี ฿{creditBalance.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
               </Text>
@@ -168,12 +168,12 @@ export function CheckoutScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>สรุปยอดชำระ</Text>
-        <Row label="ยอดสินค้า" value={`THB ${summary.subtotal.toFixed(0)}`} />
-        <Row label="ค่าธรรมเนียม" value={`THB ${summary.gatewayFee.toFixed(0)}`} />
+        <Row label="ยอดสินค้า" value={`฿${summary.subtotal.toFixed(0)}`} />
+        <Row label="ค่าธรรมเนียม" value={`฿${summary.gatewayFee.toFixed(0)}`} />
         {creditUsed > 0 && (
-          <Row label="หัก Credit" value={`-THB ${creditUsed.toFixed(0)}`} credit />
+          <Row label="หักเครดิต" value={`-฿${creditUsed.toFixed(0)}`} credit />
         )}
-        <Row label={remaining === 0 ? "ยอดชำระ (Credit ครอบคลุม)" : "ยอดที่ต้องชำระเพิ่ม"} value={`THB ${remaining.toFixed(0)}`} strong />
+        <Row label={remaining === 0 ? "ยอดชำระ (เครดิตครอบคลุม)" : "ยอดที่ต้องชำระเพิ่ม"} value={`฿${remaining.toFixed(0)}`} strong />
       </View>
 
       <Pressable

@@ -96,17 +96,17 @@ export function HomeHeroSliderSection({
             <View style={styles.topGlassSheen} />
 
             <View style={styles.copyWrap}>
-              <Text style={styles.eyebrow}>{banner.eyebrow || "Spring ritual"}</Text>
+              <Text style={styles.eyebrow}>{banner.eyebrow || "ดูแลเส้นผมทุกวัน"}</Text>
               <Text numberOfLines={2} style={styles.title}>
                 {banner.title}
               </Text>
               <Text numberOfLines={2} style={styles.body}>
                 {banner.body ||
-                  "Curated haircare with a softer feel, calm styling, and a premium finish."}
+                  "คัดสรรผลิตภัณฑ์ดูแลเส้นผมเพื่อสัมผัสที่นุ่มนวล ดูแลอย่างละมุน และได้ผลลัพธ์แบบพรีเมียม"}
               </Text>
 
               <Pressable style={styles.ctaButton}>
-                <Text style={styles.ctaText}>{banner.buttonLabel || "Shop now"}</Text>
+                <Text style={styles.ctaText}>{banner.buttonLabel || "ช้อปเลย"}</Text>
                 <Animated.View
                   style={{
                     transform: [

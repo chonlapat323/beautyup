@@ -68,23 +68,23 @@ export function RegisterScreen() {
   return (
     <Screen contentContainerStyle={styles.content}>
       <View style={styles.headerRow}>
-        <Pressable accessibilityLabel="Back to login" onPress={() => navigation.goBack()}>
+        <Pressable accessibilityLabel="กลับไปหน้าเข้าสู่ระบบ" onPress={() => navigation.goBack()}>
           <MaterialIcons color={colors.primary} name="arrow-back" size={22} />
         </Pressable>
         <BrandLockup compact />
       </View>
 
       <View style={styles.copyBlock}>
-        <Text style={styles.title}>Create your account</Text>
+        <Text style={styles.title}>สร้างบัญชีของคุณ</Text>
         <Text style={styles.subtitle}>
-          Start your premium haircare journey with a soft, refined sign-up flow.
+          เริ่มต้นประสบการณ์ดูแลเส้นผมแบบพรีเมียมด้วยการสมัครสมาชิกที่เรียบง่าย
         </Text>
       </View>
 
       <View style={styles.formBlock}>
         <TextInput
           onChangeText={setFullName}
-          placeholder="Full name"
+          placeholder="ชื่อ-นามสกุล"
           placeholderTextColor={colors.textMuted}
           style={styles.input}
           value={fullName}
@@ -108,7 +108,7 @@ export function RegisterScreen() {
         />
         <TextInput
           onChangeText={setPassword}
-          placeholder="Password"
+          placeholder="รหัสผ่าน"
           placeholderTextColor={colors.textMuted}
           secureTextEntry
           style={styles.input}
@@ -116,7 +116,7 @@ export function RegisterScreen() {
         />
         <TextInput
           onChangeText={setConfirmPassword}
-          placeholder="Confirm password"
+          placeholder="ยืนยันรหัสผ่าน"
           placeholderTextColor={colors.textMuted}
           secureTextEntry
           style={styles.input}
@@ -125,7 +125,7 @@ export function RegisterScreen() {
         <TextInput
           autoCapitalize="none"
           onChangeText={setReferralCode}
-          placeholder="Referral code (optional)"
+          placeholder="รหัสแนะนำ (ถ้ามี)"
           placeholderTextColor={colors.textMuted}
           style={styles.input}
           value={referralCode}
@@ -133,19 +133,19 @@ export function RegisterScreen() {
         <TextInput
           autoCapitalize="characters"
           onChangeText={setSalonCode}
-          placeholder="Salon Code (optional)"
+          placeholder="รหัสซาลอน (ถ้ามี)"
           placeholderTextColor={colors.textMuted}
           style={styles.input}
           value={salonCode}
         />
 
         <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleRegister()} disabled={isLoading}>
-          <Text style={styles.buttonText}>{isLoading ? "กำลังสมัครสมาชิก..." : "Create Account"}</Text>
+          <Text style={styles.buttonText}>{isLoading ? "กำลังสมัครสมาชิก..." : "สมัครสมาชิก"}</Text>
         </Pressable>
       </View>
 
       <View style={styles.footerRow}>
-        <Text style={styles.footerText}>Already have an account?</Text>
+        <Text style={styles.footerText}>มีบัญชีอยู่แล้วใช่ไหม?</Text>
         <Pressable onPress={() => navigation.navigate("Login")}>
           <Text style={styles.footerLink}>เข้าสู่ระบบ</Text>
         </Pressable>

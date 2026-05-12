@@ -32,7 +32,7 @@ const THAI_BANKS = [
   "ธนาคารเกียรตินาคินภัทร (KKP)",
   "ธนาคารซีไอเอ็มบีไทย (CIMB)",
   "ธนาคารยูโอบี (UOB)",
-  "พร้อมเพย์ (PromptPay)",
+  "พร้อมเพย์",
 ];
 
 export function BankAccountScreen() {
@@ -76,7 +76,7 @@ export function BankAccountScreen() {
       header={
         <AppHeader
           title="บัญชีธนาคาร"
-          subtitle="บัญชีสำหรับรับเงินถอน Credit"
+          subtitle="บัญชีสำหรับรับเงินถอนเครดิต"
           breadcrumbs={[
             { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
             { label: "บัญชีธนาคาร" },

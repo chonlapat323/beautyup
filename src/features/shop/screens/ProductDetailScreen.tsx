@@ -55,7 +55,7 @@ export function ProductDetailScreen() {
         <AppHeader
           title={product.name}
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
             {
               label: "สินค้า",
@@ -95,9 +95,9 @@ export function ProductDetailScreen() {
 
         <View style={styles.body}>
           <View style={styles.priceRow}>
-            <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>
+            <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
             {product.originalPrice ? (
-              <Text style={styles.originalPrice}>THB {product.originalPrice.toFixed(0)}</Text>
+              <Text style={styles.originalPrice}>฿{product.originalPrice.toFixed(0)}</Text>
             ) : null}
           </View>
 

@@ -19,9 +19,9 @@ type AppHeaderProps = {
 
 function getGreeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
+  if (hour < 12) return "สวัสดีตอนเช้า";
+  if (hour < 17) return "สวัสดีตอนบ่าย";
+  return "สวัสดีตอนเย็น";
 }
 
 export function AppHeader({
@@ -37,7 +37,7 @@ export function AppHeader({
   const horizontalPadding = width < 360 ? 18 : width >= 430 ? 28 : 24;
   const shellBottomPadding = showSearch ? (width < 360 ? 18 : 22) : 18;
   const initials = member?.fullName?.trim().charAt(0).toUpperCase() ?? "B";
-  const displayName = member?.fullName ?? "Beauty Up";
+  const displayName = member?.fullName ?? "สมาชิก Beauty Up";
   const hasCopy = Boolean(title || subtitle || breadcrumbs?.length);
 
   return (
@@ -74,7 +74,7 @@ export function AppHeader({
           <View style={styles.searchIconWrap}>
             <MaterialIcons name="search" size={18} color="#4E6B58" />
           </View>
-          <Text style={styles.searchPlaceholder}>Search haircare products</Text>
+          <Text style={styles.searchPlaceholder}>ค้นหาผลิตภัณฑ์ดูแลเส้นผม</Text>
         </Pressable>
       ) : null}
 
@@ -128,7 +128,7 @@ function PointsPillInline() {
       <View style={styles.iconWrap}>
         <MaterialIcons name="auto-awesome" size={14} color={colors.primaryDark} />
       </View>
-      <Text style={styles.pillText}>{member.pointBalance.toLocaleString()} pts</Text>
+      <Text style={styles.pillText}>{member.pointBalance.toLocaleString()} แต้ม</Text>
     </View>
   );
 }

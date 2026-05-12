@@ -35,7 +35,7 @@ export function PaymentScreen() {
 
   const [method, setMethod] = useState<PaymentMethod>("card");
   const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
-  const [cardName, setCardName] = useState("TEST USER");
+  const [cardName, setCardName] = useState("ผู้ถือบัตรทดสอบ");
   const [expiry, setExpiry] = useState("12/27");
   const [cvv, setCvv] = useState("123");
   const [qrData, setQrData] = useState<{
@@ -83,7 +83,7 @@ export function PaymentScreen() {
             setQrData(null);
             setModal({
               title: "ชำระเงินไม่สำเร็จ",
-              message: "QR Code หมดอายุหรือการชำระเงินไม่สำเร็จ กรุณาลองใหม่",
+              message: "คิวอาร์โค้ดหมดอายุหรือการชำระเงินไม่สำเร็จ กรุณาลองใหม่",
             });
           }
         } catch {
@@ -260,7 +260,7 @@ export function PaymentScreen() {
     if (!cardNumber || !cardName || !expMonth || !expYear || !cvv) {
       setModal({
         title: "กรุณากรอกข้อมูลให้ครบถ้วน",
-        message: "กรุณากรอกหมายเลขบัตร ชื่อบนบัตร วันหมดอายุ และ CVV",
+        message: "กรุณากรอกหมายเลขบัตร ชื่อบนบัตร วันหมดอายุ และรหัส CVV",
       });
       return;
     }
@@ -316,7 +316,7 @@ export function PaymentScreen() {
         setKbankPaymentID(result.partnerPaymentID);
         await Linking.openURL(result.deepLink);
       } else {
-        setModal({ title: "ไม่พบ deepLink", message: "KBank ไม่ส่ง deepLink กลับมา กรุณาลองใหม่" });
+        setModal({ title: "ไม่พบลิงก์ชำระเงิน", message: "KBank ไม่ส่งลิงก์ชำระเงินกลับมา กรุณาลองใหม่" });
       }
     } catch (error) {
       setModal({
@@ -344,11 +344,11 @@ export function PaymentScreen() {
         setKbankPaymentID(result.partnerPaymentID);
         await Linking.openURL(result.redirectURL);
       } else {
-        setModal({ title: "ไม่พบ URL ชำระเงิน", message: "KBank ไม่ส่ง redirectURL กลับมา กรุณาลองใหม่" });
+        setModal({ title: "ไม่พบลิงก์ชำระเงิน", message: "KBank ไม่ส่งลิงก์ชำระเงินกลับมา กรุณาลองใหม่" });
       }
     } catch (error) {
       setModal({
-        title: "ชำระเงินผ่าน KBank Card ไม่สำเร็จ",
+        title: "ชำระเงินผ่านบัตรเครดิต KBank ไม่สำเร็จ",
         message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง",
       });
     } finally {
@@ -388,7 +388,7 @@ export function PaymentScreen() {
       setTrueMoneyChargeId(result.chargeId);
       await Linking.openURL(result.authorizeUri);
     } catch (error) {
-      setModal({ title: "TrueMoney ไม่สำเร็จ", message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง" });
+      setModal({ title: "ทรูมันนี่ไม่สำเร็จ", message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง" });
     } finally {
       setIsTrueMoneyLoading(false);
     }
@@ -409,7 +409,7 @@ export function PaymentScreen() {
           } else if (result.status === "failed" || result.status === "expired") {
             clearTrueMoneyPolling();
             setTrueMoneyChargeId(null);
-            setModal({ title: "ชำระเงินไม่สำเร็จ", message: "TrueMoney ไม่สำเร็จ กรุณาลองใหม่" });
+            setModal({ title: "ชำระเงินไม่สำเร็จ", message: "ทรูมันนี่ไม่สำเร็จ กรุณาลองใหม่" });
           }
         } catch {
           // Ignore transient poll errors.
@@ -451,7 +451,7 @@ export function PaymentScreen() {
           title="ชำระเงิน"
           subtitle="เลือกวิธีชำระเงินและยืนยันการสั่งซื้อ"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
             { label: "ตรวจสอบคำสั่งซื้อ", onPress: () => navigation.navigate("Checkout") },
             { label: "ชำระเงิน" },
@@ -462,7 +462,7 @@ export function PaymentScreen() {
       {creditAmount > 0 && (
         <View style={styles.creditSummaryBox}>
           <Text style={styles.creditSummaryText}>
-            ใช้ Credit ฿{creditAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+            ใช้เครดิต ฿{creditAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
             {isCreditOnly ? " (ครอบคลุมทั้งหมด)" : ` — ชำระเพิ่มอีก ฿${chargeAmount.toFixed(0)}`}
           </Text>
         </View>
@@ -472,11 +472,11 @@ export function PaymentScreen() {
         <View style={styles.methodList}>
           {([
             { key: "card",      label: "บัตรเครดิต / เดบิต", icon: "credit-card-outline" },
-            { key: "qr",        label: "PromptPay QR",        icon: "qrcode-scan" },
+            { key: "qr",        label: "พร้อมเพย์ QR",       icon: "qrcode-scan" },
             { key: "kplus",     label: "KBank K+",            icon: "bank-outline" },
             { key: "kcard",     label: "KBank บัตรเครดิต",   icon: "credit-card" },
             { key: "kqr",       label: "KBank QR",            icon: "qrcode" },
-            { key: "truemoney", label: "True Money Wallet",   icon: "wallet-outline" },
+            { key: "truemoney", label: "ทรูมันนี่ วอลเล็ท",  icon: "wallet-outline" },
           ] as { key: PaymentMethod; label: string; icon: string }[]).map(({ key, label, icon }) => (
             <Pressable
               key={key}
@@ -516,7 +516,7 @@ export function PaymentScreen() {
             <Text style={styles.label}>ชื่อบนบัตร</Text>
             <TextInput
               style={styles.input}
-              placeholder="FIRST LAST"
+              placeholder="ชื่อบนบัตร"
               placeholderTextColor={colors.textMuted}
               autoCapitalize="characters"
               value={cardName}
@@ -529,7 +529,7 @@ export function PaymentScreen() {
               <Text style={styles.label}>วันหมดอายุ</Text>
               <TextInput
                 style={styles.input}
-                placeholder="MM/YY"
+                placeholder="ดด/ปป"
                 placeholderTextColor={colors.textMuted}
                 keyboardType="numeric"
                 value={expiry}
@@ -538,7 +538,7 @@ export function PaymentScreen() {
               />
             </View>
             <View style={[styles.fieldGroup, { flex: 1 }]}>
-              <Text style={styles.label}>CVV</Text>
+              <Text style={styles.label}>รหัส CVV</Text>
               <TextInput
                 style={styles.input}
                 placeholder="123"
@@ -556,13 +556,13 @@ export function PaymentScreen() {
         <View style={styles.qrCard}>
           {isCreatingQR ? (
             <>
-              <Text style={styles.sectionTitle}>PromptPay QR</Text>
+              <Text style={styles.sectionTitle}>พร้อมเพย์ QR</Text>
               <ActivityIndicator
                 size="large"
                 color={colors.primary}
                 style={{ marginVertical: spacing["2xl"] }}
               />
-              <Text style={styles.qrHint}>กำลังสร้าง QR Code...</Text>
+              <Text style={styles.qrHint}>กำลังสร้างคิวอาร์โค้ด...</Text>
             </>
           ) : qrData ? (
             <>
@@ -570,7 +570,7 @@ export function PaymentScreen() {
               {qrData.svgContent ? (
                 <SvgXml xml={qrData.svgContent} width={240} height={240} />
               ) : (
-                <Text style={styles.qrHint}>ไม่สามารถโหลด QR Code ได้ กรุณาลองใหม่</Text>
+                <Text style={styles.qrHint}>ไม่สามารถโหลดคิวอาร์โค้ดได้ กรุณาลองใหม่</Text>
               )}
               <View style={styles.pollingRow}>
                 <ActivityIndicator size="small" color={colors.primary} />
@@ -611,11 +611,11 @@ export function PaymentScreen() {
 
       {method === "kqr" && (
         <View style={styles.qrCard}>
-          <Text style={styles.sectionTitle}>KBank QR Payment</Text>
+          <Text style={styles.sectionTitle}>ชำระเงินด้วย KBank QR</Text>
           {isKBankLoading ? (
             <>
               <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: spacing["2xl"] }} />
-              <Text style={styles.qrHint}>กำลังสร้าง QR Code...</Text>
+              <Text style={styles.qrHint}>กำลังสร้างคิวอาร์โค้ด...</Text>
             </>
           ) : kbankQRData ? (
             <>
@@ -626,7 +626,7 @@ export function PaymentScreen() {
                   resizeMode="contain"
                 />
               ) : (
-                <Text style={styles.qrHint}>ไม่สามารถโหลด QR Code ได้</Text>
+                <Text style={styles.qrHint}>ไม่สามารถโหลดคิวอาร์โค้ดได้</Text>
               )}
               <View style={styles.pollingRow}>
                 <ActivityIndicator size="small" color={colors.primary} />
@@ -634,22 +634,22 @@ export function PaymentScreen() {
               </View>
             </>
           ) : (
-            <Text style={styles.qrHint}>กดปุ่มด้านล่างเพื่อสร้าง QR Code ชำระเงิน</Text>
+            <Text style={styles.qrHint}>กดปุ่มด้านล่างเพื่อสร้างคิวอาร์โค้ดชำระเงิน</Text>
           )}
         </View>
       )}
 
       {method === "truemoney" && (
         <View style={styles.qrCard}>
-          <Text style={styles.sectionTitle}>True Money Wallet</Text>
+          <Text style={styles.sectionTitle}>ทรูมันนี่ วอลเล็ท</Text>
           {trueMoneyChargeId ? (
             <View style={styles.pollingRow}>
               <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={styles.pollingText}>รอการยืนยันจาก TrueMoney...</Text>
+              <Text style={styles.pollingText}>รอการยืนยันจากทรูมันนี่...</Text>
             </View>
           ) : (
             <>
-              <Text style={styles.qrHint}>กรอกเบอร์มือถือที่ผูกกับ True Money Wallet</Text>
+              <Text style={styles.qrHint}>กรอกเบอร์มือถือที่ผูกกับทรูมันนี่ วอลเล็ท</Text>
               <TextInput
                 style={styles.input}
                 placeholder="เบอร์มือถือ (0812345678)"
@@ -665,7 +665,7 @@ export function PaymentScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>ยอดชำระทั้งหมด</Text>
-        <Text style={styles.summaryAmount}>THB {chargeAmount.toFixed(0)}</Text>
+        <Text style={styles.summaryAmount}>฿{chargeAmount.toFixed(0)}</Text>
       </View>
 
       {isCreditOnly ? (
@@ -674,7 +674,7 @@ export function PaymentScreen() {
           disabled={isLoading}
           style={[styles.button, isLoading && styles.buttonDisabled]}
         >
-          <Text style={styles.buttonText}>จ่ายด้วย Credit</Text>
+          <Text style={styles.buttonText}>ชำระด้วยเครดิต</Text>
         </Pressable>
       ) : method === "card" ? (
         <Pressable
@@ -698,7 +698,7 @@ export function PaymentScreen() {
           disabled={isKBankLoading || kbankPaymentID !== null}
           style={[styles.button, (isKBankLoading || kbankPaymentID !== null) && styles.buttonDisabled]}
         >
-          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด..." : kbankPaymentID ? "รอการยืนยัน..." : "ชำระเงินด้วย KBank Card"}</Text>
+          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด..." : kbankPaymentID ? "รอการยืนยัน..." : "ชำระเงินด้วยบัตรเครดิต KBank"}</Text>
         </Pressable>
       ) : method === "kqr" && !kbankQRData ? (
         <Pressable
@@ -714,7 +714,7 @@ export function PaymentScreen() {
           disabled={isTrueMoneyLoading || trueMoneyPhone.length < 10}
           style={[styles.button, (isTrueMoneyLoading || trueMoneyPhone.length < 10) && styles.buttonDisabled]}
         >
-          <Text style={styles.buttonText}>{isTrueMoneyLoading ? "กำลังเปิด TrueMoney..." : "ชำระเงินด้วย TrueMoney"}</Text>
+          <Text style={styles.buttonText}>{isTrueMoneyLoading ? "กำลังเปิดทรูมันนี่..." : "ชำระเงินด้วยทรูมันนี่"}</Text>
         </Pressable>
       ) : null}
 

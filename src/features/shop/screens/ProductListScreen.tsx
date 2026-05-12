@@ -57,7 +57,7 @@ export function ProductListScreen() {
           title={category?.title ?? "สินค้า"}
           subtitle={shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้าที่เหมาะกับคุณ"}
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
             shadeName
               ? {
@@ -118,7 +118,7 @@ export function ProductListScreen() {
               <CommerceImage style={styles.preview} uri={product.imageUrl} />
               {product.originalPrice != null ? (
                 <View style={styles.saleBadge}>
-                  <Text style={styles.saleBadgeText}>Sale</Text>
+                  <Text style={styles.saleBadgeText}>ลดราคา</Text>
                 </View>
               ) : null}
               <Pressable
@@ -143,9 +143,9 @@ export function ProductListScreen() {
             <Text style={styles.meta} numberOfLines={1}>{product.subtitle}</Text>
             <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
             <View style={styles.priceRow}>
-              <Text style={styles.price}>THB {product.price.toFixed(0)}</Text>
+              <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
               {product.originalPrice != null ? (
-                <Text style={styles.originalPrice}>THB {product.originalPrice.toFixed(0)}</Text>
+                <Text style={styles.originalPrice}>฿{product.originalPrice.toFixed(0)}</Text>
               ) : null}
             </View>
           </Pressable>

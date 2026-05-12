@@ -34,7 +34,7 @@ export function WithdrawalScreen() {
   async function handleSubmit() {
     const num = parseFloat(amount);
     if (!num || num <= 0) { setError("กรุณากรอกจำนวนที่ถูกต้อง"); return; }
-    if (num > creditBalance) { setError("ยอด Credit ไม่เพียงพอ"); return; }
+    if (num > creditBalance) { setError("ยอดเครดิตไม่เพียงพอ"); return; }
     if (!token) return;
 
     setIsLoading(true);
@@ -61,11 +61,11 @@ export function WithdrawalScreen() {
       contentContainerStyle={styles.content}
       header={
         <AppHeader
-          title="ถอน Credit"
-          subtitle="ส่งคำขอถอน credit ไปยัง admin"
+          title="ถอนเครดิต"
+          subtitle="ส่งคำขอถอนเครดิตไปยังแอดมิน"
           breadcrumbs={[
             { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
-            { label: "ถอน Credit" },
+            { label: "ถอนเครดิต" },
           ]}
         />
       }
@@ -73,7 +73,7 @@ export function WithdrawalScreen() {
       <View style={styles.card}>
         {/* Balance */}
         <View style={styles.balanceBox}>
-          <Text style={styles.balanceLabel}>Credit คงเหลือ</Text>
+          <Text style={styles.balanceLabel}>เครดิตคงเหลือ</Text>
           <Text style={styles.balanceAmount}>
             ฿{creditBalance.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
           </Text>
@@ -86,7 +86,7 @@ export function WithdrawalScreen() {
             </View>
             <Text style={styles.successTitle}>ส่งคำขอแล้ว</Text>
             <Text style={styles.successBody}>
-              Admin จะตรวจสอบและดำเนินการภายใน 1–3 วันทำการ
+              แอดมินจะตรวจสอบและดำเนินการภายใน 1–3 วันทำการ
             </Text>
             <Pressable style={styles.primaryButton} onPress={() => navigation.navigate("CreditHistory")}>
               <Text style={styles.primaryButtonText}>ดูประวัติการถอน</Text>
@@ -100,7 +100,7 @@ export function WithdrawalScreen() {
           <View style={styles.noBankBox}>
             <Text style={styles.noBankTitle}>ยังไม่มีบัญชีธนาคาร</Text>
             <Text style={styles.noBankBody}>
-              กรุณาเพิ่มบัญชีธนาคารก่อนทำการถอน Credit
+              กรุณาเพิ่มบัญชีธนาคารก่อนทำการถอนเครดิต
             </Text>
             <Pressable style={styles.primaryButton} onPress={() => navigation.navigate("BankAccount")}>
               <Text style={styles.primaryButtonText}>เพิ่มบัญชีธนาคาร</Text>
@@ -152,7 +152,7 @@ export function WithdrawalScreen() {
               }
             </Pressable>
 
-            <Text style={styles.note}>* credit จะถูกหักทันที และจะคืนหากถูกปฏิเสธ</Text>
+            <Text style={styles.note}>* เครดิตจะถูกหักทันที และจะคืนให้หากคำขอถูกปฏิเสธ</Text>
           </>
         )}
       </View>

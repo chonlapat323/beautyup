@@ -73,7 +73,7 @@ export function AddressesScreen() {
           title="ที่อยู่ของฉัน"
           subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "บัญชีของฉัน", onPress: () => navigateToProfileHome(navigation) },
             { label: "ที่อยู่ของฉัน" },
           ]}

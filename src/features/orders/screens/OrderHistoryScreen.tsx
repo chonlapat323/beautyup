@@ -48,7 +48,7 @@ export function OrderHistoryScreen() {
           title="ประวัติคำสั่งซื้อ"
           subtitle="ติดตามออเดอร์และสถานะล่าสุดของคุณ"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ประวัติคำสั่งซื้อ" },
           ]}
         />
@@ -84,7 +84,7 @@ export function OrderHistoryScreen() {
                 </View>
               </View>
               <Text style={styles.meta}>
-                {order.itemCount} รายการ · THB {order.total.toFixed(0)}
+                {order.itemCount} รายการ · ฿{order.total.toFixed(0)}
               </Text>
               <Text style={styles.date}>{order.placedAt}</Text>
             </Pressable>

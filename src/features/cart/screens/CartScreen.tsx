@@ -34,7 +34,7 @@ export function CartScreen() {
           title="ตะกร้าสินค้า"
           subtitle="ตรวจสอบรายการก่อนดำเนินการชำระเงิน"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ตะกร้าสินค้า" },
           ]}
         />
@@ -55,7 +55,7 @@ export function CartScreen() {
                 <CommerceImage style={styles.swatch} uri={product.imageUrl} />
                 <View style={styles.itemCopy}>
                   <Text style={styles.itemName}>{product.name}</Text>
-                  <Text style={styles.itemPrice}>THB {product.price.toFixed(0)}</Text>
+                  <Text style={styles.itemPrice}>฿{product.price.toFixed(0)}</Text>
                 </View>
                 <View style={styles.stepper}>
                   <Pressable onPress={() => updateQuantity(item.productId, item.quantity - 1)}>
@@ -74,13 +74,13 @@ export function CartScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>สรุปรายการ</Text>
-        <Row label="ยอดสินค้า" value={`THB ${summary.subtotal.toFixed(0)}`} />
-        <Row label="ค่าธรรมเนียม" value={`THB ${summary.gatewayFee.toFixed(0)}`} />
-        <Row label="ยอดรวม" strong value={`THB ${summary.total.toFixed(0)}`} />
+        <Row label="ยอดสินค้า" value={`฿${summary.subtotal.toFixed(0)}`} />
+        <Row label="ค่าธรรมเนียม" value={`฿${summary.gatewayFee.toFixed(0)}`} />
+        <Row label="ยอดรวม" strong value={`฿${summary.total.toFixed(0)}`} />
         {summary.pointsPreview > 0 ? (
           <View style={styles.pointsRow}>
             <Text style={styles.pointsLabel}>แต้มที่จะได้รับ</Text>
-            <Text style={styles.pointsValue}>+{summary.pointsPreview} pts</Text>
+            <Text style={styles.pointsValue}>+{summary.pointsPreview} แต้ม</Text>
           </View>
         ) : null}
       </View>

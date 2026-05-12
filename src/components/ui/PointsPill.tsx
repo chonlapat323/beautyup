@@ -13,7 +13,7 @@ export function PointsPill() {
       <View style={styles.iconWrap}>
         <MaterialIcons name="auto-awesome" size={14} color={colors.primaryDark} />
       </View>
-      <Text style={styles.text}>{member.pointBalance.toLocaleString()} pts</Text>
+      <Text style={styles.text}>{member.pointBalance.toLocaleString()} แต้ม</Text>
     </View>
   );
 }

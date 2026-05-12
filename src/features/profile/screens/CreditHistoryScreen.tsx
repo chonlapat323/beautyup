@@ -42,7 +42,7 @@ function formatNote(note: string | null): string {
   const match = note.match(/^Commission จากออเดอร์ (.+)$/);
   if (match) {
     const ref = match[1];
-    return ref.startsWith("BU-") ? note : "Commission";
+    return ref.startsWith("BU-") ? `คอมมิชชันจากออเดอร์ ${ref}` : "คอมมิชชัน";
   }
   return note;
 }
@@ -129,11 +129,11 @@ export function CreditHistoryScreen() {
 
   const header = (
     <AppHeader
-      title="ประวัติ Credit"
-      subtitle="รายการ EARN / USE / ถอน"
+      title="ประวัติเครดิต"
+      subtitle="รายการรับเข้า / ใช้งาน / ถอน"
       breadcrumbs={[
         { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
-        { label: "ประวัติ Credit" },
+        { label: "ประวัติเครดิต" },
       ]}
     />
   );
@@ -162,7 +162,7 @@ export function CreditHistoryScreen() {
   if (items.length === 0) {
     return (
       <Screen scrollable={false} header={header}>
-        <Text style={styles.empty}>ยังไม่มีรายการ credit</Text>
+        <Text style={styles.empty}>ยังไม่มีรายการเครดิต</Text>
       </Screen>
     );
   }

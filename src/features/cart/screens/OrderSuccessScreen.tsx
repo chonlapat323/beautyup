@@ -23,7 +23,7 @@ export function OrderSuccessScreen() {
           title="สั่งซื้อสำเร็จ"
           subtitle="ระบบได้รับการชำระเงินของคุณเรียบร้อยแล้ว"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
             { label: "ตรวจสอบคำสั่งซื้อ", onPress: () => navigation.navigate("Checkout") },
             { label: "สำเร็จ" },
@@ -37,7 +37,7 @@ export function OrderSuccessScreen() {
         <Text style={styles.subtitle}>เลขที่: {orderId}</Text>
         {order && (
           <>
-            <Text style={styles.subtitle}>ยอดชำระ: THB {order.total.toFixed(2)}</Text>
+            <Text style={styles.subtitle}>ยอดชำระ: ฿{order.total.toFixed(2)}</Text>
             <Text style={styles.subtitle}>วันที่: {order.placedAt}</Text>
           </>
         )}
@@ -46,7 +46,7 @@ export function OrderSuccessScreen() {
 
       <View style={styles.actions}>
         <Pressable onPress={() => navigateToHome(navigation)} style={styles.primaryButton}>
-          <Text style={styles.primaryText}>กลับหน้าแรก</Text>
+          <Text style={styles.primaryText}>กลับหน้าหลัก</Text>
         </Pressable>
         <Pressable
           onPress={() =>

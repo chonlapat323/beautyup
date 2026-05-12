@@ -48,9 +48,9 @@ export function LoginScreen() {
       <View style={styles.brandBlock}>
         <BrandLockup size="hero" />
 
-        <Text style={styles.title}>Beauty begins with Beauty Up</Text>
+        <Text style={styles.title}>เริ่มต้นความงามไปกับ Beauty Up</Text>
         <Text style={styles.subtitle}>
-          A refined haircare experience for your daily ritual.
+          ประสบการณ์ดูแลเส้นผมแบบพรีเมียมสำหรับทุกวันของคุณ
         </Text>
       </View>
 
@@ -59,14 +59,14 @@ export function LoginScreen() {
           autoCapitalize="none"
           keyboardType="email-address"
           onChangeText={setIdentifier}
-          placeholder="Phone or email"
+          placeholder="อีเมลหรือเบอร์โทร"
           placeholderTextColor={colors.textMuted}
           style={styles.input}
           value={identifier}
         />
         <TextInput
           onChangeText={setPassword}
-          placeholder="Password"
+          placeholder="รหัสผ่าน"
           placeholderTextColor={colors.textMuted}
           secureTextEntry
           style={styles.input}
@@ -74,15 +74,15 @@ export function LoginScreen() {
         />
 
         <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleLogin()} disabled={isLoading}>
-          <Text style={styles.buttonText}>{isLoading ? "กำลังเข้าสู่ระบบ..." : "Login"}</Text>
+          <Text style={styles.buttonText}>{isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}</Text>
         </Pressable>
 
         <Pressable style={styles.linkRow}>
-          <Text style={styles.linkText}>Forgot password</Text>
+          <Text style={styles.linkText}>ลืมรหัสผ่าน</Text>
         </Pressable>
 
         <View style={styles.footerRow}>
-          <Text style={styles.footerText}>Don&apos;t have an account?</Text>
+          <Text style={styles.footerText}>ยังไม่มีบัญชีใช่ไหม?</Text>
           <Pressable onPress={() => navigation.navigate("Register")}>
             <Text style={styles.footerLink}>สมัครสมาชิก</Text>
           </Pressable>

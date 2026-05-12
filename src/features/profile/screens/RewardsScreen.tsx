@@ -74,7 +74,7 @@ export function RewardsScreen() {
           title="แลกแต้ม"
           subtitle="ใช้แต้มสะสมแลกของรางวัล"
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
             { label: "แลกแต้ม" },
           ]}

@@ -61,7 +61,7 @@ export function OrderDetailScreen() {
             title="รายละเอียดคำสั่งซื้อ"
             subtitle="ไม่พบรายการสั่งซื้อ"
             breadcrumbs={[
-              { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+              { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
               { label: "ประวัติคำสั่งซื้อ", onPress: () => navigateToOrderHistory(navigation) },
               { label: "รายละเอียดคำสั่งซื้อ" },
             ]}
@@ -85,7 +85,7 @@ export function OrderDetailScreen() {
           title="รายละเอียดคำสั่งซื้อ"
           subtitle={`สั่งซื้อเมื่อ ${order.placedAt}`}
           breadcrumbs={[
-            { label: "หน้าแรก", onPress: () => navigateToHome(navigation) },
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ประวัติคำสั่งซื้อ", onPress: () => navigateToOrderHistory(navigation) },
             { label: "รายละเอียดคำสั่งซื้อ" },
           ]}
@@ -137,7 +137,7 @@ export function OrderDetailScreen() {
                 <Text style={styles.itemName}>{item.name}</Text>
                 <Text style={styles.itemMeta}>จำนวน {item.quantity}</Text>
               </View>
-              <Text style={styles.itemPrice}>THB {(item.price * item.quantity).toFixed(0)}</Text>
+              <Text style={styles.itemPrice}>฿{(item.price * item.quantity).toFixed(0)}</Text>
             </View>
           );
         })}
@@ -145,9 +145,9 @@ export function OrderDetailScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.sectionTitle}>สรุปยอดชำระ</Text>
-        <Row label="ยอดสินค้า" value={`THB ${subtotal.toFixed(0)}`} />
-        <Row label="ค่าธรรมเนียม" value={`THB ${order.gatewayFee.toFixed(0)}`} />
-        <Row label="รวมทั้งหมด" strong value={`THB ${order.total.toFixed(0)}`} />
+        <Row label="ยอดสินค้า" value={`฿${subtotal.toFixed(0)}`} />
+        <Row label="ค่าธรรมเนียม" value={`฿${order.gatewayFee.toFixed(0)}`} />
+        <Row label="รวมทั้งหมด" strong value={`฿${order.total.toFixed(0)}`} />
       </View>
 
       <View style={styles.docButtons}>
