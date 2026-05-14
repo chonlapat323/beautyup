@@ -22,8 +22,9 @@ export function CheckoutScreen() {
 
   const creditBalance = member?.creditBalance ?? 0;
   const [useCredit, setUseCredit] = useState(false);
-  const creditUsed = useCredit ? Math.min(creditBalance, summary.total) : 0;
-  const remaining = Math.max(0, summary.total - creditUsed);
+  const subtotalWithShipping = summary.subtotal + summary.shippingFee + summary.gatewayFee;
+  const creditUsed = useCredit ? Math.min(creditBalance, subtotalWithShipping) : 0;
+  const remaining = Math.max(0, subtotalWithShipping - creditUsed);
 
   const [addresses, setAddresses] = useState<MemberAddress[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -169,6 +170,11 @@ export function CheckoutScreen() {
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>สรุปยอดชำระ</Text>
         <Row label="ยอดสินค้า" value={`฿${summary.subtotal.toFixed(0)}`} />
+        <Row
+          label="ค่าจัดส่ง"
+          value={summary.shippingFee === 0 ? "ฟรี" : `฿${summary.shippingFee.toFixed(0)}`}
+          free={summary.shippingFee === 0}
+        />
         <Row label="ค่าธรรมเนียม" value={`฿${summary.gatewayFee.toFixed(0)}`} />
         {creditUsed > 0 && (
           <Row label="หักเครดิต" value={`-฿${creditUsed.toFixed(0)}`} credit />
@@ -187,11 +193,11 @@ export function CheckoutScreen() {
   );
 }
 
-function Row({ label, value, strong = false, credit = false }: { label: string; value: string; strong?: boolean; credit?: boolean }) {
+function Row({ label, value, strong = false, credit = false, free = false }: { label: string; value: string; strong?: boolean; credit?: boolean; free?: boolean }) {
   return (
     <View style={styles.row}>
       <Text style={[styles.rowLabel, strong && styles.strongText, credit && styles.creditText]}>{label}</Text>
-      <Text style={[styles.rowValue, strong && styles.strongText, credit && styles.creditText]}>{value}</Text>
+      <Text style={[styles.rowValue, strong && styles.strongText, credit && styles.creditText, free && styles.freeText]}>{value}</Text>
     </View>
   );
 }
@@ -348,6 +354,7 @@ const styles = StyleSheet.create({
   creditToggleSub: { color: colors.textSecondary, ...typography.caption },
   creditUsedText: { color: colors.primary, ...typography.caption, fontWeight: "600" },
   creditText: { color: colors.primary },
+  freeText: { color: "#2f7a4f", fontWeight: "700" as const },
   button: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],

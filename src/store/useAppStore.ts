@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import { storage } from "./storage";
 
 import { fetchBanners, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders, mobileGetProfile } from "@/services/api";
-import type { PointTier } from "@/services/api";
+import type { MobileConfig, PointTier } from "@/services/api";
 import type { Banner, CartItem, Category, Order, Product } from "@/types/domain";
 
 type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; creditBalance: number; referralCode: string | null; bankName: string | null; bankAccountNumber: string | null; bankAccountName: string | null };
@@ -21,6 +21,9 @@ type AppStore = {
   banners: Banner[];
   gatewayFee: number;
   pointTiers: PointTier[];
+  freeShippingThreshold: number;
+  defaultShippingFee: number;
+  social: { youtubeUrl?: string; tiktokUrl?: string };
   isLoadingCatalog: boolean;
   isLoadingOrders: boolean;
   catalogError: boolean;
@@ -52,6 +55,9 @@ export const useAppStore = create<AppStore>()(
       banners: [],
       gatewayFee: 20,
       pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }],
+      freeShippingThreshold: 1000,
+      defaultShippingFee: 50,
+      social: {},
       favoriteIds: [],
       isLoadingCatalog: false,
       isLoadingOrders: false,
@@ -78,13 +84,13 @@ export const useAppStore = create<AppStore>()(
       loadCatalog: async () => {
         set({ isLoadingCatalog: true, catalogError: false });
         try {
-          const defaultConfig = { gatewayFee: 20, pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }] };
+          const defaultConfig: MobileConfig = { gatewayFee: 20, pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }], freeShippingThreshold: 1000, defaultShippingFee: 50, social: {} };
           const [{ categories, products }, banners, config] = await Promise.all([
             loadCatalogFromApi(),
             fetchBanners().catch(() => [] as Banner[]),
             fetchMobileConfig().catch(() => defaultConfig),
           ]);
-          set({ categories, products, banners, gatewayFee: config.gatewayFee, pointTiers: config.pointTiers ?? defaultConfig.pointTiers, catalogError: false });
+          set({ categories, products, banners, gatewayFee: config.gatewayFee, pointTiers: config.pointTiers ?? defaultConfig.pointTiers, freeShippingThreshold: config.freeShippingThreshold ?? 1000, defaultShippingFee: config.defaultShippingFee ?? 50, social: config.social ?? {}, catalogError: false });
         } catch {
           set({ catalogError: true });
         } finally {
@@ -153,12 +159,13 @@ export const useAppStore = create<AppStore>()(
 );
 
 export function getCartSummary(cart: CartItem[]) {
-  const { products, gatewayFee, pointTiers } = useAppStore.getState();
+  const { products, gatewayFee, pointTiers, freeShippingThreshold, defaultShippingFee } = useAppStore.getState();
   const subtotal = cart.reduce((sum, item) => {
     const product = products.find((p) => p.id === item.productId);
     return sum + (product?.price ?? 0) * item.quantity;
   }, 0);
+  const shippingFee = subtotal >= freeShippingThreshold ? 0 : defaultShippingFee;
   const sorted = [...pointTiers].sort((a, b) => b.minSpend - a.minSpend);
   const pointsPreview = sorted.find((t) => subtotal >= t.minSpend)?.points ?? 0;
-  return { subtotal, gatewayFee, total: subtotal + gatewayFee, pointsPreview };
+  return { subtotal, shippingFee, gatewayFee, total: subtotal + shippingFee + gatewayFee, pointsPreview, freeShippingThreshold };
 }

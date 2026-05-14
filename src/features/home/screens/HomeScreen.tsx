@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StyleSheet, useWindowDimensions } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
@@ -10,6 +10,7 @@ import { HomeSkeleton } from "@/components/ui/Skeleton";
 import { HomeCategoriesSection } from "@/features/home/components/HomeCategoriesSection";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
+import { colors, typography } from "@/theme";
 
 export function HomeScreen() {
   const navigation =
@@ -19,6 +20,7 @@ export function HomeScreen() {
   const categories = useAppStore((state) => state.categories);
   const products = useAppStore((state) => state.products);
   const banners = useAppStore((state) => state.banners);
+  const social = useAppStore((state) => state.social);
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
   const addToCart = useAppStore((state) => state.addToCart);
   const loadCatalog = useAppStore((state) => state.loadCatalog);
@@ -103,6 +105,30 @@ export function HomeScreen() {
           onAddToCart={addToCart}
         />
       ) : null}
+
+      {(social.youtubeUrl || social.tiktokUrl) ? (
+        <View style={[styles.socialRow, { paddingHorizontal: horizontalPadding }]}>
+          <Text style={styles.socialLabel}>ติดตามเรา</Text>
+          <View style={styles.socialButtons}>
+            {social.youtubeUrl ? (
+              <Pressable
+                style={[styles.socialBtn, styles.youtubeBtn]}
+                onPress={() => void Linking.openURL(social.youtubeUrl!)}
+              >
+                <Text style={styles.socialBtnText}>▶ YouTube</Text>
+              </Pressable>
+            ) : null}
+            {social.tiktokUrl ? (
+              <Pressable
+                style={[styles.socialBtn, styles.tiktokBtn]}
+                onPress={() => void Linking.openURL(social.tiktokUrl!)}
+              >
+                <Text style={styles.socialBtnText}>♪ TikTok</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        </View>
+      ) : null}
     </Screen>
   );
 }
@@ -112,5 +138,37 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 44,
     backgroundColor: "#F7FBF8",
+  },
+  socialRow: {
+    marginTop: 32,
+    gap: 12,
+  },
+  socialLabel: {
+    color: colors.textSecondary,
+    ...typography.caption,
+    fontWeight: "600" as const,
+    textTransform: "uppercase" as const,
+    letterSpacing: 0.8,
+  },
+  socialButtons: {
+    flexDirection: "row" as const,
+    gap: 10,
+  },
+  socialBtn: {
+    borderRadius: 99,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    alignItems: "center" as const,
+  },
+  youtubeBtn: {
+    backgroundColor: "#FF0000",
+  },
+  tiktokBtn: {
+    backgroundColor: "#010101",
+  },
+  socialBtnText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "700" as const,
   },
 });
