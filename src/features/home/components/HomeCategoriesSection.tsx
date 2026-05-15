@@ -50,11 +50,6 @@ export function HomeCategoriesSection({
                 <View style={styles.iconWrap}>
                   <CommerceImage resizeMode="cover" style={styles.icon} uri={category.imageUrl} />
                 </View>
-                {category.requiresShadeSelection ? (
-                  <View style={styles.shadeBadge}>
-                    <MaterialIcons name="palette" size={9} color="#FFFFFF" />
-                  </View>
-                ) : null}
               </View>
 
               <Text numberOfLines={2} style={styles.label}>

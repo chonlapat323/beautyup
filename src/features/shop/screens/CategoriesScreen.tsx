@@ -86,9 +86,6 @@ export function CategoriesScreen() {
                 <CommerceImage style={styles.preview} uri={category.imageUrl} />
               </View>
 
-              <View style={[styles.arrowWrap, { backgroundColor: accent.border }]}>
-                <MaterialIcons name="chevron-right" size={20} color={accent.text} />
-              </View>
             </Pressable>
           );
         })}
@@ -170,10 +167,5 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "transparent",
-  },
-  arrowWrap: {
-    width: 32,
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
