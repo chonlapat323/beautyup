@@ -22,6 +22,7 @@ type ApiProduct = {
   price: string;
   specialPrice?: string | null;
   stock: number;
+  sellableStock: number;
   status: "DRAFT" | "ACTIVE" | "INACTIVE";
   isFeatured: boolean;
   tag?: string | null;
@@ -104,7 +105,7 @@ function mapProduct(p: ApiProduct): Product {
     images,
     isFeatured: p.isFeatured ?? false,
     tag: p.tag ?? undefined,
-    sellableStock: p.stock,
+    sellableStock: p.sellableStock,
   };
 }
 

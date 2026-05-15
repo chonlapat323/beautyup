@@ -32,7 +32,7 @@ export function ProductDetailScreen() {
   const shadeName = route.params.shadeName;
   const stock = product.sellableStock ?? 0;
   const isOutOfStock = stock === 0;
-  const isLowStock = stock > 0 && stock <= 5;
+  const isLowStock = stock > 0 && stock <= 20;
   const images =
     product.images && product.images.length > 0
       ? product.images
