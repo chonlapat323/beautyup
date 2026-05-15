@@ -123,6 +123,12 @@ export function OrderDetailScreen() {
             </Text>
           ) : null}
           {order.shippingAddr ? <Text style={styles.shippingAddr}>{order.shippingAddr}</Text> : null}
+          {order.trackingNumber ? (
+            <View style={styles.trackingRow}>
+              <Text style={styles.trackingLabel}>เลขพัสดุ</Text>
+              <Text style={styles.trackingNumber}>{order.trackingNumber}</Text>
+            </View>
+          ) : null}
         </View>
       ) : null}
 
@@ -290,6 +296,21 @@ const styles = StyleSheet.create({
   shippingAddr: {
     color: colors.textSecondary,
     ...typography.caption,
+  },
+  trackingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: spacing.xs,
+  },
+  trackingLabel: {
+    color: colors.textMuted,
+    ...typography.caption,
+  },
+  trackingNumber: {
+    color: colors.textPrimary,
+    ...typography.caption,
+    fontWeight: "600",
   },
   summaryCard: {
     marginTop: spacing["2xl"],

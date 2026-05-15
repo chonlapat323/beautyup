@@ -30,6 +30,9 @@ export function ProductDetailScreen() {
 
   const product = foundProduct;
   const shadeName = route.params.shadeName;
+  const stock = product.sellableStock ?? 0;
+  const isOutOfStock = stock === 0;
+  const isLowStock = stock > 0 && stock <= 5;
   const images =
     product.images && product.images.length > 0
       ? product.images
@@ -110,19 +113,31 @@ export function ProductDetailScreen() {
 
           {product.description ? <Text style={styles.description}>{product.description}</Text> : null}
 
+          {isOutOfStock ? (
+            <View style={styles.outOfStockBadge}>
+              <Text style={styles.outOfStockText}>สินค้าหมด</Text>
+            </View>
+          ) : isLowStock ? (
+            <View style={styles.lowStockBadge}>
+              <Text style={styles.lowStockText}>เหลือ {stock} ชิ้น</Text>
+            </View>
+          ) : null}
+
           <View style={styles.quantityBlock}>
             <Text style={styles.quantityLabel}>จำนวน</Text>
-            <View style={styles.stepper}>
+            <View style={[styles.stepper, isOutOfStock && styles.stepperDisabled]}>
               <Pressable
                 onPress={() => setQuantity((q) => Math.max(1, q - 1))}
                 style={styles.stepperBtn}
+                disabled={isOutOfStock}
               >
                 <Text style={styles.stepperBtnText}>−</Text>
               </Pressable>
               <Text style={styles.stepperCount}>{quantity}</Text>
               <Pressable
-                onPress={() => setQuantity((q) => q + 1)}
+                onPress={() => setQuantity((q) => Math.min(stock || 99, q + 1))}
                 style={styles.stepperBtn}
+                disabled={isOutOfStock}
               >
                 <Text style={styles.stepperBtnText}>+</Text>
               </Pressable>
@@ -132,8 +147,8 @@ export function ProductDetailScreen() {
       </Screen>
 
       <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-        <Pressable onPress={handleAddToCart} style={styles.button}>
-          <Text style={styles.buttonText}>เพิ่มลงตะกร้า {quantity > 1 ? `(${quantity})` : ""}</Text>
+        <Pressable onPress={handleAddToCart} disabled={isOutOfStock} style={[styles.button, isOutOfStock && styles.buttonDisabled]}>
+          <Text style={styles.buttonText}>{isOutOfStock ? "สินค้าหมด" : `เพิ่มลงตะกร้า${quantity > 1 ? ` (${quantity})` : ""}`}</Text>
         </Pressable>
         <Pressable onPress={() => navigation.navigate("Cart")} style={styles.secondaryButton}>
           <Text style={styles.secondaryButtonText}>ไปที่ตะกร้าสินค้า</Text>
@@ -285,5 +300,35 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: colors.primaryStrong,
     ...typography.title,
+  },
+  buttonDisabled: {
+    backgroundColor: colors.textMuted,
+  },
+  outOfStockBadge: {
+    alignSelf: "flex-start" as const,
+    borderRadius: 99,
+    backgroundColor: "#FEE2E2",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  outOfStockText: {
+    color: "#DC2626",
+    fontSize: 12,
+    fontWeight: "700" as const,
+  },
+  lowStockBadge: {
+    alignSelf: "flex-start" as const,
+    borderRadius: 99,
+    backgroundColor: "#FEF3C7",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  lowStockText: {
+    color: "#D97706",
+    fontSize: 12,
+    fontWeight: "700" as const,
+  },
+  stepperDisabled: {
+    opacity: 0.4,
   },
 });

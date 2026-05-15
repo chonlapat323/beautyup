@@ -104,6 +104,7 @@ function mapProduct(p: ApiProduct): Product {
     images,
     isFeatured: p.isFeatured ?? false,
     tag: p.tag ?? undefined,
+    sellableStock: p.stock,
   };
 }
 
@@ -376,6 +377,7 @@ type ApiOrder = {
   shippingName?: string;
   shippingPhone?: string;
   shippingAddr?: string;
+  trackingNumber?: string | null;
   items: { productId: string; name: string; quantity: number; unitPrice: string }[];
 };
 
@@ -713,5 +715,6 @@ export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
     shippingName: o.shippingName,
     shippingPhone: o.shippingPhone,
     shippingAddr: o.shippingAddr,
+    trackingNumber: o.trackingNumber ?? undefined,
   };
 }

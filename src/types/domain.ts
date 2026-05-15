@@ -31,6 +31,7 @@ export type Product = {
   images?: string[];
   isFeatured?: boolean;
   tag?: string;
+  sellableStock?: number;
 };
 
 export type Banner = {
@@ -71,4 +72,5 @@ export type Order = {
   shippingName?: string;
   shippingPhone?: string;
   shippingAddr?: string;
+  trackingNumber?: string;
 };
