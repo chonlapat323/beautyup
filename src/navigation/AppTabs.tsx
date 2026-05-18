@@ -103,6 +103,11 @@ export function AppTabs() {
       <Tab.Screen
         name="Profile"
         component={ProfileStack}
+        listeners={({ navigation }) => ({
+          tabPress: () => {
+            navigation.navigate("Profile", { screen: "ProfileHome" });
+          },
+        })}
         options={{
           title: "บัญชี",
           tabBarIcon: ({ focused }) => (
