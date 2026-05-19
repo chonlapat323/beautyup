@@ -22,7 +22,7 @@ export function CheckoutScreen() {
 
   const creditBalance = member?.creditBalance ?? 0;
   const [useCredit, setUseCredit] = useState(false);
-  const subtotalWithShipping = summary.subtotal + summary.shippingFee + summary.gatewayFee;
+  const subtotalWithShipping = summary.subtotal + summary.shippingFee;
   const creditUsed = useCredit ? Math.min(creditBalance, subtotalWithShipping) : 0;
   const remaining = Math.max(0, subtotalWithShipping - creditUsed);
 
@@ -175,7 +175,6 @@ export function CheckoutScreen() {
           value={summary.shippingFee === 0 ? "ฟรี" : `฿${summary.shippingFee.toFixed(0)}`}
           free={summary.shippingFee === 0}
         />
-        <Row label="ค่าธรรมเนียม" value={`฿${summary.gatewayFee.toFixed(0)}`} />
         {creditUsed > 0 && (
           <Row label="หักเครดิต" value={`-฿${creditUsed.toFixed(0)}`} credit />
         )}

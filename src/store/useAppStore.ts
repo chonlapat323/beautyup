@@ -167,5 +167,5 @@ export function getCartSummary(cart: CartItem[]) {
   const shippingFee = subtotal >= freeShippingThreshold ? 0 : defaultShippingFee;
   const sorted = [...pointTiers].sort((a, b) => b.minSpend - a.minSpend);
   const pointsPreview = sorted.find((t) => subtotal >= t.minSpend)?.points ?? 0;
-  return { subtotal, shippingFee, gatewayFee, total: subtotal + shippingFee + gatewayFee, pointsPreview, freeShippingThreshold };
+  return { subtotal, shippingFee, gatewayFee, total: subtotal + shippingFee, pointsPreview, freeShippingThreshold };
 }

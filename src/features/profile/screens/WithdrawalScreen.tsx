@@ -24,16 +24,20 @@ export function WithdrawalScreen() {
   const refreshProfile = useAppStore((s) => s.refreshProfile);
 
   const creditBalance = member?.creditBalance ?? 0;
+  const gatewayFee = useAppStore((s) => s.gatewayFee);
   const hasSavedBank = !!(member?.bankName && member.bankAccountNumber && member.bankAccountName);
 
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const parsedAmount = parseFloat(amount) || 0;
+  const netAmount = Math.max(0, parsedAmount - gatewayFee);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   async function handleSubmit() {
     const num = parseFloat(amount);
     if (!num || num <= 0) { setError("กรุณากรอกจำนวนที่ถูกต้อง"); return; }
+    if (num <= gatewayFee) { setError(`จำนวนต้องมากกว่าค่าธรรมเนียม ฿${gatewayFee}`); return; }
     if (num > creditBalance) { setError("ยอดเครดิตไม่เพียงพอ"); return; }
     if (!token) return;
 
@@ -123,6 +127,19 @@ export function WithdrawalScreen() {
                 ถอนทั้งหมด ฿{creditBalance.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
               </Text>
             </Pressable>
+
+            {parsedAmount > gatewayFee && (
+              <View style={styles.feeBox}>
+                <View style={styles.feeRow}>
+                  <Text style={styles.feeLabel}>ค่าธรรมเนียม</Text>
+                  <Text style={styles.feeValue}>-฿{gatewayFee.toFixed(0)}</Text>
+                </View>
+                <View style={styles.feeRow}>
+                  <Text style={[styles.feeLabel, styles.feeNet]}>ยอดที่จะได้รับ</Text>
+                  <Text style={[styles.feeValue, styles.feeNet]}>฿{netAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</Text>
+                </View>
+              </View>
+            )}
 
             <View style={styles.divider} />
 
@@ -233,6 +250,18 @@ const styles = StyleSheet.create({
   },
   outlineButtonText: { color: colors.textSecondary, ...typography.title },
   note: { color: colors.textMuted, fontSize: 11, lineHeight: 16 },
+  feeBox: {
+    borderRadius: radius.md,
+    backgroundColor: "#F0FAF4",
+    borderWidth: 1,
+    borderColor: "#B7DDC7",
+    padding: spacing.md,
+    gap: spacing.xs,
+  },
+  feeRow: { flexDirection: "row", justifyContent: "space-between" },
+  feeLabel: { color: colors.textSecondary, ...typography.body },
+  feeValue: { color: colors.textSecondary, ...typography.body },
+  feeNet: { color: colors.primary, fontWeight: "700" as const },
   noBankBox: { alignItems: "center", gap: spacing.md, paddingVertical: spacing.lg },
   noBankTitle: { color: colors.textPrimary, fontWeight: "700", fontSize: 16 },
   noBankBody: { color: colors.textSecondary, ...typography.body, textAlign: "center" },

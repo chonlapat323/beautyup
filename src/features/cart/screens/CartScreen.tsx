@@ -72,18 +72,24 @@ export function CartScreen() {
         )}
       </View>
 
-      <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>สรุปรายการ</Text>
-        <Row label="ยอดสินค้า" value={`฿${summary.subtotal.toFixed(0)}`} />
-        <Row label="ค่าธรรมเนียม" value={`฿${summary.gatewayFee.toFixed(0)}`} />
-        <Row label="ยอดรวม" strong value={`฿${summary.total.toFixed(0)}`} />
-        {summary.pointsPreview > 0 ? (
-          <View style={styles.pointsRow}>
-            <Text style={styles.pointsLabel}>แต้มที่จะได้รับ</Text>
-            <Text style={styles.pointsValue}>+{summary.pointsPreview} แต้ม</Text>
-          </View>
-        ) : null}
-      </View>
+      {cart.length > 0 && (
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>สรุปรายการ</Text>
+          <Row label="ยอดสินค้า" value={`฿${summary.subtotal.toFixed(0)}`} />
+          <Row
+            label="ค่าจัดส่ง"
+            value={summary.shippingFee === 0 ? "ฟรี" : `฿${summary.shippingFee.toFixed(0)}`}
+            free={summary.shippingFee === 0}
+          />
+          <Row label="ยอดรวม" strong value={`฿${summary.total.toFixed(0)}`} />
+          {summary.pointsPreview > 0 ? (
+            <View style={styles.pointsRow}>
+              <Text style={styles.pointsLabel}>แต้มที่จะได้รับ</Text>
+              <Text style={styles.pointsValue}>+{summary.pointsPreview} แต้ม</Text>
+            </View>
+          ) : null}
+        </View>
+      )}
 
       <Pressable
         disabled={cart.length === 0}
@@ -100,11 +106,11 @@ export function CartScreen() {
   );
 }
 
-function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+function Row({ label, value, strong = false, free = false }: { label: string; value: string; strong?: boolean; free?: boolean }) {
   return (
     <View style={styles.row}>
       <Text style={[styles.rowLabel, strong && styles.strongText]}>{label}</Text>
-      <Text style={[styles.rowValue, strong && styles.strongText]}>{value}</Text>
+      <Text style={[styles.rowValue, strong && styles.strongText, free && styles.freeText]}>{value}</Text>
     </View>
   );
 }
@@ -201,6 +207,10 @@ const styles = StyleSheet.create({
   },
   strongText: {
     ...typography.title,
+  },
+  freeText: {
+    color: "#2f7a4f",
+    fontWeight: "700" as const,
   },
   pointsRow: {
     flexDirection: "row",

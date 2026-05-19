@@ -244,6 +244,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     height: 52, borderRadius: radius.pill, backgroundColor: colors.primary,
     alignItems: "center", justifyContent: "center", marginTop: spacing.sm,
+    alignSelf: "stretch",
   },
   disabledButton: { opacity: 0.6 },
   primaryButtonText: { color: "#FFFFFF", ...typography.title },
