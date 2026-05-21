@@ -8,6 +8,8 @@ import { AddressFormScreen } from "@/features/profile/screens/AddressFormScreen"
 import { OrderHistoryScreen } from "@/features/orders/screens/OrderHistoryScreen";
 import { OrderDetailScreen } from "@/features/orders/screens/OrderDetailScreen";
 import { RewardsScreen } from "@/features/profile/screens/RewardsScreen";
+import { MyRedemptionsScreen } from "@/features/profile/screens/MyRedemptionsScreen";
+import { RedemptionDetailScreen } from "@/features/profile/screens/RedemptionDetailScreen";
 import { WithdrawalScreen } from "@/features/profile/screens/WithdrawalScreen";
 import { CreditHistoryScreen } from "@/features/profile/screens/CreditHistoryScreen";
 import { BankAccountScreen } from "@/features/profile/screens/BankAccountScreen";
@@ -26,6 +28,8 @@ export function ProfileStack() {
       <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
       <Stack.Screen name="Rewards" component={RewardsScreen} />
+      <Stack.Screen name="MyRedemptions" component={MyRedemptionsScreen} />
+      <Stack.Screen name="RedemptionDetail" component={RedemptionDetailScreen} />
       <Stack.Screen name="Withdrawal" component={WithdrawalScreen} />
       <Stack.Screen name="CreditHistory" component={CreditHistoryScreen} />
       <Stack.Screen name="BankAccount" component={BankAccountScreen} />

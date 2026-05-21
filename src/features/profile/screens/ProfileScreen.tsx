@@ -185,6 +185,10 @@ export function ProfileScreen() {
           <Text style={styles.menuButtonText}>แลกแต้ม</Text>
         </Pressable>
 
+        <Pressable onPress={() => navigation.navigate("MyRedemptions")} style={styles.menuButton}>
+          <Text style={styles.menuButtonText}>ของรางวัลของฉัน</Text>
+        </Pressable>
+
         <Pressable onPress={() => navigation.navigate("OrderHistory")} style={styles.menuButton}>
           <Text style={styles.menuButtonText}>ประวัติคำสั่งซื้อ</Text>
         </Pressable>

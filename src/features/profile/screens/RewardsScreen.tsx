@@ -6,11 +6,12 @@ import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, V
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
+import { AddressPickerModal } from "@/components/ui/AddressPickerModal";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ProfileStackParamList } from "@/navigation/types";
 import { mobileGetRewardProducts, mobileRedeemReward } from "@/services/api";
-import type { RewardProduct } from "@/services/api";
+import type { MemberAddress, RewardProduct } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
@@ -31,6 +32,9 @@ export function RewardsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [redeeming, setRedeeming] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>(null);
+  const [addressModalVisible, setAddressModalVisible] = useState(false);
+  const [pendingItem, setPendingItem] = useState<RewardProduct | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<MemberAddress | null>(null);
 
   useEffect(() => {
     if (!token) return;
@@ -46,15 +50,22 @@ export function RewardsScreen() {
       setModal({ type: "insufficient", points, cost: item.pointCost });
       return;
     }
-    setModal({ type: "confirm", item });
+    setPendingItem(item);
+    setAddressModalVisible(true);
+  }
+
+  function handleAddressSelected(address: MemberAddress) {
+    setSelectedAddress(address);
+    setAddressModalVisible(false);
+    if (pendingItem) setModal({ type: "confirm", item: pendingItem });
   }
 
   async function confirmRedeem(item: RewardProduct) {
-    if (!token) return;
+    if (!token || !selectedAddress) return;
     setModal(null);
     setRedeeming(item.id);
     try {
-      await mobileRedeemReward(token, item.id);
+      await mobileRedeemReward(token, item.id, selectedAddress.id);
       await refreshProfile();
       setRewards((prev) => prev.map((r) => (r.id === item.id ? { ...r, stock: r.stock - 1 } : r)));
       setModal({ type: "success", itemName: item.name });
@@ -81,6 +92,14 @@ export function RewardsScreen() {
         />
       }
     >
+      {/* Address Picker */}
+      <AddressPickerModal
+        visible={addressModalVisible}
+        onClose={() => { setAddressModalVisible(false); setPendingItem(null); }}
+        onSelect={handleAddressSelected}
+        onAddAddress={() => navigation.navigate("Addresses")}
+      />
+
       {/* Modals */}
       <AppModal
         visible={modal?.type === "confirm"}

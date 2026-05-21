@@ -664,14 +664,59 @@ export async function mobileGetRewardProducts(token: string): Promise<RewardProd
   return res.json() as Promise<RewardProduct[]>;
 }
 
-export async function mobileRedeemReward(token: string, rewardProductId: string): Promise<void> {
+export async function mobileRedeemReward(token: string, rewardProductId: string, addressId: string): Promise<void> {
   const res = await fetch(`${API_BASE}/mobile/rewards/${rewardProductId}/redeem`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ addressId }),
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };
     throw new Error(err.message ?? "แลกแต้มไม่สำเร็จ");
+  }
+}
+
+export type MyRedemption = {
+  id: string;
+  pointsSpent: number;
+  status: "PENDING" | "PREPARING" | "SHIPPED" | "DELIVERED";
+  rewardProduct: { id: string; name: string; imageUrl: string | null };
+  createdAt: string;
+};
+
+export type MyRedemptionDetail = MyRedemption & {
+  trackingNumber: string | null;
+  shippingRecipient: string | null;
+  shippingPhone: string | null;
+  shippingAddress: string | null;
+  statusUpdatedAt: string | null;
+};
+
+export async function mobileGetMyRedemptions(token: string): Promise<MyRedemption[]> {
+  const res = await fetch(`${API_BASE}/mobile/me/redemptions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดรายการของรางวัลไม่สำเร็จ");
+  return res.json() as Promise<MyRedemption[]>;
+}
+
+export async function mobileGetMyRedemption(token: string, id: string): Promise<MyRedemptionDetail> {
+  const res = await fetch(`${API_BASE}/mobile/me/redemptions/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดรายละเอียดของรางวัลไม่สำเร็จ");
+  return res.json() as Promise<MyRedemptionDetail>;
+}
+
+export async function mobileRegisterPushToken(token: string, expoPushToken: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/mobile/me/push-token`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ expoPushToken }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "ลงทะเบียน push token ไม่สำเร็จ");
   }
 }
 
