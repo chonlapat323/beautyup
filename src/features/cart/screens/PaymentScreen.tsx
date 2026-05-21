@@ -622,7 +622,7 @@ export function PaymentScreen() {
               {kbankQRData.qrImage ? (
                 <Image
                   source={{ uri: kbankQRData.qrImage.startsWith("http") ? kbankQRData.qrImage : `data:image/png;base64,${kbankQRData.qrImage}` }}
-                  style={{ width: 240, height: 240 }}
+                  style={{ width: 240, height: 240, aspectRatio: 1 }}
                   resizeMode="contain"
                 />
               ) : (

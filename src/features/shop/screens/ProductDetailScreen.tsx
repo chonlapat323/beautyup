@@ -148,7 +148,7 @@ export function ProductDetailScreen() {
 
       <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         <Pressable onPress={handleAddToCart} disabled={isOutOfStock} style={[styles.button, isOutOfStock && styles.buttonDisabled]}>
-          <Text style={styles.buttonText}>{isOutOfStock ? "สินค้าหมด" : `เพิ่มลงตะกร้า${quantity > 1 ? ` (${quantity})` : ""}`}</Text>
+          <Text style={styles.buttonText} numberOfLines={1} adjustsFontSizeToFit>{isOutOfStock ? "สินค้าหมด" : `เพิ่มลงตะกร้า${quantity > 1 ? ` (${quantity})` : ""}`}</Text>
         </Pressable>
         <Pressable onPress={() => navigation.navigate("Cart")} style={styles.secondaryButton}>
           <Text style={styles.secondaryButtonText}>ไปที่ตะกร้าสินค้า</Text>

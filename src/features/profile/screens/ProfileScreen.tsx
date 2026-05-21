@@ -108,7 +108,7 @@ export function ProfileScreen() {
             <Text style={styles.commissionTitle}>คอมมิชชันของคุณ</Text>
             <View style={styles.commissionRow}>
               <View style={styles.commissionItem}>
-                <Text style={styles.commissionAmount}>
+                <Text style={styles.commissionAmount} numberOfLines={1}>
                   ฿{commission.paidAmount.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
                 </Text>
                 <Text style={styles.commissionLabel}>ได้รับทั้งหมด ({commission.paidCount} รายการ)</Text>
@@ -127,7 +127,7 @@ export function ProfileScreen() {
             <Text style={styles.statLabel}>แต้มสะสม</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>
+            <Text style={styles.statValue} numberOfLines={1}>
               ฿{totalSpend.toLocaleString("th-TH", { maximumFractionDigits: 0 })}
             </Text>
             <Text style={styles.statLabel}>ยอดซื้อรวม</Text>
@@ -139,7 +139,7 @@ export function ProfileScreen() {
             <View style={styles.creditRow}>
               <View>
                 <Text style={styles.creditLabel}>เครดิตคงเหลือ</Text>
-                <Text style={styles.creditAmount}>
+                <Text style={styles.creditAmount} numberOfLines={1}>
                   ฿{(member?.creditBalance ?? 0).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                 </Text>
               </View>

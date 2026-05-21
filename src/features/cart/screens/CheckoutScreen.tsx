@@ -148,7 +148,7 @@ export function CheckoutScreen() {
           <View style={styles.creditToggleRow}>
             <View style={styles.creditToggleLeft}>
               <Text style={styles.creditToggleTitle}>ใช้เครดิต</Text>
-              <Text style={styles.creditToggleSub}>
+              <Text style={styles.creditToggleSub} numberOfLines={1}>
                 มี ฿{creditBalance.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
               </Text>
             </View>

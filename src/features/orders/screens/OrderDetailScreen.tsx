@@ -140,7 +140,7 @@ export function OrderDetailScreen() {
             <View key={`${order.id}-${item.productId}`} style={styles.itemCard}>
               <CommerceImage style={styles.itemArtwork} uri={product?.imageUrl} />
               <View style={styles.itemCopy}>
-                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
                 <Text style={styles.itemMeta}>จำนวน {item.quantity}</Text>
               </View>
               <Text style={styles.itemPrice}>฿{(item.price * item.quantity).toFixed(0)}</Text>

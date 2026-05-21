@@ -115,7 +115,7 @@ export function HomeScreen() {
                 style={[styles.socialBtn, styles.youtubeBtn]}
                 onPress={() => void Linking.openURL(social.youtubeUrl!)}
               >
-                <Text style={styles.socialBtnText}>▶ YouTube</Text>
+                <Text numberOfLines={1} style={styles.socialBtnText}>▶ YouTube</Text>
               </Pressable>
             ) : null}
             {social.tiktokUrl ? (
@@ -123,7 +123,7 @@ export function HomeScreen() {
                 style={[styles.socialBtn, styles.tiktokBtn]}
                 onPress={() => void Linking.openURL(social.tiktokUrl!)}
               >
-                <Text style={styles.socialBtnText}>♪ TikTok</Text>
+                <Text numberOfLines={1} style={styles.socialBtnText}>♪ TikTok</Text>
               </Pressable>
             ) : null}
           </View>
@@ -159,6 +159,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 10,
     alignItems: "center" as const,
+    flexShrink: 1,
   },
   youtubeBtn: {
     backgroundColor: "#FF0000",

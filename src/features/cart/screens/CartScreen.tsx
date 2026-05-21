@@ -54,7 +54,7 @@ export function CartScreen() {
               <View key={item.productId} style={styles.itemCard}>
                 <CommerceImage style={styles.swatch} uri={product.imageUrl} />
                 <View style={styles.itemCopy}>
-                  <Text style={styles.itemName}>{product.name}</Text>
+                  <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{product.name}</Text>
                   <Text style={styles.itemPrice}>฿{product.price.toFixed(0)}</Text>
                 </View>
                 <View style={styles.stepper}>

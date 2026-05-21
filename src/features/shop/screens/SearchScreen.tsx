@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   card: {
-    width: "47%",
+    flex: 1,
     gap: spacing.xs,
   },
   image: {

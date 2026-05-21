@@ -143,7 +143,7 @@ export function ProductListScreen() {
             <Text style={styles.meta} numberOfLines={1}>{product.subtitle}</Text>
             <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
             <View style={styles.priceRow}>
-              <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
+              <Text style={styles.price} numberOfLines={1}>฿{product.price.toFixed(0)}</Text>
               {product.originalPrice != null ? (
                 <Text style={styles.originalPrice}>฿{product.originalPrice.toFixed(0)}</Text>
               ) : null}
@@ -280,6 +280,7 @@ const styles = StyleSheet.create({
   name: {
     color: colors.textPrimary,
     minHeight: 44,
+    flexWrap: "wrap",
     ...typography.body,
   },
   priceRow: {

@@ -70,7 +70,7 @@ export function CategoriesScreen() {
               <View style={[styles.accentBar, { backgroundColor: accent.border }]} />
 
               <View style={styles.copy}>
-                <Text style={[styles.title, { color: accent.text }]}>{category.title}</Text>
+                <Text numberOfLines={2} style={[styles.title, { color: accent.text }]}>{category.title}</Text>
 
                 {category.requiresShadeSelection ? (
                   <View style={styles.shadeCue}>

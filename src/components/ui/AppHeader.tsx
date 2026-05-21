@@ -60,7 +60,7 @@ export function AppHeader({
 
           <View style={styles.profileCopy}>
             <Text style={styles.greeting}>{getGreeting()}</Text>
-            <Text numberOfLines={1} style={styles.memberName}>
+            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.memberName}>
               {displayName}
             </Text>
           </View>
@@ -89,6 +89,7 @@ export function AppHeader({
                 const content = (
                   <Text
                     numberOfLines={1}
+                    ellipsizeMode="tail"
                     style={[
                       styles.breadcrumbText,
                       item.onPress && !isLast
