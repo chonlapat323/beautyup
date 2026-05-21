@@ -39,7 +39,7 @@ export function Screen({
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
         {header}
@@ -69,6 +69,7 @@ export function Screen({
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   safeArea: {
     flex: 1,
@@ -79,6 +80,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
+    justifyContent: "flex-start",
     backgroundColor: colors.background,
   },
   fixed: {

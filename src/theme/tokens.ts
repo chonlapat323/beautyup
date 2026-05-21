@@ -56,7 +56,7 @@ export const typography = {
   },
   headline: {
     fontSize: 28,
-    lineHeight: 34,
+    lineHeight: 42,
     fontFamily: fonts.semiBold,
   },
   body: {
