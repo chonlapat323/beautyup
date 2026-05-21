@@ -1,0 +1,5 @@
+# Maestro config สำหรับ BeautyUp
+# App ID: com.beautyup.app
+#
+# รัน: maestro test .maestro/flows/
+# ติดตั้ง (Windows PowerShell as Admin): iwr get.maestro.mobile.dev -useb | iex

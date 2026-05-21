@@ -1,0 +1,38 @@
+appId: com.beautyup.app
+---
+# Flow 05: Profile screen, logout, กลับมา login screen
+- runFlow: 02-login.yaml
+
+# ไป Profile tab (login แล้วอยู่ที่ Profile อยู่แล้ว แต่ tap เพื่อ assert)
+- tapOn:
+    text: "บัญชี"
+
+# assert profile screen ของ authenticated user
+- assertVisible:
+    text: "บัญชีของฉัน"
+    optional: false
+
+# assert stats / ข้อมูล member
+- assertVisible:
+    text: "ออเดอร์ทั้งหมด"
+    optional: false
+- assertVisible:
+    text: "แต้มสะสม"
+    optional: false
+
+# assert ปุ่ม logout
+- assertVisible:
+    text: "ออกจากระบบ"
+    optional: false
+
+# กด logout
+- tapOn:
+    text: "ออกจากระบบ"
+
+# assert กลับมา guest profile / login screen
+- assertVisible:
+    text: "ยินดีต้อนรับสู่ Beauty Up"
+    optional: false
+- assertVisible:
+    text: "เข้าสู่ระบบ"
+    optional: false

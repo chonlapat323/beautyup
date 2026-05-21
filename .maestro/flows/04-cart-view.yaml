@@ -1,0 +1,30 @@
+appId: com.beautyup.app
+---
+# Flow 04: ดู cart, summary, ปุ่ม checkout
+# เริ่มจาก login แล้วมีสินค้าในตะกร้า
+- runFlow: 03-browse-and-cart.yaml
+
+# ตอนนี้อยู่ที่ CartScreen แล้ว (03 navigate ไปหลัง add to cart)
+# หรือกด tab "ตะกร้า" อีกครั้งเพื่อ assert
+- tapOn:
+    text: "ตะกร้า"
+
+# assert หัวข้อหน้า cart
+- assertVisible:
+    text: "ตะกร้าสินค้า"
+    optional: false
+
+# assert สรุปรายการ (แสดงเมื่อมีสินค้า)
+- assertVisible:
+    text: "สรุปรายการ"
+    optional: false
+
+# assert ปุ่ม checkout
+- assertVisible:
+    text: "ดำเนินการชำระเงิน"
+    optional: false
+
+# assert ปุ่ม "เลือกสินค้าต่อ"
+- assertVisible:
+    text: "เลือกสินค้าต่อ"
+    optional: true

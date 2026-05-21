@@ -1,0 +1,51 @@
+appId: com.beautyup.app
+---
+# Flow 03: Browse categories → product → add to cart
+# ต้อง login ก่อน
+- runFlow: 02-login.yaml
+
+# ไปหน้าหลัก
+- tapOn:
+    text: "หน้าหลัก"
+
+# assert home screen
+- assertVisible:
+    text: "หมวดหมู่"
+    optional: false
+
+# กด "ดูทั้งหมด" เพื่อไป CategoriesScreen
+- tapOn:
+    text: "ดูทั้งหมด"
+
+# assert หน้า categories
+- assertVisible:
+    text: "หมวดหมู่สินค้า"
+    optional: false
+
+# เลือก category แรกที่ปรากฏ (กด category card แรก)
+# ใช้ index 0 เพื่อเลือกอันแรกที่เจอ
+- tapOn:
+    id: "category-item-0"
+    optional: true
+# fallback: ถ้าไม่มี id ให้ scroll และ tap text ที่มีในหน้า ProductList
+- assertVisible:
+    text: "สินค้า"
+    optional: true
+
+# เลือก product แรก (กด card ใดก็ได้ที่เห็น)
+- tapOn:
+    id: "product-item-0"
+    optional: true
+# fallback: หาปุ่ม "รายละเอียดสินค้า" หรือ assert ว่าเข้า product detail
+- assertVisible:
+    text: "เพิ่มลงตะกร้า"
+    optional: true
+
+# กด "เพิ่มลงตะกร้า"
+- tapOn:
+    text: "เพิ่มลงตะกร้า"
+
+# app navigate ไป CartScreen อัตโนมัติหลัง addToCart (ดู handleAddToCart)
+- assertVisible:
+    text: "ตะกร้าสินค้า"
+    optional: false

@@ -1,0 +1,14 @@
+appId: com.beautyup.app
+---
+# Flow 01: ทดสอบว่า app เปิดได้และแสดง landing/login screen
+- launchApp
+- assertVisible:
+    text: "Beauty Up"
+    optional: false
+# ตรวจว่าเห็น login screen (guest state)
+- assertVisible:
+    text: "ยินดีต้อนรับสู่ Beauty Up"
+    optional: true
+- assertVisible:
+    text: "เข้าสู่ระบบ"
+    optional: true

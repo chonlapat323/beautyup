@@ -1,0 +1,33 @@
+appId: com.beautyup.app
+---
+# Flow 02: Login flow ครบ
+# สมมติว่า app เปิดอยู่ที่ tab Profile (guest state) ซึ่งมีปุ่ม "เข้าสู่ระบบ"
+# ถ้าเริ่มจาก cold launch ให้ launchApp ก่อน
+- launchApp
+
+# นำทางไปหน้า login ผ่าน Profile tab
+- tapOn:
+    text: "บัญชี"
+- assertVisible:
+    text: "ยินดีต้อนรับสู่ Beauty Up"
+- tapOn:
+    text: "เข้าสู่ระบบ"
+
+# กรอก email และ password
+- tapOn:
+    text: "อีเมลหรือเบอร์โทร"
+- inputText: "test@beautyup.com"
+- tapOn:
+    text: "รหัสผ่าน"
+- inputText: "Test1234!"
+
+# กด login
+- tapOn:
+    text: "เข้าสู่ระบบ"
+
+# assert เข้า home/profile screen สำเร็จ
+- assertVisible:
+    text: "บัญชีของฉัน"
+    optional: false
+- assertNotVisible:
+    text: "ยินดีต้อนรับสู่ Beauty Up"
