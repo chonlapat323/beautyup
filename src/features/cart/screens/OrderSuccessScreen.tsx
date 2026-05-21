@@ -69,8 +69,7 @@ export function OrderSuccessScreen() {
 const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
-    justifyContent: "center",
-    paddingTop: spacing.lg,
+    paddingTop: spacing["3xl"],
     paddingHorizontal: spacing["2xl"],
     gap: spacing["2xl"],
   },
