@@ -53,6 +53,7 @@ export function MyRedemptionsScreen() {
 
   return (
     <Screen
+      scrollable={false}
       header={
         <AppHeader
           title="ของรางวัลของฉัน"
@@ -76,6 +77,7 @@ export function MyRedemptionsScreen() {
         </View>
       ) : (
         <FlatList
+          style={{ flex: 1 }}
           data={redemptions}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}

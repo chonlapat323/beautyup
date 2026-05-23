@@ -170,6 +170,7 @@ export function CreditHistoryScreen() {
   return (
     <Screen scrollable={false} header={header}>
       <FlatList
+        style={{ flex: 1 }}
         data={items}
         keyExtractor={(item) => item.data.id}
         renderItem={renderItem}
