@@ -1,7 +1,16 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
@@ -10,6 +19,16 @@ import type { ProfileStackParamList } from "@/navigation/types";
 import { mobileAddAddress, mobileGetAddresses, mobileUpdateAddress } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const DB: DbEntry[] = require("thailand-address/lib/database/raw_database/raw_database.json") as DbEntry[];
+
+type DbEntry = {
+  district: string;   // ตำบล/แขวง
+  amphoe: string;     // อำเภอ/เขต
+  province: string;   // จังหวัด
+  zipcode: number;
+};
 
 type Props = NativeStackScreenProps<ProfileStackParamList, "AddressForm">;
 
@@ -20,6 +39,7 @@ type FormState = {
   phone: string;
   addressLine1: string;
   addressLine2: string;
+  subdistrict: string;
   district: string;
   province: string;
   postalCode: string;
@@ -32,10 +52,17 @@ const EMPTY: FormState = {
   phone: "",
   addressLine1: "",
   addressLine2: "",
+  subdistrict: "",
   district: "",
   province: "",
   postalCode: "",
 };
+
+function queryByZipcode(zip: string): DbEntry[] {
+  const code = parseInt(zip, 10);
+  if (isNaN(code)) return [];
+  return DB.filter((e) => e.zipcode === code);
+}
 
 export function AddressFormScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
@@ -47,7 +74,15 @@ export function AddressFormScreen() {
   const [isLoading, setIsLoading] = useState(Boolean(addressId));
   const [isSaving, setIsSaving] = useState(false);
 
+  // Subdistrict picker state
+  const [subdistrictOptions, setSubdistrictOptions] = useState<string[]>([]);
+  const [pickerVisible, setPickerVisible] = useState(false);
+
   const pageTitle = addressId ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่";
+
+  // Ref to track whether we should suppress the postalCode auto-fill
+  // (e.g. when loading an existing address that already has all fields set)
+  const suppressAutoFill = useRef(false);
 
   useEffect(() => {
     if (!addressId || !token) return;
@@ -55,6 +90,7 @@ export function AddressFormScreen() {
       .then((list) => {
         const addr = list.find((entry) => entry.id === addressId);
         if (addr) {
+          suppressAutoFill.current = true;
           setForm({
             label: addr.label ?? "",
             storeName: addr.storeName ?? "",
@@ -62,6 +98,7 @@ export function AddressFormScreen() {
             phone: addr.phone,
             addressLine1: addr.addressLine1,
             addressLine2: addr.addressLine2 ?? "",
+            subdistrict: "",        // MemberAddress has no subdistrict field
             district: addr.district ?? "",
             province: addr.province ?? "",
             postalCode: addr.postalCode ?? "",
@@ -74,6 +111,32 @@ export function AddressFormScreen() {
 
   function update(next: Partial<FormState>) {
     setForm((prev) => ({ ...prev, ...next }));
+  }
+
+  // Auto-fill district/province from postalCode
+  function handlePostalCodeChange(value: string) {
+    update({ postalCode: value });
+
+    if (suppressAutoFill.current) {
+      suppressAutoFill.current = false;
+      return;
+    }
+
+    if (value.length === 5) {
+      const matches = queryByZipcode(value);
+      if (matches.length > 0) {
+        const first = matches[0];
+        const subdistricts = [...new Set(matches.map((e) => e.district))];
+        update({
+          district: first.amphoe,
+          province: first.province,
+          subdistrict: subdistricts[0] ?? "",
+        });
+        setSubdistrictOptions(subdistricts);
+      }
+    } else {
+      setSubdistrictOptions([]);
+    }
   }
 
   async function handleSave() {
@@ -151,16 +214,10 @@ export function AddressFormScreen() {
     <Screen contentContainerStyle={styles.content} header={header}>
       <View style={styles.card}>
         <Field
-          label="ชื่อที่อยู่ (เช่น บ้าน, ที่ทำงาน)"
-          placeholder="บ้าน"
+          label="ชื่อร้านหรือบริษัทของท่าน (ถ้ามี)"
+          placeholder="เช่น ร้านบิวตี้อัพ"
           value={form.label}
           onChangeText={(value) => update({ label: value })}
-        />
-        <Field
-          label="ชื่อร้าน (ถ้ามี)"
-          placeholder="ชื่อร้าน / บริษัท"
-          value={form.storeName}
-          onChangeText={(value) => update({ storeName: value })}
         />
         <Field
           label="ชื่อผู้รับ *"
@@ -188,10 +245,33 @@ export function AddressFormScreen() {
           onChangeText={(value) => update({ addressLine2: value })}
         />
 
-        <View style={styles.row3}>
+        {/* Postal code — drives auto-fill */}
+        <Field
+          label="รหัสไปรษณีย์"
+          placeholder="10110"
+          value={form.postalCode}
+          onChangeText={handlePostalCodeChange}
+          keyboardType="numeric"
+          maxLength={5}
+        />
+
+        {/* Subdistrict picker — appears after postal code resolves options */}
+        {subdistrictOptions.length > 0 && (
+          <View style={styles.field}>
+            <Text style={styles.label}>ตำบล/แขวง</Text>
+            <Pressable style={styles.pickerBtn} onPress={() => setPickerVisible(true)}>
+              <Text style={form.subdistrict ? styles.pickerValue : styles.pickerPlaceholder}>
+                {form.subdistrict || "เลือกตำบล/แขวง"}
+              </Text>
+              <Text style={styles.chevron}>›</Text>
+            </Pressable>
+          </View>
+        )}
+
+        <View style={styles.row2}>
           <View style={styles.flexField}>
             <Field
-              label="เขต/อำเภอ"
+              label="อำเภอ/เขต"
               placeholder="คลองเตย"
               value={form.district}
               onChangeText={(value) => update({ district: value })}
@@ -203,16 +283,6 @@ export function AddressFormScreen() {
               placeholder="กรุงเทพฯ"
               value={form.province}
               onChangeText={(value) => update({ province: value })}
-            />
-          </View>
-          <View style={styles.postalField}>
-            <Field
-              label="รหัสไปรษณีย์"
-              placeholder="10110"
-              value={form.postalCode}
-              onChangeText={(value) => update({ postalCode: value })}
-              keyboardType="numeric"
-              maxLength={5}
             />
           </View>
         </View>
@@ -230,6 +300,31 @@ export function AddressFormScreen() {
           <Text style={styles.saveText}>{isSaving ? "กำลังบันทึก..." : "บันทึก"}</Text>
         </Pressable>
       </View>
+
+      {/* Subdistrict picker modal */}
+      <Modal visible={pickerVisible} animationType="slide" transparent onRequestClose={() => setPickerVisible(false)}>
+        <Pressable style={styles.backdrop} onPress={() => setPickerVisible(false)} />
+        <View style={styles.sheet}>
+          <View style={styles.sheetHandle} />
+          <Text style={styles.sheetTitle}>เลือกตำบล/แขวง</Text>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {subdistrictOptions.map((name) => (
+              <Pressable
+                key={name}
+                style={[styles.sheetItem, form.subdistrict === name && styles.sheetItemActive]}
+                onPress={() => {
+                  update({ subdistrict: name });
+                  setPickerVisible(false);
+                }}
+              >
+                <Text style={[styles.sheetItemText, form.subdistrict === name && styles.sheetItemTextActive]}>
+                  {name}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      </Modal>
     </Screen>
   );
 }
@@ -303,15 +398,35 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     ...typography.body,
   },
-  row3: {
+  pickerBtn: {
+    height: 50,
+    borderRadius: radius.md,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    paddingHorizontal: spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  pickerValue: {
+    color: colors.textPrimary,
+    ...typography.body,
+  },
+  pickerPlaceholder: {
+    color: colors.textMuted,
+    ...typography.body,
+  },
+  chevron: {
+    color: colors.textMuted,
+    fontSize: 20,
+  },
+  row2: {
     flexDirection: "row",
     gap: spacing.sm,
   },
   flexField: {
     flex: 1,
-  },
-  postalField: {
-    width: 90,
   },
   actions: {
     flexDirection: "row",
@@ -346,5 +461,49 @@ const styles = StyleSheet.create({
   saveText: {
     color: "#FFF",
     ...typography.title,
+  },
+  // Subdistrict picker modal
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  sheet: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    paddingBottom: spacing["3xl"],
+    maxHeight: "60%",
+  },
+  sheetHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.borderStrong,
+    alignSelf: "center",
+    marginTop: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  sheetTitle: {
+    color: colors.textPrimary,
+    ...typography.title,
+    paddingHorizontal: spacing["2xl"],
+    marginBottom: spacing.md,
+  },
+  sheetItem: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing["2xl"],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSoft,
+  },
+  sheetItemActive: {
+    backgroundColor: colors.primarySoft,
+  },
+  sheetItemText: {
+    color: colors.textPrimary,
+    ...typography.body,
+  },
+  sheetItemTextActive: {
+    color: colors.primary,
+    fontWeight: "600",
   },
 });
