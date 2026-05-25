@@ -11,7 +11,7 @@ export function PointsPill() {
   return (
     <View style={styles.pill}>
       <View style={styles.iconWrap}>
-        <MaterialIcons name="auto-awesome" size={14} color={colors.primaryDark} />
+        <MaterialIcons name="auto-awesome" size={14} color={colors.goldDark} />
       </View>
       <Text style={styles.text}>{member.pointBalance.toLocaleString()} แต้ม</Text>
     </View>
@@ -23,23 +23,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#ECF5EE",
+    backgroundColor: colors.goldSoft,
     borderRadius: radius.pill,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
     borderWidth: 1,
-    borderColor: "#D3E5DA",
+    borderColor: colors.gold,
   },
   iconWrap: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.gold,
     alignItems: "center",
     justifyContent: "center",
   },
   text: {
-    color: colors.primaryDark,
+    color: colors.goldDeep,
     fontSize: 13,
     fontFamily: fonts.semiBold,
   },

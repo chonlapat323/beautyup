@@ -72,7 +72,7 @@ export function AppHeader({
       {showSearch ? (
         <Pressable onPress={onSearchPress} style={styles.searchBar}>
           <View style={styles.searchIconWrap}>
-            <MaterialIcons name="search" size={18} color="#4E6B58" />
+            <MaterialIcons name="search" size={18} color={colors.goldDeep} />
           </View>
           <Text style={styles.searchPlaceholder}>ค้นหาผลิตภัณฑ์ดูแลเส้นผม</Text>
         </Pressable>
@@ -127,7 +127,7 @@ function PointsPillInline() {
   return (
     <View style={styles.pill}>
       <View style={styles.iconWrap}>
-        <MaterialIcons name="auto-awesome" size={14} color={colors.primaryDark} />
+        <MaterialIcons name="auto-awesome" size={14} color={colors.goldDark} />
       </View>
       <Text style={styles.pillText}>{member.pointBalance.toLocaleString()} แต้ม</Text>
     </View>
@@ -138,9 +138,9 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#F7FBF8",
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(31, 82, 54, 0.08)",
-    shadowColor: "#183322",
-    shadowOpacity: 0.08,
+    borderBottomColor: colors.goldMuted,
+    shadowColor: colors.gold,
+    shadowOpacity: 0.10,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 },
     elevation: 5,
@@ -159,31 +159,33 @@ const styles = StyleSheet.create({
     gap: 12,
     flex: 1,
   },
+  // วงแหวนทองล้อมรอบ avatar — แสดงถึงความพรีเมียม
   avatarShell: {
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: "#E8F3EC",
+    backgroundColor: colors.goldSoft,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#D3E5DA",
+    borderWidth: 1.5,
+    borderColor: colors.gold,
   },
   avatarWrap: {
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: "#295B3F",
+    backgroundColor: "#046340",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#1D412D",
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
+    shadowColor: colors.gold,
+    shadowOpacity: 0.30,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
+  // ตัวอักษรย่อ — ทองบนหยก
   avatarText: {
-    color: "#FFFFFF",
+    color: colors.gold,
     fontSize: 18,
     fontFamily: fonts.bold,
   },
@@ -213,9 +215,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     gap: 10,
     borderWidth: 1,
-    borderColor: "rgba(41, 91, 63, 0.08)",
-    shadowColor: "#214530",
-    shadowOpacity: 0.06,
+    borderColor: colors.goldMuted,
+    shadowColor: colors.gold,
+    shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 8 },
     elevation: 3,
@@ -224,7 +226,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: "#E9F3EC",
+    backgroundColor: colors.goldSoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -271,7 +273,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
   breadcrumbLink: {
-    color: colors.primaryStrong,
+    color: colors.goldDeep,
   },
   breadcrumbCurrent: {
     color: "#6B8474",
@@ -282,27 +284,28 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: "#8AA091",
   },
+  // Points pill — ทองคำขับบนพื้นขาว
   pill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#ECF5EE",
+    backgroundColor: colors.goldSoft,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: "#D3E5DA",
+    borderColor: colors.gold,
   },
   iconWrap: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.gold,
     alignItems: "center",
     justifyContent: "center",
   },
   pillText: {
-    color: colors.primaryDark,
+    color: colors.goldDeep,
     fontSize: 13,
     fontFamily: fonts.semiBold,
   },

@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   content: {
     paddingTop: 16,
     paddingBottom: 44,
-    backgroundColor: "#F7FBF8",
+    backgroundColor: colors.background,
   },
   socialRow: {
     marginTop: 32,

@@ -11,7 +11,8 @@ export const fonts = {
 } as const;
 
 export const colors = {
-  background: "#fafcfa",
+  // ─── Jade foundation ───────────────────────────────────────────────
+  background: "#046340",
   surface: "#ffffff",
   surfaceMuted: "#eef8f1",
   primary: "#2f7a4f",
@@ -22,8 +23,15 @@ export const colors = {
   textPrimary: "#1a1a1a",
   textSecondary: "#6b7280",
   textMuted: "#9ca3af",
-  borderSoft: "rgba(15, 40, 25, 0.08)",
-  borderStrong: "rgba(15, 40, 25, 0.14)",
+  borderSoft: "rgba(255, 255, 255, 0.12)",
+  borderStrong: "rgba(255, 255, 255, 0.22)",
+
+  // ─── Gold accent — หยกน้ำ × ทองคำแท้ ──────────────────────────────
+  gold: "#D4AF37",           // ทองคำแท้ — icons, borders, buttons
+  goldDeep: "#B8962E",       // ทองเข้ม — text บน surface ขาว
+  goldSoft: "rgba(212, 175, 55, 0.14)",  // พื้นหลัง subtle
+  goldMuted: "rgba(212, 175, 55, 0.07)", // เส้นขอบบาง / hover
+  goldDark: "#1A0F00",       // ข้อความบนปุ่มทอง (contrast ดี)
 } as const;
 
 export const spacing = {

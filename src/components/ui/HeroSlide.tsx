@@ -66,7 +66,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   eyebrow: {
-    color: colors.primary,
+    // ทองบน eyebrow — บ่งบอกความพิเศษของ collection
+    color: colors.gold,
     textTransform: "uppercase",
     ...typography.eyebrow,
   },
@@ -87,11 +88,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md,
     borderRadius: radius.pill,
-    backgroundColor: colors.primary,
+    // ปุ่มทองคำแท้ — CTA ที่โดดเด่นบนพื้นขาว
+    backgroundColor: colors.gold,
+    shadowColor: colors.gold,
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
   buttonText: {
-    color: "#FFFFFF",
+    // ข้อความเข้มบนทอง — contrast ดี อ่านง่าย
+    color: colors.goldDark,
     ...typography.caption,
+    fontWeight: "700",
   },
   visual: {
     width: 128,

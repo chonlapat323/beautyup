@@ -22,13 +22,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: spacing["2xl"],
+    // เส้นทองบาง ๆ ซ้ายมือให้ความรู้สึกหรูหรา
+    borderLeftWidth: 3,
+    borderLeftColor: colors.gold,
+    marginLeft: spacing["2xl"],
+    paddingLeft: spacing.md,
+    paddingHorizontal: 0,
+    paddingRight: spacing["2xl"],
   },
   title: {
     color: colors.textPrimary,
     ...typography.title,
   },
   action: {
-    color: colors.primary,
+    color: colors.goldDeep,
     ...typography.caption,
+    fontWeight: "600",
   },
 });

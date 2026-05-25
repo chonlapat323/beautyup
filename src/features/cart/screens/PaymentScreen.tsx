@@ -817,7 +817,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    color: colors.textPrimary,
+    color: "#FFFFFF",
     ...typography.body,
     backgroundColor: colors.background,
     alignSelf: "stretch",

@@ -171,22 +171,30 @@ const styles = StyleSheet.create({
   button: {
     height: 56,
     borderRadius: radius.pill,
-    backgroundColor: colors.primary,
+    // ปุ่มหลัก — ทองคำแท้ เป็นจุดโฟกัสของหน้า Login
+    backgroundColor: colors.gold,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: colors.gold,
+    shadowOpacity: 0.40,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
   },
   buttonDisabled: {
     backgroundColor: colors.textMuted,
+    shadowOpacity: 0,
   },
   buttonText: {
-    color: "#FFFFFF",
+    color: colors.goldDark,
     ...typography.title,
+    fontWeight: "700",
   },
   linkRow: {
     alignSelf: "center",
   },
   linkText: {
-    color: colors.primaryStrong,
+    color: colors.goldDeep,
     ...typography.caption,
   },
   footerRow: {
@@ -200,7 +208,8 @@ const styles = StyleSheet.create({
     ...typography.caption,
   },
   footerLink: {
-    color: colors.primaryStrong,
+    color: colors.goldDeep,
     ...typography.caption,
+    fontWeight: "600",
   },
 });
