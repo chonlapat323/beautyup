@@ -1,4 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { View, Text, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -109,11 +110,25 @@ export function AppTabs() {
             navigation.navigate("Profile", { screen: "ProfileHome" });
           },
         })}
-        options={{
-          title: "บัญชี",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} name={focused ? "person" : "person-outline"} />
-          ),
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "ProfileHome";
+          const hideTabBar = routeName === "Login" || routeName === "Register";
+          return {
+            title: "บัญชี",
+            tabBarIcon: ({ focused }) => (
+              <TabIcon focused={focused} name={focused ? "person" : "person-outline"} />
+            ),
+            tabBarStyle: hideTabBar
+              ? { display: "none" }
+              : {
+                  backgroundColor: colors.surface,
+                  borderTopWidth: 1,
+                  borderTopColor: colors.goldMuted,
+                  paddingTop: 8,
+                  paddingBottom: bottom > 0 ? bottom : 10,
+                  height: 56 + (bottom > 0 ? bottom : 10),
+                },
+          };
         }}
       />
     </Tab.Navigator>

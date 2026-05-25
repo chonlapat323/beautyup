@@ -106,6 +106,7 @@ function mapProduct(p: ApiProduct): Product {
     isFeatured: p.isFeatured ?? false,
     tag: p.tag ?? undefined,
     sellableStock: p.sellableStock,
+    totalStock: p.stock,
   };
 }
 

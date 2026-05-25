@@ -32,7 +32,7 @@ export function ProductDetailScreen() {
   const shadeName = route.params.shadeName;
   const stock = product.sellableStock ?? 0;
   const isOutOfStock = stock === 0;
-  const isLowStock = stock > 0 && stock <= 20;
+  const isLowStock = stock > 0 && stock <= (product.totalStock ?? stock) * 0.5;
   const images =
     product.images && product.images.length > 0
       ? product.images
@@ -119,9 +119,13 @@ export function ProductDetailScreen() {
             </View>
           ) : isLowStock ? (
             <View style={styles.lowStockBadge}>
-              <Text style={styles.lowStockText}>เหลือ {stock} ชิ้น</Text>
+              <Text style={styles.lowStockText}>ใกล้หมด</Text>
             </View>
-          ) : null}
+          ) : (
+            <View style={styles.inStockBadge}>
+              <Text style={styles.inStockText}>มีสินค้า</Text>
+            </View>
+          )}
 
           <View style={styles.quantityBlock}>
             <Text style={styles.quantityLabel}>จำนวน</Text>
@@ -330,5 +334,17 @@ const styles = StyleSheet.create({
   },
   stepperDisabled: {
     opacity: 0.4,
+  },
+  inStockBadge: {
+    alignSelf: "flex-start" as const,
+    backgroundColor: "#e6f4ed",
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  inStockText: {
+    color: "#2d7a4f",
+    fontSize: 13,
+    fontWeight: "600" as const,
   },
 });

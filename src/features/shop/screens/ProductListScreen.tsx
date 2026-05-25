@@ -121,6 +121,14 @@ export function ProductListScreen() {
                   <Text style={styles.saleBadgeText}>ลดราคา</Text>
                 </View>
               ) : null}
+              {product.sellableStock != null && product.sellableStock > 0 && product.sellableStock <= (product.totalStock ?? product.sellableStock) * 0.5 ? (
+                <>
+                  <View style={styles.lowStockOverlay} />
+                  <View style={styles.lowStockBadge}>
+                    <Text style={styles.lowStockText}>ใกล้หมด</Text>
+                  </View>
+                </>
+              ) : null}
               <Pressable
                 style={styles.favoriteBtn}
                 onPress={(e) => { e.stopPropagation(); toggleFavorite(product.id); }}
@@ -296,5 +304,28 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 12,
     textDecorationLine: "line-through",
+  },
+  lowStockOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(30,30,30,0.22)",
+    borderRadius: radius.md,
+  },
+  lowStockBadge: {
+    position: "absolute",
+    bottom: spacing.sm,
+    left: spacing.sm,
+    backgroundColor: "#3a3a3a",
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
+  lowStockText: {
+    color: "#e0e0e0",
+    fontSize: 10,
+    fontWeight: "700",
   },
 });

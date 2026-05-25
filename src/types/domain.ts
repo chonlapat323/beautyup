@@ -32,6 +32,7 @@ export type Product = {
   isFeatured?: boolean;
   tag?: string;
   sellableStock?: number;
+  totalStock?: number;
 };
 
 export type Banner = {

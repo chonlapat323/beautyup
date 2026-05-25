@@ -473,7 +473,7 @@ export function PaymentScreen() {
           {([
             { key: "card",      label: "บัตรเครดิต / เดบิต", icon: "credit-card-outline" },
             { key: "qr",        label: "พร้อมเพย์ QR",       icon: "qrcode-scan" },
-            { key: "kplus",     label: "KBank K+",            icon: "bank-outline" },
+            { key: "kplus",     label: "ชำระผ่าน K Plus",            icon: "bank-outline" },
             { key: "kcard",     label: "KBank บัตรเครดิต",   icon: "credit-card" },
             { key: "kqr",       label: "KBank QR",            icon: "qrcode" },
             { key: "truemoney", label: "ทรูมันนี่ วอลเล็ท",  icon: "wallet-outline" },
@@ -583,7 +583,7 @@ export function PaymentScreen() {
 
       {method === "kplus" && (
         <View style={styles.qrCard}>
-          <Text style={styles.sectionTitle}>ชำระเงินผ่าน K+</Text>
+          <Text style={styles.sectionTitle}>ชำระผ่าน K Plus</Text>
           {kbankPaymentID ? (
             <View style={styles.pollingRow}>
               <ActivityIndicator size="small" color={colors.primary} />
@@ -690,7 +690,7 @@ export function PaymentScreen() {
           disabled={isKBankLoading || kbankPaymentID !== null}
           style={[styles.button, (isKBankLoading || kbankPaymentID !== null) && styles.buttonDisabled]}
         >
-          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด K+..." : kbankPaymentID ? "รอการยืนยัน..." : "ชำระเงินด้วย K+"}</Text>
+          <Text style={styles.buttonText}>{isKBankLoading ? "กำลังเปิด K Plus..." : kbankPaymentID ? "รอการยืนยัน..." : "ชำระผ่าน K Plus"}</Text>
         </Pressable>
       ) : method === "kcard" ? (
         <Pressable
