@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 import { useAppStore } from "@/store/useAppStore";
 import { colors, fonts, spacing } from "@/theme";
@@ -54,7 +54,15 @@ export function AppHeader({
         <View style={styles.profileGroup}>
           <View style={styles.avatarShell}>
             <View style={styles.avatarWrap}>
-              <Text style={styles.avatarText}>{initials}</Text>
+              {member?.profileImageUrl ? (
+                <Image
+                  source={{ uri: member.profileImageUrl }}
+                  style={{ width: "100%", height: "100%", borderRadius: 999 }}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Text style={styles.avatarText}>{initials}</Text>
+              )}
             </View>
           </View>
 

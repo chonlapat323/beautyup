@@ -229,6 +229,8 @@ type AuthResponse = {
     bankName: string | null;
     bankAccountNumber: string | null;
     bankAccountName: string | null;
+    profileImageUrl?: string | null;
+    bannerImageUrl?: string | null;
   };
 };
 
@@ -635,6 +637,8 @@ export async function mobileGetProfile(token: string): Promise<{
   bankName: string | null;
   bankAccountNumber: string | null;
   bankAccountName: string | null;
+  profileImageUrl?: string | null;
+  bannerImageUrl?: string | null;
 }> {
   const res = await fetch(`${API_BASE}/mobile/profile`, {
     headers: { Authorization: `Bearer ${token}` },
