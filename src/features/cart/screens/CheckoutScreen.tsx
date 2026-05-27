@@ -13,6 +13,10 @@ import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 import { Switch } from "react-native";
 
+function fmtBaht(n: number) {
+  return `฿${n.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export function CheckoutScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const cart = useAppStore((state) => state.cart);
@@ -23,7 +27,7 @@ export function CheckoutScreen() {
   const creditBalance = member?.creditBalance ?? 0;
   const [useCredit, setUseCredit] = useState(false);
   const subtotalWithShipping = summary.subtotal + summary.shippingFee;
-  const creditUsed = useCredit ? Math.min(creditBalance, subtotalWithShipping) : 0;
+  const creditUsed = useCredit ? Math.floor(Math.min(creditBalance, subtotalWithShipping)) : 0;
   const remaining = Math.max(0, subtotalWithShipping - creditUsed);
 
   const [addresses, setAddresses] = useState<MemberAddress[]>([]);
@@ -149,7 +153,7 @@ export function CheckoutScreen() {
             <View style={styles.creditToggleLeft}>
               <Text style={styles.creditToggleTitle}>ใช้เครดิต</Text>
               <Text style={styles.creditToggleSub} numberOfLines={1}>
-                มี ฿{creditBalance.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                มี ฿{creditBalance.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Text>
             </View>
             <Switch
@@ -161,7 +165,7 @@ export function CheckoutScreen() {
           </View>
           {useCredit && (
             <Text style={styles.creditUsedText}>
-              หักออก ฿{creditUsed.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+              หักออก {fmtBaht(creditUsed)}
             </Text>
           )}
         </View>
@@ -169,16 +173,16 @@ export function CheckoutScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>สรุปยอดชำระ</Text>
-        <Row label="ยอดสินค้า" value={`฿${summary.subtotal.toFixed(0)}`} />
+        <Row label="ยอดสินค้า" value={fmtBaht(summary.subtotal)} />
         <Row
           label="ค่าจัดส่ง"
-          value={summary.shippingFee === 0 ? "ฟรี" : `฿${summary.shippingFee.toFixed(0)}`}
+          value={summary.shippingFee === 0 ? "ฟรี" : fmtBaht(summary.shippingFee)}
           free={summary.shippingFee === 0}
         />
         {creditUsed > 0 && (
-          <Row label="หักเครดิต" value={`-฿${creditUsed.toFixed(0)}`} credit />
+          <Row label="หักเครดิต" value={`-${fmtBaht(creditUsed)}`} credit />
         )}
-        <Row label={remaining === 0 ? "ยอดชำระ (เครดิตครอบคลุม)" : "ยอดที่ต้องชำระเพิ่ม"} value={`฿${remaining.toFixed(0)}`} strong />
+        <Row label={remaining === 0 ? "ยอดชำระ (เครดิตครอบคลุม)" : "ยอดที่ต้องชำระเพิ่ม"} value={fmtBaht(remaining)} strong />
       </View>
 
       <Pressable

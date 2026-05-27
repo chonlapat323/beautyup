@@ -2,6 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
+import * as Clipboard from "expo-clipboard";
 import { Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
@@ -28,6 +29,8 @@ export function ProfileScreen() {
       void refreshProfile();
     }, [refreshProfile]),
   );
+
+  const [copied, setCopied] = useState(false);
 
   const [commission, setCommission] = useState<{
     pendingAmount: number;
@@ -89,18 +92,34 @@ export function ProfileScreen() {
         <Text style={styles.identifier}>{member?.email ?? member?.phone ?? ""}</Text>
 
         {member?.referralCode ? (
-          <Pressable
-            style={styles.referralBox}
-            onPress={() =>
-              void Share.share({
-                message: `ใช้รหัสแนะนำของฉัน ${member.referralCode} สมัคร Beauty Up รับสิทธิพิเศษได้เลย`,
-              })
-            }
-          >
+          <View style={styles.referralBox}>
             <Text style={styles.referralLabel}>รหัสแนะนำของคุณ</Text>
             <Text style={styles.referralCode}>{member.referralCode}</Text>
-            <Text style={styles.referralHint}>แตะเพื่อแชร์</Text>
-          </Pressable>
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+              <Pressable
+                style={{ flex: 1, alignItems: 'center', backgroundColor: '#45745a', paddingVertical: 8, borderRadius: 12 }}
+                onPress={() => {
+                  void Clipboard.setStringAsync(member.referralCode ?? '');
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>
+                  {copied ? '✓ คัดลอกแล้ว' : 'คัดลอกรหัส'}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={{ flex: 1, alignItems: 'center', backgroundColor: '#f0f8f3', paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: '#c3dfce' }}
+                onPress={() =>
+                  void Share.share({
+                    message: `ใช้รหัสแนะนำของฉัน ${member.referralCode} สมัคร Beauty Up รับสิทธิพิเศษได้เลย`,
+                  })
+                }
+              >
+                <Text style={{ color: '#45745a', fontSize: 13, fontWeight: '600' }}>แชร์</Text>
+              </Pressable>
+            </View>
+          </View>
         ) : null}
 
         {commission && commission.paidAmount > 0 ? (
@@ -322,10 +341,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     letterSpacing: 2,
-  },
-  referralHint: {
-    color: colors.textMuted,
-    ...typography.caption,
   },
   commissionBox: {
     marginTop: spacing.md,

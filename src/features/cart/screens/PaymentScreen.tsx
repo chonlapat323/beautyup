@@ -18,6 +18,10 @@ import { colors, radius, spacing, typography } from "@/theme";
 
 type PaymentMethod = "card" | "qr" | "kplus" | "kcard" | "kqr" | "truemoney";
 
+function fmtBaht(n: number) {
+  return `฿${n.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export function PaymentScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const route = useRoute<RouteProp<ShopStackParamList, "Payment">>();
@@ -462,8 +466,8 @@ export function PaymentScreen() {
       {creditAmount > 0 && (
         <View style={styles.creditSummaryBox}>
           <Text style={styles.creditSummaryText}>
-            ใช้เครดิต ฿{creditAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-            {isCreditOnly ? " (ครอบคลุมทั้งหมด)" : ` — ชำระเพิ่มอีก ฿${chargeAmount.toFixed(0)}`}
+            ใช้เครดิต {fmtBaht(creditAmount)}
+            {isCreditOnly ? " (ครอบคลุมทั้งหมด)" : ` — ชำระเพิ่มอีก ${fmtBaht(chargeAmount)}`}
           </Text>
         </View>
       )}
@@ -665,7 +669,7 @@ export function PaymentScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>ยอดชำระทั้งหมด</Text>
-        <Text style={styles.summaryAmount}>฿{chargeAmount.toFixed(0)}</Text>
+        <Text style={styles.summaryAmount}>{fmtBaht(chargeAmount)}</Text>
       </View>
 
       {isCreditOnly ? (

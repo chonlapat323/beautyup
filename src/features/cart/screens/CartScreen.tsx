@@ -10,6 +10,10 @@ import type { ShopStackParamList } from "@/navigation/types";
 import { getCartSummary, useAppStore } from "@/store/useAppStore";
 import { colors, radius, spacing, typography } from "@/theme";
 
+function fmtBaht(n: number) {
+  return `฿${n.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export function CartScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const cart = useAppStore((state) => state.cart);
@@ -55,7 +59,7 @@ export function CartScreen() {
                 <CommerceImage style={styles.swatch} uri={product.imageUrl} />
                 <View style={styles.itemCopy}>
                   <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{product.name}</Text>
-                  <Text style={styles.itemPrice}>฿{product.price.toFixed(0)}</Text>
+                  <Text style={styles.itemPrice}>{fmtBaht(product.price)}</Text>
                 </View>
                 <View style={styles.stepper}>
                   <Pressable onPress={() => updateQuantity(item.productId, item.quantity - 1)}>
@@ -75,13 +79,13 @@ export function CartScreen() {
       {cart.length > 0 && (
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>สรุปรายการ</Text>
-          <Row label="ยอดสินค้า" value={`฿${summary.subtotal.toFixed(0)}`} />
+          <Row label="ยอดสินค้า" value={fmtBaht(summary.subtotal)} />
           <Row
             label="ค่าจัดส่ง"
-            value={summary.shippingFee === 0 ? "ฟรี" : `฿${summary.shippingFee.toFixed(0)}`}
+            value={summary.shippingFee === 0 ? "ฟรี" : fmtBaht(summary.shippingFee)}
             free={summary.shippingFee === 0}
           />
-          <Row label="ยอดรวม" strong value={`฿${summary.total.toFixed(0)}`} />
+          <Row label="ยอดรวม" strong value={fmtBaht(summary.total)} />
           {summary.pointsPreview > 0 ? (
             <View style={styles.pointsRow}>
               <Text style={styles.pointsLabel}>แต้มที่จะได้รับ</Text>
