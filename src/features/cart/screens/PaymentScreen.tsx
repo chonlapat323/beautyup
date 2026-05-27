@@ -25,7 +25,7 @@ function fmtBaht(n: number) {
 export function PaymentScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const route = useRoute<RouteProp<ShopStackParamList, "Payment">>();
-  const { shippingName, shippingPhone, shippingAddr } = route.params;
+  const { shippingName, shippingPhone, shippingAddr, note } = route.params;
 
   const cart = useAppStore((state) => state.cart);
   const token = useAppStore((state) => state.token);
@@ -247,6 +247,7 @@ export function PaymentScreen() {
         shippingAddr,
         undefined,
         creditAmount,
+        note,
       );
       clearCart();
       await Promise.all([loadOrders(), refreshProfile()]);
@@ -288,6 +289,7 @@ export function PaymentScreen() {
         shippingAddr,
         omiseToken,
         creditAmount > 0 ? creditAmount : undefined,
+        note,
       );
 
       clearCart();

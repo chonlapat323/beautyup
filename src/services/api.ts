@@ -393,11 +393,12 @@ export async function mobileCheckout(
   shippingAddr: string,
   omiseToken?: string,
   creditAmount?: number,
+  note?: string,
 ): Promise<ApiOrder> {
   const res = await fetch(`${API_BASE}/mobile/checkout`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr, omiseToken, creditAmount }),
+    body: JSON.stringify({ items, shippingName, shippingPhone, shippingAddr, omiseToken, creditAmount, note }),
   });
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { message?: string };

@@ -30,7 +30,7 @@ export type ShopStackParamList = {
   ProductDetail: { productId: string; shadeName?: string };
   Cart: undefined;
   Checkout: undefined;
-  Payment: { shippingName: string; shippingPhone: string; shippingAddr: string; creditAmount?: number };
+  Payment: { shippingName: string; shippingPhone: string; shippingAddr: string; creditAmount?: number; note?: string };
   OrderSuccess: { orderId: string };
 };
 

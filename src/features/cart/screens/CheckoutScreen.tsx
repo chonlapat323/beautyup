@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
@@ -26,6 +26,7 @@ export function CheckoutScreen() {
 
   const creditBalance = member?.creditBalance ?? 0;
   const [useCredit, setUseCredit] = useState(false);
+  const [note, setNote] = useState("");
   const subtotalWithShipping = summary.subtotal + summary.shippingFee;
   const creditUsed = useCredit ? Math.floor(Math.min(creditBalance, subtotalWithShipping)) : 0;
   const remaining = Math.max(0, subtotalWithShipping - creditUsed);
@@ -69,6 +70,7 @@ export function CheckoutScreen() {
       shippingPhone: selected.phone,
       shippingAddr: addrLines,
       creditAmount: creditUsed > 0 ? creditUsed : undefined,
+      note: note.trim() || undefined,
     });
   }
 
@@ -183,6 +185,19 @@ export function CheckoutScreen() {
           <Row label="หักเครดิต" value={`-${fmtBaht(creditUsed)}`} credit />
         )}
         <Row label={remaining === 0 ? "ยอดชำระ (เครดิตครอบคลุม)" : "ยอดที่ต้องชำระเพิ่ม"} value={fmtBaht(remaining)} strong />
+      </View>
+
+      <View style={styles.noteCard}>
+        <Text style={styles.noteLabel}>หมายเหตุ (ถ้ามี)</Text>
+        <TextInput
+          style={styles.noteInput}
+          value={note}
+          onChangeText={setNote}
+          placeholder="เช่น ฝากไว้ที่หน้าบ้าน, ต้องการกล่องของขวัญ..."
+          placeholderTextColor="#9ca3af"
+          multiline
+          numberOfLines={2}
+        />
       </View>
 
       <Pressable
@@ -358,6 +373,32 @@ const styles = StyleSheet.create({
   creditUsedText: { color: colors.primary, ...typography.caption, fontWeight: "600" },
   creditText: { color: colors.primary },
   freeText: { color: "#2f7a4f", fontWeight: "700" as const },
+  noteCard: {
+    backgroundColor: colors.surface ?? '#fff',
+    borderRadius: radius.card ?? 16,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    padding: spacing.md ?? 16,
+    marginBottom: spacing.sm ?? 8,
+    marginHorizontal: spacing["2xl"],
+    marginTop: spacing["2xl"],
+  },
+  noteLabel: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginBottom: 6,
+  },
+  noteInput: {
+    ...typography.body,
+    color: colors.text ?? '#111',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minHeight: 60,
+    textAlignVertical: 'top',
+  },
   button: {
     marginTop: spacing["2xl"],
     marginHorizontal: spacing["2xl"],
