@@ -189,9 +189,10 @@ const styles = StyleSheet.create({
   },
   socialBtn: {
     borderRadius: 99,
-    paddingHorizontal: 10,
+    paddingHorizontal: 14,
     paddingVertical: 10,
     alignItems: "center" as const,
+    alignSelf: "flex-start" as const,
   },
   youtubeBtn: {
     backgroundColor: "#FF0000",
