@@ -492,7 +492,7 @@ export function PaymentScreen() {
               <MaterialCommunityIcons
                 name={icon as React.ComponentProps<typeof MaterialCommunityIcons>["name"]}
                 size={20}
-                color={method === key ? "#fff" : colors.textMuted}
+                color="#C9952A"
                 style={{ marginRight: 10 }}
               />
               <Text style={[styles.methodBtnText, method === key && styles.methodBtnTextActive]}>{label}</Text>
@@ -779,15 +779,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   methodBtnActive: {
-    backgroundColor: "#C9952A",
     borderColor: "#C9952A",
+    borderWidth: 2,
+    backgroundColor: "#FFFBF3",
   },
   methodBtnText: {
     color: colors.textSecondary,
     ...typography.body,
   },
   methodBtnTextActive: {
-    color: "#FFF",
+    color: "#C9952A",
     fontWeight: "600",
   },
   card: {
