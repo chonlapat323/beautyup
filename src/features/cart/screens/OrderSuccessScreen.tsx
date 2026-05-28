@@ -22,6 +22,7 @@ export function OrderSuccessScreen() {
         <AppHeader
           title="สั่งซื้อสำเร็จ"
           subtitle="ระบบได้รับการชำระเงินของคุณเรียบร้อยแล้ว"
+          onBack={() => navigateToHome(navigation)}
           breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },

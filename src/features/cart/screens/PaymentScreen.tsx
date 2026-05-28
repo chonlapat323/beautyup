@@ -456,6 +456,7 @@ export function PaymentScreen() {
         <AppHeader
           title="ชำระเงิน"
           subtitle="เลือกวิธีชำระเงินและยืนยันการสั่งซื้อ"
+          onBack={() => navigation.goBack()}
           breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },

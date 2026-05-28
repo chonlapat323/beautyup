@@ -60,6 +60,7 @@ export function OrderDetailScreen() {
           <AppHeader
             title="รายละเอียดคำสั่งซื้อ"
             subtitle="ไม่พบรายการสั่งซื้อ"
+            onBack={() => navigation.goBack()}
             breadcrumbs={[
               { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
               { label: "ประวัติคำสั่งซื้อ", onPress: () => navigateToOrderHistory(navigation) },
@@ -84,6 +85,7 @@ export function OrderDetailScreen() {
         <AppHeader
           title="รายละเอียดคำสั่งซื้อ"
           subtitle={`สั่งซื้อเมื่อ ${order.placedAt}`}
+          onBack={() => navigation.goBack()}
           breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ประวัติคำสั่งซื้อ", onPress: () => navigateToOrderHistory(navigation) },
