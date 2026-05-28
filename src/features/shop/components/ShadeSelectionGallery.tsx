@@ -90,7 +90,7 @@ export function ShadeSelectionGallery({
                 <Text style={styles.visualBadgeText}>{shade.groupName}</Text>
               </View>
 
-              <CommerceImage resizeMode="cover" style={styles.image} uri={shade.imageUrl} />
+              <CommerceImage contentFit="cover" style={styles.image} uri={shade.imageUrl} />
             </View>
 
             <View style={styles.cardBody}>

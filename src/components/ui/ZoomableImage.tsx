@@ -50,7 +50,7 @@ export function ZoomableImage({ uri, width, height }: Props) {
           simultaneousHandlers={doubleTapRef}
         >
           <Animated.View style={{ width, height, transform: [{ scale }] }}>
-            <CommerceImage uri={uri} style={{ width, height }} resizeMode="contain" />
+            <CommerceImage uri={uri} style={{ width, height }} contentFit="contain" />
           </Animated.View>
         </PinchGestureHandler>
       </Animated.View>

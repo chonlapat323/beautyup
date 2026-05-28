@@ -80,7 +80,7 @@ export function HomeFeaturedSection({
                   <View style={styles.imageShell}>
                     <View style={styles.imageGlow} />
                     <CommerceImage
-                      resizeMode="cover"
+                      contentFit="cover"
                       style={styles.image}
                       uri={product.imageUrl}
                     />

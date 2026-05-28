@@ -84,7 +84,7 @@ export function HomeHeroSliderSection({
           >
             <View style={styles.imageLayer}>
               <CommerceImage
-                resizeMode="cover"
+                contentFit="cover"
                 style={styles.backgroundImage}
                 uri={banner.imageUrl}
               />
