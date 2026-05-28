@@ -58,6 +58,7 @@ export function MyRedemptionsScreen() {
         <AppHeader
           title="ของรางวัลของฉัน"
           subtitle="ติดตามสถานะของรางวัลที่แลก"
+          onBack={() => navigation.goBack()}
           breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },

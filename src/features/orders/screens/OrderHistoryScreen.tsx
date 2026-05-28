@@ -47,6 +47,7 @@ export function OrderHistoryScreen() {
         <AppHeader
           title="ประวัติคำสั่งซื้อ"
           subtitle="ติดตามออเดอร์และสถานะล่าสุดของคุณ"
+          onBack={() => navigation.goBack()}
           breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ประวัติคำสั่งซื้อ" },

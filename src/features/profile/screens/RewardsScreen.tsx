@@ -84,6 +84,7 @@ export function RewardsScreen() {
         <AppHeader
           title="แลกแต้ม"
           subtitle="ใช้แต้มสะสมแลกของรางวัล"
+          onBack={() => navigation.goBack()}
           breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },

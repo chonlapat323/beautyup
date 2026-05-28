@@ -72,6 +72,7 @@ export function AddressesScreen() {
         <AppHeader
           title="ที่อยู่ของฉัน"
           subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า"
+          onBack={() => navigation.goBack()}
           breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "บัญชีของฉัน", onPress: () => navigateToProfileHome(navigation) },

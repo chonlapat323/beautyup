@@ -90,13 +90,15 @@ export function AppHeader({
 
       {hasCopy ? (
         <View style={styles.copyBlock}>
-          {onBack ? (
-            <Pressable onPress={onBack} style={styles.backBtn} hitSlop={8}>
-              <MaterialIcons name="arrow-back" size={20} color={colors.primaryStrong} />
-              <Text style={styles.backText}>ย้อนกลับ</Text>
-            </Pressable>
-          ) : null}
-          {title ? <Text style={styles.title}>{title}</Text> : null}
+          <View style={styles.titleRow}>
+            {title ? <Text style={styles.title}>{title}</Text> : null}
+            {onBack ? (
+              <Pressable onPress={onBack} style={styles.backBtn} hitSlop={8}>
+                <MaterialIcons name="arrow-back" size={16} color={colors.primaryStrong} />
+                <Text style={styles.backText}>ย้อนกลับ</Text>
+              </Pressable>
+            ) : null}
+          </View>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
           {breadcrumbs?.length ? (
             <View style={styles.breadcrumbRow}>
@@ -256,11 +258,17 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     gap: 8,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
   backBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    marginBottom: 4,
+    flexShrink: 0,
   },
   backText: {
     color: colors.primaryStrong,
@@ -273,6 +281,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.extraBold,
     color: "#173022",
     paddingTop: 2,
+    flex: 1,
   },
   subtitle: {
     fontSize: 14,

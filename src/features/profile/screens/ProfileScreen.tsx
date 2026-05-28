@@ -79,6 +79,7 @@ export function ProfileScreen() {
         <AppHeader
           title="บัญชีของฉัน"
           subtitle="จัดการข้อมูลส่วนตัวและติดตามคำสั่งซื้อ"
+          onBack={() => navigation.goBack()}
           breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "บัญชีของฉัน" },
