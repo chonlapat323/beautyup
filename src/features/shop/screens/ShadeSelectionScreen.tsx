@@ -65,8 +65,6 @@ export function ShadeSelectionScreen() {
     setSelectedShade(shade.id);
     navigation.navigate("ProductList", {
       categoryId: route.params.categoryId,
-      shadeId: shade.id,
-      shadeName: shade.name,
     });
   }
 

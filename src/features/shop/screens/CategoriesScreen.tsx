@@ -1,4 +1,3 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -11,7 +10,6 @@ import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, fonts, radius, spacing, typography } from "@/theme";
-import type { Category } from "@/types/domain";
 
 const ACCENTS = [
   { bg: "#FFF0F5", border: "#F5C0D0", text: "#B94A72" },
@@ -28,14 +26,6 @@ export function CategoriesScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const categories = useAppStore((state) => state.categories);
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
-
-  function handlePress(category: Category) {
-    if (category.requiresShadeSelection) {
-      navigation.navigate("ShadeSelection", { categoryId: category.id });
-    } else {
-      navigation.navigate("ProductList", { categoryId: category.id });
-    }
-  }
 
   return (
     <Screen
@@ -65,7 +55,7 @@ export function CategoriesScreen() {
           return (
             <Pressable
               key={category.id}
-              onPress={() => handlePress(category)}
+              onPress={() => navigation.navigate("ProductList", { categoryId: category.id })}
               style={[styles.card, { borderColor: accent.border, backgroundColor: accent.bg }]}
             >
               <View style={[styles.accentBar, { backgroundColor: accent.border }]} />
@@ -73,14 +63,7 @@ export function CategoriesScreen() {
               <View style={styles.copy}>
                 <Text numberOfLines={2} style={[styles.title, { color: accent.text }]}>{category.title}</Text>
 
-                {category.requiresShadeSelection ? (
-                  <View style={styles.shadeCue}>
-                    <MaterialIcons name="palette" size={12} color={accent.text} />
-                    <Text style={[styles.shadeCueText, { color: accent.text }]}>เลือกเฉดสีก่อนช้อป</Text>
-                  </View>
-                ) : (
-                  <Text style={[styles.subtitle, { color: accent.text }]}>พร้อมช้อปได้ทันที</Text>
-                )}
+                <Text style={[styles.subtitle, { color: accent.text }]}>พร้อมช้อปได้ทันที</Text>
               </View>
 
               <View style={styles.previewWrapper}>
@@ -146,15 +129,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.medium,
     opacity: 0.8,
-  },
-  shadeCue: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  shadeCueText: {
-    fontSize: 12,
-    fontFamily: fonts.semiBold,
   },
   previewWrapper: {
     width: 120,

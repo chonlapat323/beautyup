@@ -15,10 +15,10 @@ import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { ProductGridSkeleton } from "@/components/ui/Skeleton";
-import { navigateToCategories, navigateToHome } from "@/navigation/helpers";
+import { navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
-import { colors, radius, spacing, typography } from "@/theme";
+import { colors, fonts, radius, spacing, typography } from "@/theme";
 import type { Product } from "@/types/domain";
 
 type SortKey = "all" | "sale" | "newest";
@@ -45,75 +45,69 @@ export function ProductListScreen() {
   const favoriteIds = useAppStore((state) => state.favoriteIds);
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
 
-  const { categoryId, shadeId, shadeName, bundleId, bundleName } = route.params;
+  const { categoryId, bundleId } = route.params;
   const bundles = useAppStore((state) => state.bundles);
-  const category = categories.find((item) => item.id === categoryId);
 
   const [sort, setSort] = useState<SortKey>("all");
   const [search, setSearch] = useState("");
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(categoryId ?? null);
+  const [selectedBundleId, setSelectedBundleId] = useState<string | null>(bundleId ?? null);
   const [listView, setListView] = useState(false);
-
-  const categoryProducts = useMemo(() => {
-    if (bundleId) {
-      const bundle = bundles.find((b) => b.id === bundleId);
-      if (!bundle) return [];
-      const ids = new Set(bundle.items.map((i) => i.productId));
-      return products.filter((p) => ids.has(p.id));
-    }
-    return products.filter(
-      (item) =>
-        item.categoryId === categoryId &&
-        (shadeId ? item.shadeId === shadeId : true),
-    );
-  }, [products, categoryId, shadeId, bundleId, bundles]);
 
   const brands = useMemo(() => {
     const seen = new Map<string, string>();
-    for (const p of categoryProducts) {
+    for (const p of products) {
       if (p.brandId && p.brandName && !seen.has(p.brandId)) {
         seen.set(p.brandId, p.brandName);
       }
     }
     return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
-  }, [categoryProducts]);
+  }, [products]);
 
   const filteredProducts = useMemo(() => {
-    let result = sortProducts(categoryProducts, sort);
-    if (selectedBrandId) result = result.filter((p) => p.brandId === selectedBrandId);
+    let result = products;
+
+    // Collection filter (bundle)
+    if (selectedBundleId) {
+      const bundle = bundles.find((b) => b.id === selectedBundleId);
+      if (bundle) {
+        const ids = new Set(bundle.items.map((i) => i.productId));
+        result = result.filter((p) => ids.has(p.id));
+      }
+    }
+
+    // Category filter
+    if (selectedCategoryId) {
+      result = result.filter((p) => p.categoryId === selectedCategoryId);
+    }
+
+    // Brand filter
+    if (selectedBrandId) {
+      result = result.filter((p) => p.brandId === selectedBrandId);
+    }
+
+    // Search filter
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       result = result.filter((p) => p.name.toLowerCase().includes(q));
     }
-    return result;
-  }, [categoryProducts, sort, selectedBrandId, search]);
 
-  function toggleBrand(id: string) {
-    setSelectedBrandId((prev) => (prev === id ? null : id));
-  }
+    // Sort
+    return sortProducts(result, sort);
+  }, [products, bundles, selectedCategoryId, selectedBundleId, selectedBrandId, search, sort]);
 
   return (
     <Screen
       contentContainerStyle={styles.content}
       header={
         <AppHeader
-          title={bundleName ?? category?.title ?? "สินค้า"}
-          subtitle={bundleId ? "สินค้าในสูตรพิเศษ" : shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้าที่เหมาะกับคุณ"}
-          breadcrumbs={bundleId ? [
+          title={selectedCategoryId ? (categories.find((c) => c.id === selectedCategoryId)?.title ?? "สินค้า") : "สินค้าทั้งหมด"}
+          subtitle="เลือกสินค้าที่เหมาะกับคุณ"
+          breadcrumbs={[
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "สูตรพิเศษ", onPress: () => navigation.goBack() },
-            { label: bundleName ?? "สินค้า" },
-          ] : [
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
-            shadeName
-              ? {
-                  label: "เลือกเฉดสี",
-                  onPress: () => navigation.navigate("ShadeSelection", { categoryId }),
-                }
-              : null,
             { label: "สินค้า" },
-          ].filter(Boolean) as { label: string; onPress?: () => void }[]}
+          ]}
           onBack={() => navigation.goBack()}
         />
       }
@@ -145,38 +139,80 @@ export function ProductListScreen() {
         </Pressable>
       </View>
 
-      {/* Brand slider */}
-      {brands.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.brandSlider}
-        >
-          {brands.map((brand) => (
+      {/* Category filter */}
+      {categories.length > 0 && (
+        <View style={styles.filterSection}>
+          <Text style={styles.filterLabel}>หมวดหมู่</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
             <Pressable
-              key={brand.id}
-              style={[styles.brandPill, selectedBrandId === brand.id && styles.brandPillActive]}
-              onPress={() => toggleBrand(brand.id)}
+              style={[styles.filterChip, !selectedCategoryId && styles.filterChipActive]}
+              onPress={() => setSelectedCategoryId(null)}
             >
-              <Text
-                style={[styles.brandPillText, selectedBrandId === brand.id && styles.brandPillTextActive]}
-              >
-                {brand.name}
-              </Text>
+              <Text style={[styles.filterChipText, !selectedCategoryId && styles.filterChipTextActive]}>ทั้งหมด</Text>
             </Pressable>
-          ))}
-        </ScrollView>
+            {categories.map((cat) => (
+              <Pressable
+                key={cat.id}
+                style={[styles.filterChip, selectedCategoryId === cat.id && styles.filterChipActive]}
+                onPress={() => setSelectedCategoryId(cat.id)}
+              >
+                <Text style={[styles.filterChipText, selectedCategoryId === cat.id && styles.filterChipTextActive]}>{cat.title}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
       )}
 
-      {/* Sort + shade row */}
+      {/* Brand filter */}
+      {brands.length > 0 && (
+        <View style={styles.filterSection}>
+          <Text style={styles.filterLabel}>แบรนด์</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+            <Pressable
+              style={[styles.filterChip, !selectedBrandId && styles.filterChipActive]}
+              onPress={() => setSelectedBrandId(null)}
+            >
+              <Text style={[styles.filterChipText, !selectedBrandId && styles.filterChipTextActive]}>ทั้งหมด</Text>
+            </Pressable>
+            {brands.map((brand) => (
+              <Pressable
+                key={brand.id}
+                style={[styles.filterChip, selectedBrandId === brand.id && styles.filterChipActive]}
+                onPress={() => setSelectedBrandId(brand.id)}
+              >
+                <Text style={[styles.filterChipText, selectedBrandId === brand.id && styles.filterChipTextActive]}>{brand.name}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      {/* Collection filter */}
+      {bundles.length > 0 && (
+        <View style={styles.filterSection}>
+          <Text style={styles.filterLabel}>คอลเลกชัน</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+            <Pressable
+              style={[styles.filterChip, !selectedBundleId && styles.filterChipActive]}
+              onPress={() => setSelectedBundleId(null)}
+            >
+              <Text style={[styles.filterChipText, !selectedBundleId && styles.filterChipTextActive]}>ทั้งหมด</Text>
+            </Pressable>
+            {bundles.map((bundle) => (
+              <Pressable
+                key={bundle.id}
+                style={[styles.filterChip, selectedBundleId === bundle.id && styles.filterChipActive]}
+                onPress={() => setSelectedBundleId(bundle.id)}
+              >
+                <Text style={[styles.filterChipText, selectedBundleId === bundle.id && styles.filterChipTextActive]}>{bundle.name}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      {/* Sort row */}
       <View style={styles.toolbar}>
-        {shadeName ? (
-          <View style={styles.filterPill}>
-            <Text style={styles.filterText}>{shadeName}</Text>
-          </View>
-        ) : (
-          <View />
-        )}
         <View style={styles.sortTabs}>
           {SORT_TABS.map((tab) => (
             <Pressable
@@ -212,7 +248,7 @@ export function ProductListScreen() {
               key={product.id}
               product={product}
               isFavorite={favoriteIds.includes(product.id)}
-              onPress={() => navigation.navigate("ProductDetail", { productId: product.id, shadeName })}
+              onPress={() => navigation.navigate("ProductDetail", { productId: product.id })}
               onAddToCart={() => addToCart(product.id)}
               onToggleFavorite={() => toggleFavorite(product.id)}
             />
@@ -221,7 +257,7 @@ export function ProductListScreen() {
               key={product.id}
               product={product}
               isFavorite={favoriteIds.includes(product.id)}
-              onPress={() => navigation.navigate("ProductDetail", { productId: product.id, shadeName })}
+              onPress={() => navigation.navigate("ProductDetail", { productId: product.id })}
               onAddToCart={() => addToCart(product.id)}
               onToggleFavorite={() => toggleFavorite(product.id)}
             />
@@ -397,52 +433,48 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  brandSlider: {
+  filterSection: {
     paddingHorizontal: spacing["2xl"],
-    paddingBottom: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  filterLabel: {
+    color: "rgba(255,255,255,0.6)",
+    fontSize: 11,
+    fontFamily: fonts.semiBold,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    marginBottom: spacing.xs,
+  },
+  filterRow: {
     gap: spacing.sm,
   },
-  brandPill: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+  filterChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    backgroundColor: colors.surface,
+    backgroundColor: "rgba(255,255,255,0.1)",
   },
-  brandPillActive: {
+  filterChipActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
-  brandPillText: {
+  filterChipText: {
+    color: "rgba(255,255,255,0.75)",
     fontSize: 12,
-    fontWeight: "500",
-    color: colors.textSecondary,
+    fontFamily: fonts.medium,
   },
-  brandPillTextActive: {
+  filterChipTextActive: {
     color: "#FFFFFF",
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
   },
   toolbar: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     paddingHorizontal: spacing["2xl"],
     marginBottom: spacing.lg,
-    gap: spacing.md,
-  },
-  filterPill: {
-    alignSelf: "flex-start",
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.pill,
-  },
-  filterText: {
-    color: colors.primaryStrong,
-    ...typography.caption,
   },
   sortTabs: {
     flexDirection: "row",

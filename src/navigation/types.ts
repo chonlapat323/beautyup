@@ -26,7 +26,7 @@ export type ShopStackParamList = {
   Search: undefined;
   Categories: undefined;
   ShadeSelection: { categoryId: string };
-  ProductList: { categoryId?: string; shadeId?: string; shadeName?: string; bundleId?: string; bundleName?: string };
+  ProductList: { categoryId?: string; bundleId?: string; bundleName?: string };
   ProductDetail: { productId: string; shadeName?: string };
   Cart: undefined;
   Checkout: undefined;
@@ -42,7 +42,7 @@ export type OrderStackParamList = {
 export type ShopBrowseStackParamList = {
   BrowseHome: undefined;
   ShadeSelection: { categoryId: string };
-  ProductList: { categoryId?: string; shadeId?: string; shadeName?: string; bundleId?: string; bundleName?: string };
+  ProductList: { categoryId?: string; bundleId?: string; bundleName?: string };
   ProductDetail: { productId: string; shadeName?: string };
 };
 
