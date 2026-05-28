@@ -113,15 +113,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.lg,
   },
-  emptyText: { color: colors.textSecondary, ...typography.body },
+  emptyText: { color: "rgba(255,255,255,0.7)", ...typography.body },
   goRedeemBtn: {
     borderRadius: radius.pill,
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.borderStrong,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing["2xl"],
   },
-  goRedeemText: { color: colors.primary, ...typography.body, fontWeight: "600" },
+  goRedeemText: { color: "#FFFFFF", ...typography.body, fontWeight: "600" },
   list: {
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing.lg,

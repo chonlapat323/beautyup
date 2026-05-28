@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing["3xl"],
   },
   placeholder: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.7)",
     textAlign: "center",
     marginTop: spacing["3xl"],
     ...typography.body,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   emptyText: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.6)",
     ...typography.body,
   },
   list: {

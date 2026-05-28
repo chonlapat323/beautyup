@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing["3xl"],
   },
   muted: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.6)",
     ...typography.body,
   },
   list: {

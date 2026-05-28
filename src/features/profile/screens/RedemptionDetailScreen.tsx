@@ -124,7 +124,7 @@ export function RedemptionDetailScreen() {
 const styles = StyleSheet.create({
   loader: { marginTop: spacing["3xl"] },
   empty: { marginTop: spacing["3xl"], alignItems: "center" },
-  emptyText: { color: colors.textSecondary, ...typography.body },
+  emptyText: { color: "rgba(255,255,255,0.7)", ...typography.body },
   content: {
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing.lg,
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   points: { color: colors.primary, ...typography.caption, fontWeight: "600" },
   date: { color: colors.textMuted, ...typography.caption },
   section: { gap: spacing.sm },
-  sectionTitle: { color: colors.textSecondary, ...typography.caption, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.8 },
+  sectionTitle: { color: "rgba(255,255,255,0.6)", ...typography.caption, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.8 },
   statusBadge: {
     alignSelf: "flex-start",
     borderRadius: radius.pill,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   statusText: { fontSize: 14, fontWeight: "700" },
-  statusDate: { color: colors.textMuted, ...typography.caption },
+  statusDate: { color: "rgba(255,255,255,0.55)", ...typography.caption },
   trackingBox: {
     backgroundColor: colors.surfaceMuted,
     borderRadius: radius.md,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     borderColor: colors.borderSoft,
   },
   trackingNumber: { color: colors.textPrimary, fontSize: 16, fontWeight: "700", letterSpacing: 1 },
-  noTracking: { color: colors.textMuted, ...typography.body },
+  noTracking: { color: "rgba(255,255,255,0.6)", ...typography.body },
   addressBox: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,

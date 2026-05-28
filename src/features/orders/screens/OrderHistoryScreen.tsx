@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
     fontSize: 48,
   },
   emptyText: {
-    color: colors.textPrimary,
+    color: "#FFFFFF",
     ...typography.title,
   },
   emptyCaption: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.6)",
     ...typography.caption,
   },
   statusPill: {

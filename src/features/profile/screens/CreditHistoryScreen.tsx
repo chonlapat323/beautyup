@@ -16,8 +16,8 @@ type ListItem =
   | { kind: "wd"; data: WithdrawalRequest };
 
 const TX_CONFIG: Record<string, { label: string; color: string; sign: "+" | "-" }> = {
-  EARN:     { label: "ได้รับ",  color: "#2f7a4f", sign: "+" },
-  USE:      { label: "ใช้งาน", color: "#c84b44", sign: "-" },
+  EARN:     { label: "ได้รับ",  color: "#4ade80", sign: "+" },
+  USE:      { label: "ใช้งาน", color: "#f87171", sign: "-" },
 };
 
 const WD_STATUS: Record<string, { label: string; color: string; bg: string }> = {
@@ -210,11 +210,11 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   cardNote: {
-    color: colors.textPrimary,
+    color: "rgba(255,255,255,0.9)",
     ...typography.caption,
   },
   cardDate: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.55)",
     fontSize: 11,
   },
   cardAmount: {
@@ -234,11 +234,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   bankInfo: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.7)",
     fontSize: 12,
   },
   bankName: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.55)",
     fontSize: 11,
   },
   rejectNote: {
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   },
   empty: {
     textAlign: "center",
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.6)",
     ...typography.body,
     marginTop: spacing["3xl"],
   },

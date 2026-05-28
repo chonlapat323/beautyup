@@ -237,14 +237,14 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   guestTitle: {
-    color: colors.textPrimary,
+    color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "600",
     textAlign: "center",
     marginTop: spacing.md,
   },
   guestSubtitle: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.7)",
     textAlign: "center",
     maxWidth: 280,
     ...typography.body,

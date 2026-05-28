@@ -28,8 +28,10 @@ export function SearchScreen() {
         onPress={() => navigation.navigate("ProductDetail", { productId: item.id })}
       >
         <CommerceImage style={styles.image} uri={item.imageUrl} />
-        <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-        <Text style={styles.price}>฿{item.price.toFixed(0)}</Text>
+        <View style={styles.cardBody}>
+          <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
+          <Text style={styles.price}>฿{item.price.toFixed(0)}</Text>
+        </View>
       </Pressable>
     );
   }
@@ -38,7 +40,7 @@ export function SearchScreen() {
     <Screen scrollable={false}>
       <View style={styles.bar}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={8}>
-          <MaterialIcons name="arrow-back" size={24} color={colors.textPrimary} />
+          <MaterialIcons name="arrow-back" size={24} color="#FFFFFF" />
         </Pressable>
         <View style={styles.inputWrap}>
           <MaterialIcons name="search" size={18} color={colors.textMuted} />
@@ -130,12 +132,19 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     gap: spacing.xs,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    overflow: "hidden",
   },
   image: {
     width: "100%",
     aspectRatio: 0.85,
-    borderRadius: radius.md,
     backgroundColor: colors.surfaceMuted,
+  },
+  cardBody: {
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.sm,
+    gap: spacing.xs,
   },
   name: {
     color: colors.textPrimary,
@@ -156,6 +165,6 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 14,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.65)",
   },
 });
