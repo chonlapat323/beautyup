@@ -45,7 +45,8 @@ export function ProductListScreen() {
   const favoriteIds = useAppStore((state) => state.favoriteIds);
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
 
-  const { categoryId, shadeId, shadeName } = route.params;
+  const { categoryId, shadeId, shadeName, bundleId, bundleName } = route.params;
+  const bundles = useAppStore((state) => state.bundles);
   const category = categories.find((item) => item.id === categoryId);
 
   const [sort, setSort] = useState<SortKey>("all");
@@ -53,15 +54,19 @@ export function ProductListScreen() {
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const [listView, setListView] = useState(false);
 
-  const categoryProducts = useMemo(
-    () =>
-      products.filter(
-        (item) =>
-          item.categoryId === categoryId &&
-          (shadeId ? item.shadeId === shadeId : true),
-      ),
-    [products, categoryId, shadeId],
-  );
+  const categoryProducts = useMemo(() => {
+    if (bundleId) {
+      const bundle = bundles.find((b) => b.id === bundleId);
+      if (!bundle) return [];
+      const ids = new Set(bundle.items.map((i) => i.productId));
+      return products.filter((p) => ids.has(p.id));
+    }
+    return products.filter(
+      (item) =>
+        item.categoryId === categoryId &&
+        (shadeId ? item.shadeId === shadeId : true),
+    );
+  }, [products, categoryId, shadeId, bundleId, bundles]);
 
   const brands = useMemo(() => {
     const seen = new Map<string, string>();
@@ -92,9 +97,13 @@ export function ProductListScreen() {
       contentContainerStyle={styles.content}
       header={
         <AppHeader
-          title={category?.title ?? "สินค้า"}
-          subtitle={shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้าที่เหมาะกับคุณ"}
-          breadcrumbs={[
+          title={bundleName ?? category?.title ?? "สินค้า"}
+          subtitle={bundleId ? "สินค้าในสูตรพิเศษ" : shadeName ? `เฉดสี: ${shadeName}` : "เลือกสินค้าที่เหมาะกับคุณ"}
+          breadcrumbs={bundleId ? [
+            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+            { label: "สูตรพิเศษ", onPress: () => navigation.goBack() },
+            { label: bundleName ?? "สินค้า" },
+          ] : [
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
             shadeName

@@ -112,7 +112,6 @@ export function HomeScreen() {
         <HomeBundleSection
           bundles={bundles}
           horizontalPadding={horizontalPadding}
-          onAddToCart={addToCart}
         />
       ) : null}
 
