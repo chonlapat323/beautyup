@@ -49,6 +49,7 @@ export function RedemptionDetailScreen() {
       header={
         <AppHeader
           title="รายละเอียดของรางวัล"
+          onBack={() => navigation.goBack()}
           breadcrumbs={[
             { label: "บัญชีของฉัน", onPress: () => navigation.navigate("ProfileHome") },
             { label: "ของรางวัลของฉัน", onPress: () => navigation.goBack() },
