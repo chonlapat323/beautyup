@@ -676,7 +676,7 @@ export function PaymentScreen() {
 
       <Pressable
         style={styles.policyLink}
-        onPress={() => void Linking.openURL("https://example.com/payment-policy")}
+        onPress={() => void Linking.openURL("https://www.beautyup-enterprise.com/policy")}
       >
         <Text style={styles.policyLinkText}>นโยบายการชำระเงิน</Text>
       </Pressable>
