@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   emptyText: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.65)",
     ...typography.body,
   },
   grid: {

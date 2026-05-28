@@ -282,13 +282,15 @@ function GridCard({ product, isFavorite, onPress, onAddToCart, onToggleFavorite 
           <MaterialIcons name="add-shopping-cart" size={16} color="#FFFFFF" />
         </Pressable>
       </View>
-      <Text style={styles.meta} numberOfLines={1}>{product.subtitle}</Text>
-      <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
-      <View style={styles.priceRow}>
-        <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
-        {product.originalPrice != null && (
-          <Text style={styles.originalPrice}>฿{product.originalPrice.toFixed(0)}</Text>
-        )}
+      <View style={styles.cardBody}>
+        <Text style={styles.meta} numberOfLines={1}>{product.subtitle}</Text>
+        <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
+          {product.originalPrice != null && (
+            <Text style={styles.originalPrice}>฿{product.originalPrice.toFixed(0)}</Text>
+          )}
+        </View>
       </View>
     </Pressable>
   );
@@ -458,7 +460,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   sortTabText: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.7)",
     fontSize: 12,
     fontWeight: "500",
   },
@@ -471,7 +473,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing["3xl"],
   },
   emptyText: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.6)",
     fontSize: 14,
   },
   grid: {
@@ -487,6 +489,14 @@ const styles = StyleSheet.create({
   card: {
     width: "47%",
     gap: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    overflow: "hidden",
+  },
+  cardBody: {
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.sm,
+    gap: spacing.xs,
   },
   imageWrap: {
     position: "relative",
@@ -494,7 +504,6 @@ const styles = StyleSheet.create({
   preview: {
     width: "100%",
     aspectRatio: 0.85,
-    borderRadius: radius.md,
     backgroundColor: colors.surfaceMuted,
   },
   saleBadge: {

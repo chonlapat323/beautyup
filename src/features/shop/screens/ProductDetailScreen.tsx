@@ -203,11 +203,11 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   price: {
-    color: colors.primaryStrong,
+    color: "#FFFFFF",
     ...typography.headline,
   },
   originalPrice: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.5)",
     fontSize: 16,
     textDecorationLine: "line-through",
   },
@@ -223,12 +223,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   shadeName: {
-    color: colors.primaryStrong,
+    color: "rgba(255,255,255,0.9)",
     ...typography.caption,
     fontWeight: "600",
   },
   description: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.75)",
     ...typography.body,
   },
   quantityBlock: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
   },
   quantityLabel: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.8)",
     ...typography.body,
   },
   stepper: {
@@ -248,6 +248,7 @@ const styles = StyleSheet.create({
     borderColor: colors.borderSoft,
     borderRadius: radius.md,
     overflow: "hidden",
+    backgroundColor: colors.surface,
   },
   stepperBtn: {
     width: 40,
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
   },
   stepperBtnText: {
     fontSize: 20,
-    color: colors.primary,
+    color: colors.primaryStrong,
     fontWeight: "600",
     lineHeight: 24,
   },
