@@ -119,42 +119,37 @@ export function HomeScreen() {
       {(social.youtubeUrl || social.tiktokUrl || social.lineOaUrl) ? (
         <View style={[styles.socialRow, { paddingHorizontal: horizontalPadding }]}>
           {/* Labels row */}
-          <View style={styles.socialLabelRow}>
-            {(social.youtubeUrl || social.tiktokUrl) ? (
-              <Text style={[styles.socialLabel, styles.socialLabelLeft]}>ติดตามเรา</Text>
-            ) : null}
-            {social.lineOaUrl ? (
-              <Text style={[styles.socialLabel, styles.socialLabelRight]}>ติดต่อสอบถาม</Text>
-            ) : null}
+          <View style={styles.socialCols}>
+            <Text style={[styles.socialLabel, styles.colLeft]}>ติดตามเรา</Text>
+            <View style={styles.colMid} />
+            <Text style={[styles.socialLabel, styles.colRight]}>ติดต่อสอบถาม</Text>
           </View>
-          {/* Buttons row */}
-          <View style={styles.socialLabelRow}>
-            <View style={styles.socialButtons}>
-              {social.youtubeUrl ? (
-                <Pressable
-                  style={[styles.socialBtn, styles.youtubeBtn]}
-                  onPress={() => void Linking.openURL(social.youtubeUrl!)}
-                >
-                  <Text numberOfLines={1} style={styles.socialBtnText}>▶ YouTube</Text>
-                </Pressable>
-              ) : null}
-              {social.tiktokUrl ? (
-                <Pressable
-                  style={[styles.socialBtn, styles.tiktokBtn]}
-                  onPress={() => void Linking.openURL(social.tiktokUrl!)}
-                >
-                  <Text numberOfLines={1} style={styles.socialBtnText}>♪ TikTok</Text>
-                </Pressable>
-              ) : null}
-            </View>
+          {/* Buttons row — 3 equal columns */}
+          <View style={styles.socialCols}>
+            {social.youtubeUrl ? (
+              <Pressable
+                style={[styles.socialBtn, styles.youtubeBtn, styles.colLeft]}
+                onPress={() => void Linking.openURL(social.youtubeUrl!)}
+              >
+                <Text numberOfLines={1} style={styles.socialBtnText}>▶ YouTube</Text>
+              </Pressable>
+            ) : <View style={styles.colLeft} />}
+            {social.tiktokUrl ? (
+              <Pressable
+                style={[styles.socialBtn, styles.tiktokBtn, styles.colMid]}
+                onPress={() => void Linking.openURL(social.tiktokUrl!)}
+              >
+                <Text numberOfLines={1} style={styles.socialBtnText}>♪ TikTok</Text>
+              </Pressable>
+            ) : <View style={styles.colMid} />}
             {social.lineOaUrl ? (
               <Pressable
-                style={[styles.socialBtn, styles.lineOaBtn]}
+                style={[styles.socialBtn, styles.lineOaBtn, styles.colRight]}
                 onPress={() => void Linking.openURL(social.lineOaUrl!)}
               >
                 <Text numberOfLines={1} style={styles.socialBtnText}>💬 Line OA</Text>
               </Pressable>
-            ) : null}
+            ) : <View style={styles.colRight} />}
           </View>
         </View>
       ) : null}
@@ -173,22 +168,30 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   socialLabel: {
-    color: colors.textSecondary,
+    color: "#FFFFFF",
     ...typography.caption,
     fontWeight: "600" as const,
     textTransform: "uppercase" as const,
     letterSpacing: 0.8,
   },
-  socialButtons: {
+  socialCols: {
     flexDirection: "row" as const,
-    gap: 10,
+    gap: 8,
+  },
+  colLeft: {
+    flex: 1,
+  },
+  colMid: {
+    flex: 1,
+  },
+  colRight: {
+    flex: 1,
   },
   socialBtn: {
     borderRadius: 99,
-    paddingHorizontal: 18,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     alignItems: "center" as const,
-    flexShrink: 1,
   },
   youtubeBtn: {
     backgroundColor: "#FF0000",
@@ -198,17 +201,6 @@ const styles = StyleSheet.create({
   },
   lineOaBtn: {
     backgroundColor: "#06C755",
-  },
-  socialLabelRow: {
-    flexDirection: "row" as const,
-    justifyContent: "space-between" as const,
-    alignItems: "center" as const,
-  },
-  socialLabelLeft: {
-    flex: 1,
-  },
-  socialLabelRight: {
-    textAlign: "right" as const,
   },
   socialBtnText: {
     color: "#FFFFFF",
