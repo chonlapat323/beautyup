@@ -15,6 +15,7 @@ type AppHeaderProps = {
   subtitle?: string;
   showSearch?: boolean;
   onSearchPress?: () => void;
+  onBack?: () => void;
 };
 
 function getGreeting() {
@@ -30,6 +31,7 @@ export function AppHeader({
   subtitle,
   showSearch = false,
   onSearchPress,
+  onBack,
 }: AppHeaderProps) {
   const { width } = useWindowDimensions();
   const member = useAppStore((state) => state.member);
@@ -88,6 +90,12 @@ export function AppHeader({
 
       {hasCopy ? (
         <View style={styles.copyBlock}>
+          {onBack ? (
+            <Pressable onPress={onBack} style={styles.backBtn} hitSlop={8}>
+              <MaterialIcons name="arrow-back" size={20} color={colors.primaryStrong} />
+              <Text style={styles.backText}>ย้อนกลับ</Text>
+            </Pressable>
+          ) : null}
           {title ? <Text style={styles.title}>{title}</Text> : null}
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
           {breadcrumbs?.length ? (
@@ -247,6 +255,17 @@ const styles = StyleSheet.create({
   copyBlock: {
     paddingTop: spacing.lg,
     gap: 8,
+  },
+  backBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginBottom: 4,
+  },
+  backText: {
+    color: colors.primaryStrong,
+    fontSize: 13,
+    fontFamily: fonts.medium,
   },
   title: {
     fontSize: 28,

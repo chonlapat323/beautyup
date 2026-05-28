@@ -4,6 +4,7 @@ import { Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from 
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { HomeBundleSection } from "@/features/home/components/HomeBundleSection";
 import { HomeFeaturedSection } from "@/features/home/components/HomeFeaturedSection";
 import { HomeHeroSliderSection } from "@/features/home/components/HomeHeroSliderSection";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
@@ -22,6 +23,7 @@ export function HomeScreen() {
   const banners = useAppStore((state) => state.banners);
   const social = useAppStore((state) => state.social);
   const isLoading = useAppStore((state) => state.isLoadingCatalog);
+  const bundles = useAppStore((state) => state.bundles);
   const addToCart = useAppStore((state) => state.addToCart);
   const loadCatalog = useAppStore((state) => state.loadCatalog);
 
@@ -106,7 +108,15 @@ export function HomeScreen() {
         />
       ) : null}
 
-      {(social.youtubeUrl || social.tiktokUrl) ? (
+      {bundles.length > 0 ? (
+        <HomeBundleSection
+          bundles={bundles}
+          horizontalPadding={horizontalPadding}
+          onAddToCart={addToCart}
+        />
+      ) : null}
+
+      {(social.youtubeUrl || social.tiktokUrl || social.lineOaUrl) ? (
         <View style={[styles.socialRow, { paddingHorizontal: horizontalPadding }]}>
           <Text style={styles.socialLabel}>ติดตามเรา</Text>
           <View style={styles.socialButtons}>
@@ -124,6 +134,14 @@ export function HomeScreen() {
                 onPress={() => void Linking.openURL(social.tiktokUrl!)}
               >
                 <Text numberOfLines={1} style={styles.socialBtnText}>♪ TikTok</Text>
+              </Pressable>
+            ) : null}
+            {social.lineOaUrl ? (
+              <Pressable
+                style={[styles.socialBtn, styles.lineOaBtn]}
+                onPress={() => void Linking.openURL(social.lineOaUrl!)}
+              >
+                <Text numberOfLines={1} style={styles.socialBtnText}>💬 Line OA</Text>
               </Pressable>
             ) : null}
           </View>
@@ -166,6 +184,9 @@ const styles = StyleSheet.create({
   },
   tiktokBtn: {
     backgroundColor: "#010101",
+  },
+  lineOaBtn: {
+    backgroundColor: "#06C755",
   },
   socialBtnText: {
     color: "#FFFFFF",

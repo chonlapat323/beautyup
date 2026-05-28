@@ -20,7 +20,12 @@ export function CartScreen() {
   const products = useAppStore((state) => state.products);
   const updateQuantity = useAppStore((state) => state.updateQuantity);
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const pointTiers = useAppStore((state) => state.pointTiers);
   const summary = getCartSummary(cart);
+
+  const nextTier = [...pointTiers]
+    .sort((a, b) => a.minSpend - b.minSpend)
+    .find((t) => summary.subtotal < t.minSpend);
 
   function handleCheckout() {
     if (!isAuthenticated) {
@@ -41,6 +46,7 @@ export function CartScreen() {
             { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
             { label: "ตะกร้าสินค้า" },
           ]}
+          onBack={() => navigateToHome(navigation)}
         />
       }
     >
@@ -90,6 +96,13 @@ export function CartScreen() {
             <View style={styles.pointsRow}>
               <Text style={styles.pointsLabel}>แต้มที่จะได้รับ</Text>
               <Text style={styles.pointsValue}>+{summary.pointsPreview} แต้ม</Text>
+            </View>
+          ) : null}
+          {nextTier ? (
+            <View style={styles.upsellRow}>
+              <Text style={styles.upsellText}>
+                ซื้ออีก ฿{(nextTier.minSpend - summary.subtotal).toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} รับ {nextTier.points} แต้ม
+              </Text>
             </View>
           ) : null}
         </View>
@@ -231,6 +244,17 @@ const styles = StyleSheet.create({
     color: colors.primary,
     ...typography.caption,
     fontWeight: "600",
+  },
+  upsellRow: {
+    marginTop: 6,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderSoft,
+  },
+  upsellText: {
+    color: "#C9952A",
+    ...typography.caption,
+    textAlign: "center",
   },
   button: {
     marginTop: spacing["2xl"],

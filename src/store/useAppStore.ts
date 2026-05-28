@@ -3,9 +3,9 @@ import { persist } from "zustand/middleware";
 
 import { storage } from "./storage";
 
-import { fetchBanners, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders, mobileGetProfile } from "@/services/api";
+import { fetchBanners, fetchBundles, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders, mobileGetProfile } from "@/services/api";
 import type { MobileConfig, PointTier } from "@/services/api";
-import type { Banner, CartItem, Category, Order, Product } from "@/types/domain";
+import type { Banner, Bundle, CartItem, Category, Order, Product } from "@/types/domain";
 
 type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; creditBalance: number; referralCode: string | null; bankName: string | null; bankAccountNumber: string | null; bankAccountName: string | null; profileImageUrl?: string | null };
 
@@ -19,11 +19,12 @@ type AppStore = {
   categories: Category[];
   products: Product[];
   banners: Banner[];
+  bundles: Bundle[];
   gatewayFee: number;
   pointTiers: PointTier[];
   freeShippingThreshold: number;
   defaultShippingFee: number;
-  social: { youtubeUrl?: string; tiktokUrl?: string };
+  social: { youtubeUrl?: string; tiktokUrl?: string; lineOaUrl?: string };
   isLoadingCatalog: boolean;
   isLoadingOrders: boolean;
   catalogError: boolean;
@@ -53,6 +54,7 @@ export const useAppStore = create<AppStore>()(
       categories: [],
       products: [],
       banners: [],
+      bundles: [],
       gatewayFee: 20,
       pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }],
       freeShippingThreshold: 1000,
@@ -85,12 +87,13 @@ export const useAppStore = create<AppStore>()(
         set({ isLoadingCatalog: true, catalogError: false });
         try {
           const defaultConfig: MobileConfig = { gatewayFee: 20, pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }], freeShippingThreshold: 1000, defaultShippingFee: 50, social: {} };
-          const [{ categories, products }, banners, config] = await Promise.all([
+          const [{ categories, products }, banners, bundles, config] = await Promise.all([
             loadCatalogFromApi(),
             fetchBanners().catch(() => [] as Banner[]),
+            fetchBundles().catch(() => [] as Bundle[]),
             fetchMobileConfig().catch(() => defaultConfig),
           ]);
-          set({ categories, products, banners, gatewayFee: config.gatewayFee, pointTiers: config.pointTiers ?? defaultConfig.pointTiers, freeShippingThreshold: config.freeShippingThreshold ?? 1000, defaultShippingFee: config.defaultShippingFee ?? 50, social: config.social ?? {}, catalogError: false });
+          set({ categories, products, banners, bundles, gatewayFee: config.gatewayFee, pointTiers: config.pointTiers ?? defaultConfig.pointTiers, freeShippingThreshold: config.freeShippingThreshold ?? 1000, defaultShippingFee: config.defaultShippingFee ?? 50, social: config.social ?? {}, catalogError: false });
         } catch {
           set({ catalogError: true });
         } finally {

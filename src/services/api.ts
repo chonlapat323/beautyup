@@ -1,4 +1,4 @@
-import type { Banner, Category, Product, Shade } from "@/types/domain";
+import type { Banner, Bundle, Category, Product, Shade } from "@/types/domain";
 
 const API_BASE =
   (process.env.EXPO_PUBLIC_API_URL as string | undefined) ?? "http://localhost:3000/api";
@@ -28,6 +28,7 @@ type ApiProduct = {
   tag?: string | null;
   categoryId: string;
   shadeId?: string | null;
+  brand?: { id: string; name: string } | null;
   images?: { id: string; url: string; sortOrder: number }[];
 };
 
@@ -95,6 +96,8 @@ function mapProduct(p: ApiProduct): Product {
     id: p.id,
     categoryId: p.categoryId,
     shadeId: p.shadeId ?? undefined,
+    brandId: p.brand?.id ?? undefined,
+    brandName: p.brand?.name ?? undefined,
     name: p.name,
     subtitle: p.description?.split(".")[0]?.trim() ?? "",
     price: specialPrice ?? basePrice,
@@ -193,6 +196,62 @@ export async function loadCatalogFromApi(): Promise<{
   return { categories, products };
 }
 
+// ─── Bundles ──────────────────────────────────────────────────────────────────
+
+type ApiBundle = {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: string;
+  imageUrl?: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  items: {
+    id: string;
+    productId: string;
+    quantity: number;
+    product: {
+      id: string;
+      name: string;
+      sku: string;
+      price: string;
+      specialPrice: string | null;
+      images: { url: string }[];
+    };
+  }[];
+};
+
+function mapBundle(b: ApiBundle): Bundle {
+  return {
+    id: b.id,
+    name: b.name,
+    description: b.description ?? undefined,
+    price: parseFloat(b.price) || 0,
+    imageUrl: b.imageUrl ?? undefined,
+    items: b.items.map((item) => ({
+      productId: item.product.id,
+      quantity: item.quantity,
+      product: {
+        id: item.product.id,
+        name: item.product.name,
+        price: item.product.specialPrice
+          ? parseFloat(item.product.specialPrice)
+          : parseFloat(item.product.price) || 0,
+        imageUrl: item.product.images?.[0]?.url ?? undefined,
+      },
+    })),
+  };
+}
+
+export async function fetchBundles(): Promise<Bundle[]> {
+  const res = await fetch(`${API_BASE}/bundles?active=true`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`Bundles fetch failed: ${res.status}`);
+  const data = (await res.json()) as ApiBundle[];
+  return data.map(mapBundle);
+}
+
 // ─── Mobile config ────────────────────────────────────────────────────────────
 
 export type PointTier = { minSpend: number; points: number };
@@ -202,7 +261,7 @@ export type MobileConfig = {
   pointTiers: PointTier[];
   freeShippingThreshold: number;
   defaultShippingFee: number;
-  social?: { youtubeUrl?: string; tiktokUrl?: string };
+  social?: { youtubeUrl?: string; tiktokUrl?: string; lineOaUrl?: string };
 };
 
 export async function fetchMobileConfig(): Promise<MobileConfig> {

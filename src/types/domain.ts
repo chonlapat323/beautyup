@@ -21,6 +21,8 @@ export type Product = {
   id: string;
   categoryId: string;
   shadeId?: string;
+  brandId?: string;
+  brandName?: string;
   name: string;
   subtitle: string;
   price: number;
@@ -47,6 +49,28 @@ export type Banner = {
   linkId?: string;
   sortOrder: number;
   isActive: boolean;
+};
+
+export type BundleProduct = {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl?: string;
+};
+
+export type BundleItem = {
+  productId: string;
+  quantity: number;
+  product: BundleProduct;
+};
+
+export type Bundle = {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  imageUrl?: string;
+  items: BundleItem[];
 };
 
 export type CartItem = {

@@ -674,6 +674,13 @@ export function PaymentScreen() {
         <Text style={styles.summaryAmount}>{fmtBaht(chargeAmount)}</Text>
       </View>
 
+      <Pressable
+        style={styles.policyLink}
+        onPress={() => void Linking.openURL("https://example.com/payment-policy")}
+      >
+        <Text style={styles.policyLinkText}>นโยบายการชำระเงิน</Text>
+      </Pressable>
+
       {isCreditOnly ? (
         <Pressable
           onPress={() => void handleCreditOnlyPay()}
@@ -772,8 +779,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   methodBtnActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: "#C9952A",
+    borderColor: "#C9952A",
   },
   methodBtnText: {
     color: colors.textSecondary,
@@ -865,6 +872,16 @@ const styles = StyleSheet.create({
   summaryAmount: {
     color: colors.primaryStrong,
     ...typography.title,
+  },
+  policyLink: {
+    alignItems: "center",
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  policyLinkText: {
+    color: colors.textMuted,
+    fontSize: 12,
+    textDecorationLine: "underline",
   },
   button: {
     marginTop: spacing["2xl"],
