@@ -94,8 +94,8 @@ export function AppHeader({
             {title ? <Text style={styles.title}>{title}</Text> : null}
             {onBack ? (
               <Pressable onPress={onBack} style={styles.backBtn} hitSlop={8}>
-                <MaterialIcons name="arrow-back" size={14} color={colors.goldDeep} />
-                <Text style={styles.backText}>ย้อนกลับ</Text>
+                <MaterialIcons name="arrow-back" size={12} color={colors.goldDeep} />
+                <Text style={[styles.breadcrumbText, styles.breadcrumbLink]}>ย้อนกลับ</Text>
               </Pressable>
             ) : null}
           </View>
@@ -269,12 +269,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     flexShrink: 0,
-  },
-  backText: {
-    color: colors.goldDeep,
-    fontSize: 12,
-    lineHeight: 16,
-    fontFamily: fonts.medium,
   },
   title: {
     fontSize: 28,
