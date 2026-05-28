@@ -143,7 +143,7 @@ export function HomeScreen() {
           ) : null}
           {social.lineOaUrl ? (
             <View style={styles.lineOaRow}>
-              <Text style={styles.socialLabel}>ติดต่อสอบถาม</Text>
+              <Text style={styles.lineOaLabel}>ติดต่อสอบถาม</Text>
               <Pressable
                 style={[styles.socialBtn, styles.lineOaBtn]}
                 onPress={() => void Linking.openURL(social.lineOaUrl!)}
@@ -199,6 +199,11 @@ const styles = StyleSheet.create({
     flexDirection: "row" as const,
     alignItems: "center" as const,
     justifyContent: "space-between" as const,
+  },
+  lineOaLabel: {
+    color: colors.textPrimary,
+    ...typography.body,
+    fontWeight: "600" as const,
   },
   socialBtnText: {
     color: "#FFFFFF",
