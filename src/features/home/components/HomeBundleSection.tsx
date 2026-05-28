@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import type { ShopStackParamList } from "@/navigation/types";
-import { colors, radius, spacing, typography } from "@/theme";
+import { colors, fonts, radius, spacing, typography } from "@/theme";
 import type { Bundle } from "@/types/domain";
 
 type Props = {
@@ -62,11 +62,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: "#FFFFFF",
     fontSize: 18,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
   },
   sectionSub: {
     color: "rgba(255,255,255,0.7)",
-    ...typography.caption,
+    fontSize: 12,
+    fontFamily: fonts.medium,
     marginTop: 2,
   },
   scroll: {
@@ -93,11 +94,12 @@ const styles = StyleSheet.create({
   cardName: {
     color: colors.textPrimary,
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     minHeight: 36,
   },
   cardMeta: {
     color: colors.textMuted,
     fontSize: 11,
+    fontFamily: fonts.medium,
   },
 });
