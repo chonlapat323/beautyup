@@ -269,12 +269,12 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: radius.pill,
     borderWidth: 1.5,
-    borderColor: colors.primary,
+    borderColor: colors.borderStrong,
     alignItems: "center",
     justifyContent: "center",
   },
   outlineButtonText: {
-    color: colors.primary,
+    color: "#FFFFFF",
     ...typography.title,
   },
   card: {
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   menuButtonText: {
-    color: colors.textPrimary,
+    color: "#FFFFFF",
     ...typography.title,
   },
   signOutButton: {
