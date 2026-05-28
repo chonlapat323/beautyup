@@ -60,12 +60,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   sectionTitle: {
-    color: colors.textPrimary,
+    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "700",
   },
   sectionSub: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.7)",
     ...typography.caption,
     marginTop: 2,
   },
