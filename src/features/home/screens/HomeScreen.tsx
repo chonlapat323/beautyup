@@ -118,40 +118,44 @@ export function HomeScreen() {
 
       {(social.youtubeUrl || social.tiktokUrl || social.lineOaUrl) ? (
         <View style={[styles.socialRow, { paddingHorizontal: horizontalPadding }]}>
-          {(social.youtubeUrl || social.tiktokUrl) ? (
-            <>
-              <Text style={styles.socialLabel}>ติดตามเรา</Text>
-              <View style={styles.socialButtons}>
-                {social.youtubeUrl ? (
-                  <Pressable
-                    style={[styles.socialBtn, styles.youtubeBtn]}
-                    onPress={() => void Linking.openURL(social.youtubeUrl!)}
-                  >
-                    <Text numberOfLines={1} style={styles.socialBtnText}>▶ YouTube</Text>
-                  </Pressable>
-                ) : null}
-                {social.tiktokUrl ? (
-                  <Pressable
-                    style={[styles.socialBtn, styles.tiktokBtn]}
-                    onPress={() => void Linking.openURL(social.tiktokUrl!)}
-                  >
-                    <Text numberOfLines={1} style={styles.socialBtnText}>♪ TikTok</Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            </>
-          ) : null}
-          {social.lineOaUrl ? (
-            <View style={styles.lineOaRow}>
-              <Text style={styles.lineOaLabel}>ติดต่อสอบถาม</Text>
+          {/* Labels row */}
+          <View style={styles.socialLabelRow}>
+            {(social.youtubeUrl || social.tiktokUrl) ? (
+              <Text style={[styles.socialLabel, styles.socialLabelLeft]}>ติดตามเรา</Text>
+            ) : null}
+            {social.lineOaUrl ? (
+              <Text style={[styles.socialLabel, styles.socialLabelRight]}>ติดต่อสอบถาม</Text>
+            ) : null}
+          </View>
+          {/* Buttons row */}
+          <View style={styles.socialLabelRow}>
+            <View style={styles.socialButtons}>
+              {social.youtubeUrl ? (
+                <Pressable
+                  style={[styles.socialBtn, styles.youtubeBtn]}
+                  onPress={() => void Linking.openURL(social.youtubeUrl!)}
+                >
+                  <Text numberOfLines={1} style={styles.socialBtnText}>▶ YouTube</Text>
+                </Pressable>
+              ) : null}
+              {social.tiktokUrl ? (
+                <Pressable
+                  style={[styles.socialBtn, styles.tiktokBtn]}
+                  onPress={() => void Linking.openURL(social.tiktokUrl!)}
+                >
+                  <Text numberOfLines={1} style={styles.socialBtnText}>♪ TikTok</Text>
+                </Pressable>
+              ) : null}
+            </View>
+            {social.lineOaUrl ? (
               <Pressable
                 style={[styles.socialBtn, styles.lineOaBtn]}
                 onPress={() => void Linking.openURL(social.lineOaUrl!)}
               >
                 <Text numberOfLines={1} style={styles.socialBtnText}>💬 Line OA</Text>
               </Pressable>
-            </View>
-          ) : null}
+            ) : null}
+          </View>
         </View>
       ) : null}
     </Screen>
@@ -195,15 +199,16 @@ const styles = StyleSheet.create({
   lineOaBtn: {
     backgroundColor: "#06C755",
   },
-  lineOaRow: {
+  socialLabelRow: {
     flexDirection: "row" as const,
-    alignItems: "center" as const,
     justifyContent: "space-between" as const,
+    alignItems: "center" as const,
   },
-  lineOaLabel: {
-    color: colors.textPrimary,
-    ...typography.body,
-    fontWeight: "600" as const,
+  socialLabelLeft: {
+    flex: 1,
+  },
+  socialLabelRight: {
+    textAlign: "right" as const,
   },
   socialBtnText: {
     color: "#FFFFFF",
