@@ -54,7 +54,6 @@ export type Banner = {
 export type BundleProduct = {
   id: string;
   name: string;
-  price: number;
   imageUrl?: string;
 };
 
@@ -68,7 +67,6 @@ export type Bundle = {
   id: string;
   name: string;
   description?: string;
-  price: number;
   imageUrl?: string;
   items: BundleItem[];
 };

@@ -202,7 +202,6 @@ type ApiBundle = {
   id: string;
   name: string;
   description?: string | null;
-  price: string;
   imageUrl?: string | null;
   isActive: boolean;
   sortOrder: number;
@@ -214,8 +213,6 @@ type ApiBundle = {
       id: string;
       name: string;
       sku: string;
-      price: string;
-      specialPrice: string | null;
       images: { url: string }[];
     };
   }[];
@@ -226,7 +223,6 @@ function mapBundle(b: ApiBundle): Bundle {
     id: b.id,
     name: b.name,
     description: b.description ?? undefined,
-    price: parseFloat(b.price) || 0,
     imageUrl: b.imageUrl ?? undefined,
     items: b.items.map((item) => ({
       productId: item.product.id,
@@ -234,9 +230,6 @@ function mapBundle(b: ApiBundle): Bundle {
       product: {
         id: item.product.id,
         name: item.product.name,
-        price: item.product.specialPrice
-          ? parseFloat(item.product.specialPrice)
-          : parseFloat(item.product.price) || 0,
         imageUrl: item.product.images?.[0]?.url ?? undefined,
       },
     })),
