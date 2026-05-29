@@ -230,11 +230,11 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   sectionTitle: {
-    color: colors.textPrimary,
+    color: "#FFFFFF",
     ...typography.title,
   },
   hint: {
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.65)",
     ...typography.caption,
   },
   noAddressBox: {
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   noAddressText: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.7)",
     ...typography.body,
   },
   addressList: {
