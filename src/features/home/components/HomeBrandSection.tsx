@@ -15,23 +15,27 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
 
   if (brands.length === 0) return null;
 
-  const cardWidth = width - horizontalPadding * 2 - spacing["2xl"];
+  // Same as banner: card fills full width within horizontal padding
+  const cardWidth = width - horizontalPadding * 2;
+  const cardHeight = Math.round(cardWidth * 0.52);
 
   return (
-    <View style={[styles.wrapper, { paddingHorizontal: horizontalPadding }]}>
+    <View style={{ marginHorizontal: horizontalPadding, marginTop: spacing["2xl"] }}>
       <Text style={styles.sectionTitle}>แบรนด์</Text>
       <ScrollView
         horizontal
+        pagingEnabled
         showsHorizontalScrollIndicator={false}
-        decelerationRate="fast"
-        snapToInterval={cardWidth + spacing.sm}
-        snapToAlignment="start"
-        contentContainerStyle={styles.scroll}
+        style={{ marginTop: spacing.sm }}
       >
         {brands.map((brand) => (
           <Pressable
             key={brand.id}
-            style={({ pressed }) => [styles.card, { width: cardWidth }, pressed && { opacity: 0.88 }]}
+            style={({ pressed }) => [
+              styles.card,
+              { width: cardWidth, height: cardHeight },
+              pressed && { opacity: 0.88 },
+            ]}
             onPress={() => onSelectBrand(brand.id, brand.name)}
           >
             {brand.imageUrl ? (
@@ -39,7 +43,6 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
             ) : (
               <View style={styles.imagePlaceholder} />
             )}
-            {/* Text label — bg only behind text, bottom-left */}
             <View style={styles.labelWrap}>
               <Text style={styles.brandName} numberOfLines={1}>{brand.name}</Text>
             </View>
@@ -51,30 +54,16 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    marginTop: spacing["2xl"],
-    gap: spacing.sm,
-  },
   sectionTitle: {
     color: "#FFFFFF",
     fontSize: 18,
     fontFamily: fonts.bold,
     letterSpacing: 0.2,
   },
-  scroll: {
-    gap: spacing.sm,
-    paddingRight: spacing.sm,
-  },
   card: {
-    height: 160,
-    borderRadius: radius.xl,
     overflow: "hidden",
+    borderRadius: radius.xl,
     backgroundColor: colors.surfaceMuted,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
   },
   image: {
     position: "absolute",
