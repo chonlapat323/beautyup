@@ -805,13 +805,20 @@ export async function mobileGetMyRedemption(token: string, id: string): Promise<
 }
 
 export async function mobileUploadProfileImage(token: string, imageUri: string): Promise<{ profileImageUrl: string }> {
-  const formData = new FormData();
   const filename = imageUri.split("/").pop() ?? "profile.jpg";
-  const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
-  const mimeType = ext === "png" ? "image/png" : "image/jpeg";
-  formData.append("image", { uri: imageUri, name: filename, type: mimeType } as unknown as Blob);
+  const ext = (filename.split(".").pop() ?? "jpg").toLowerCase();
+  const mimeType = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
+
+  // React Native FormData — must NOT set Content-Type manually
+  const formData = new FormData();
+  formData.append("image", {
+    uri: imageUri,
+    name: filename,
+    type: mimeType,
+  } as unknown as File);
+
   const res = await fetch(`${API_BASE}/mobile/me/profile-image`, {
-    method: "PATCH",
+    method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
