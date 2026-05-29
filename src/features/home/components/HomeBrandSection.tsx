@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { useAppStore } from "@/store/useAppStore";
@@ -11,8 +11,11 @@ type Props = {
 
 export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
   const brands = useAppStore((state) => state.brands);
+  const { width } = useWindowDimensions();
 
   if (brands.length === 0) return null;
+
+  const cardWidth = width - horizontalPadding * 2 - spacing.lg;
 
   return (
     <View style={[styles.wrapper, { paddingHorizontal: horizontalPadding }]}>
@@ -20,31 +23,25 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        decelerationRate="fast"
+        snapToInterval={cardWidth + spacing.md}
+        snapToAlignment="start"
         contentContainerStyle={styles.scroll}
       >
         {brands.map((brand) => (
           <Pressable
             key={brand.id}
-            style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+            style={({ pressed }) => [styles.slide, { width: cardWidth }, pressed && { opacity: 0.85 }]}
             onPress={() => onSelectBrand(brand.id, brand.name)}
           >
-            {brand.imageUrl ? (
-              <CommerceImage
-                style={styles.image}
-                uri={brand.imageUrl}
-                contentFit="cover"
-              />
-            ) : (
-              <View style={styles.imagePlaceholder} />
-            )}
-            {/* Gradient overlay */}
-            <View style={styles.overlay} />
-            {/* Brand name bottom-left */}
-            <View style={styles.labelWrap}>
-              <Text style={styles.brandName} numberOfLines={2}>
-                {brand.name}
-              </Text>
+            <View style={styles.imageWrap}>
+              {brand.imageUrl ? (
+                <CommerceImage style={styles.image} uri={brand.imageUrl} contentFit="cover" />
+              ) : (
+                <View style={styles.imagePlaceholder} />
+              )}
             </View>
+            <Text style={styles.brandName} numberOfLines={1}>{brand.name}</Text>
           </Pressable>
         ))}
       </ScrollView>
@@ -55,7 +52,7 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
 const styles = StyleSheet.create({
   wrapper: {
     marginTop: spacing["2xl"],
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   sectionTitle: {
     color: "#FFFFFF",
@@ -67,20 +64,19 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingRight: spacing.sm,
   },
-  card: {
-    width: 160,
-    height: 100,
-    borderRadius: radius.lg,
+  slide: {
+    gap: spacing.sm,
+  },
+  imageWrap: {
+    height: 160,
+    borderRadius: radius.xl,
     overflow: "hidden",
     backgroundColor: colors.surfaceMuted,
     shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
-  cardPressed: {
-    opacity: 0.85,
+    elevation: 5,
   },
   image: {
     position: "absolute",
@@ -90,42 +86,12 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   imagePlaceholder: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     backgroundColor: colors.surface,
-  },
-  overlay: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 56,
-    backgroundColor: "transparent",
-    // gradient-like fade using multiple layers
-    borderBottomLeftRadius: radius.lg,
-    borderBottomRightRadius: radius.lg,
-    // dark scrim at bottom for text readability
-    opacity: 1,
-    backgroundImage: undefined,
-  },
-  labelWrap: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.sm,
-    paddingBottom: spacing.sm,
-    paddingTop: spacing.lg,
-    // dark gradient for readability
-    backgroundColor: "rgba(0,0,0,0.45)",
   },
   brandName: {
     color: "#FFFFFF",
-    fontSize: 13,
+    fontSize: 16,
     fontFamily: fonts.bold,
-    lineHeight: 17,
   },
 });

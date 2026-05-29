@@ -85,19 +85,19 @@ function BrandSlide({
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
-        styles.brandCard,
+        styles.brandSlide,
         { width: cardWidth },
         pressed && { opacity: 0.82 },
       ]}
     >
-      {imageUrl ? (
-        <CommerceImage style={styles.brandImage} uri={imageUrl} contentFit="cover" />
-      ) : (
-        <View style={styles.brandImagePlaceholder} />
-      )}
-      <View style={styles.brandOverlay}>
-        <Text style={styles.brandName} numberOfLines={2}>{name}</Text>
+      <View style={styles.brandImageWrap}>
+        {imageUrl ? (
+          <CommerceImage style={styles.brandImage} uri={imageUrl} contentFit="cover" />
+        ) : (
+          <View style={styles.brandImagePlaceholder} />
+        )}
       </View>
+      <Text style={styles.brandName} numberOfLines={1}>{name}</Text>
     </Pressable>
   );
 }
@@ -262,12 +262,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.semiBold,
   },
-  // Brand grid
+  // Brand slides
   brandGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
+    paddingBottom: spacing["2xl"],
   },
-  brandCard: {
+  brandSlide: {
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  brandImageWrap: {
     height: 120,
     borderRadius: radius.lg,
     overflow: "hidden",
@@ -277,7 +282,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
-    marginBottom: spacing.md,
   },
   brandImage: {
     position: "absolute",
@@ -287,28 +291,13 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   brandImagePlaceholder: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     backgroundColor: colors.surface,
-  },
-  brandOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.sm,
-    paddingBottom: spacing.sm,
-    paddingTop: spacing.lg,
-    backgroundColor: "rgba(0,0,0,0.45)",
   },
   brandName: {
     color: "#FFFFFF",
     fontSize: 14,
     fontFamily: fonts.bold,
-    lineHeight: 18,
   },
   // Category list
   list: {
