@@ -56,52 +56,65 @@ export function ProductListScreen() {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(initialCollectionId ?? null);
   const [listView, setListView] = useState(false);
 
-  const brands = useMemo(() => {
+  // Base product set (after bundle filter)
+  const baseProducts = useMemo(() => {
+    if (!bundleId) return products;
+    const bundle = bundles.find((b) => b.id === bundleId);
+    if (!bundle) return products;
+    const ids = new Set(bundle.items.map((i) => i.productId));
+    return products.filter((p) => ids.has(p.id));
+  }, [products, bundles, bundleId]);
+
+  // Brand chips — derived from base products
+  const availableBrands = useMemo(() => {
     const seen = new Map<string, string>();
-    for (const p of products) {
+    for (const p of baseProducts) {
       if (p.brandId && p.brandName && !seen.has(p.brandId)) {
         seen.set(p.brandId, p.brandName);
       }
     }
     return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
-  }, [products]);
+  }, [baseProducts]);
+
+  // Category chips — only categories that have products for the selected brand
+  const availableCategories = useMemo(() => {
+    const catIds = new Set(
+      baseProducts
+        .filter((p) => !selectedBrandId || p.brandId === selectedBrandId)
+        .map((p) => p.categoryId),
+    );
+    return categories.filter((c) => catIds.has(c.id));
+  }, [baseProducts, categories, selectedBrandId]);
+
+  // Collection chips — only collections that have products for selected brand + category
+  const availableCollections = useMemo(() => {
+    const colIds = new Set(
+      baseProducts
+        .filter(
+          (p) =>
+            (!selectedBrandId || p.brandId === selectedBrandId) &&
+            (!selectedCategoryId || p.categoryId === selectedCategoryId) &&
+            p.collectionId,
+        )
+        .map((p) => p.collectionId!),
+    );
+    return collections.filter((c) => colIds.has(c.id));
+  }, [baseProducts, collections, selectedBrandId, selectedCategoryId]);
 
   const filteredProducts = useMemo(() => {
-    let result = products;
+    let result = baseProducts;
 
-    // Bundle filter — silent, from home screen navigation (สูตร)
-    if (bundleId) {
-      const bundle = bundles.find((b) => b.id === bundleId);
-      if (bundle) {
-        const ids = new Set(bundle.items.map((i) => i.productId));
-        result = result.filter((p) => ids.has(p.id));
-      }
-    }
+    if (selectedBrandId) result = result.filter((p) => p.brandId === selectedBrandId);
+    if (selectedCategoryId) result = result.filter((p) => p.categoryId === selectedCategoryId);
+    if (selectedCollectionId) result = result.filter((p) => p.collectionId === selectedCollectionId);
 
-    // Category filter
-    if (selectedCategoryId) {
-      result = result.filter((p) => p.categoryId === selectedCategoryId);
-    }
-
-    // Brand filter
-    if (selectedBrandId) {
-      result = result.filter((p) => p.brandId === selectedBrandId);
-    }
-
-    // Collection filter
-    if (selectedCollectionId) {
-      result = result.filter((p) => p.collectionId === selectedCollectionId);
-    }
-
-    // Search filter
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       result = result.filter((p) => p.name.toLowerCase().includes(q));
     }
 
-    // Sort
     return sortProducts(result, sort);
-  }, [products, bundles, bundleId, selectedCategoryId, selectedCollectionId, selectedBrandId, search, sort]);
+  }, [baseProducts, selectedBrandId, selectedCategoryId, selectedCollectionId, search, sort]);
 
   return (
     <Screen
@@ -145,46 +158,22 @@ export function ProductListScreen() {
         </Pressable>
       </View>
 
-      {/* Category filter */}
-      {categories.length > 0 && (
-        <View style={styles.filterSection}>
-          <Text style={styles.filterLabel}>หมวดหมู่</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
-            <Pressable
-              style={[styles.filterChip, !selectedCategoryId && styles.filterChipActive]}
-              onPress={() => setSelectedCategoryId(null)}
-            >
-              <Text style={[styles.filterChipText, !selectedCategoryId && styles.filterChipTextActive]}>ทั้งหมด</Text>
-            </Pressable>
-            {categories.map((cat) => (
-              <Pressable
-                key={cat.id}
-                style={[styles.filterChip, selectedCategoryId === cat.id && styles.filterChipActive]}
-                onPress={() => setSelectedCategoryId(cat.id)}
-              >
-                <Text style={[styles.filterChipText, selectedCategoryId === cat.id && styles.filterChipTextActive]}>{cat.title}</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
       {/* Brand filter */}
-      {brands.length > 0 && (
+      {availableBrands.length > 0 && (
         <View style={styles.filterSection}>
           <Text style={styles.filterLabel}>แบรนด์</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
             <Pressable
               style={[styles.filterChip, !selectedBrandId && styles.filterChipActive]}
-              onPress={() => setSelectedBrandId(null)}
+              onPress={() => { setSelectedBrandId(null); setSelectedCategoryId(null); setSelectedCollectionId(null); }}
             >
               <Text style={[styles.filterChipText, !selectedBrandId && styles.filterChipTextActive]}>ทั้งหมด</Text>
             </Pressable>
-            {brands.map((brand) => (
+            {availableBrands.map((brand) => (
               <Pressable
                 key={brand.id}
                 style={[styles.filterChip, selectedBrandId === brand.id && styles.filterChipActive]}
-                onPress={() => setSelectedBrandId(brand.id)}
+                onPress={() => { setSelectedBrandId(brand.id); setSelectedCategoryId(null); setSelectedCollectionId(null); }}
               >
                 <Text style={[styles.filterChipText, selectedBrandId === brand.id && styles.filterChipTextActive]}>{brand.name}</Text>
               </Pressable>
@@ -193,8 +182,32 @@ export function ProductListScreen() {
         </View>
       )}
 
+      {/* Category filter */}
+      {availableCategories.length > 0 && (
+        <View style={styles.filterSection}>
+          <Text style={styles.filterLabel}>หมวดหมู่</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+            <Pressable
+              style={[styles.filterChip, !selectedCategoryId && styles.filterChipActive]}
+              onPress={() => { setSelectedCategoryId(null); setSelectedCollectionId(null); }}
+            >
+              <Text style={[styles.filterChipText, !selectedCategoryId && styles.filterChipTextActive]}>ทั้งหมด</Text>
+            </Pressable>
+            {availableCategories.map((cat) => (
+              <Pressable
+                key={cat.id}
+                style={[styles.filterChip, selectedCategoryId === cat.id && styles.filterChipActive]}
+                onPress={() => { setSelectedCategoryId(cat.id); setSelectedCollectionId(null); }}
+              >
+                <Text style={[styles.filterChipText, selectedCategoryId === cat.id && styles.filterChipTextActive]}>{cat.title}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
       {/* Collection filter */}
-      {collections.length > 0 && (
+      {availableCollections.length > 0 && (
         <View style={styles.filterSection}>
           <Text style={styles.filterLabel}>คอลเลกชัน</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
@@ -204,7 +217,7 @@ export function ProductListScreen() {
             >
               <Text style={[styles.filterChipText, !selectedCollectionId && styles.filterChipTextActive]}>ทั้งหมด</Text>
             </Pressable>
-            {collections.map((col) => (
+            {availableCollections.map((col) => (
               <Pressable
                 key={col.id}
                 style={[styles.filterChip, selectedCollectionId === col.id && styles.filterChipActive]}
