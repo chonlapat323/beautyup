@@ -91,9 +91,6 @@ function BrandSlide({
       ) : (
         <View style={styles.brandImagePlaceholder} />
       )}
-      <View style={[styles.brandGradient, { bottom: 50, height: 35, opacity: 0.15 }]} />
-      <View style={[styles.brandGradient, { bottom: 20, height: 35, opacity: 0.35 }]} />
-      <View style={[styles.brandGradient, { bottom: 0, height: 35, opacity: 0.55 }]} />
       <View style={styles.brandLabel}>
         <Text style={styles.brandName} numberOfLines={1}>{name}</Text>
       </View>
@@ -294,27 +291,19 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: colors.surface,
   },
-  brandGradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    backgroundColor: "#000000",
-  },
   brandLabel: {
     position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.sm,
-    paddingBottom: spacing.sm,
+    bottom: spacing.sm,
+    left: spacing.sm,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
   },
   brandName: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: fonts.bold,
-    textShadowColor: "rgba(0,0,0,0.8)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
   },
   // Category list
   list: {

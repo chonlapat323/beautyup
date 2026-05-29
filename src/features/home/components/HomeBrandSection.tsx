@@ -39,12 +39,8 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
             ) : (
               <View style={styles.imagePlaceholder} />
             )}
-            {/* Gradient layers — simulate bottom fade */}
-            <View style={[styles.gradientLayer, { bottom: 60, height: 40, opacity: 0.15 }]} />
-            <View style={[styles.gradientLayer, { bottom: 20, height: 40, opacity: 0.35 }]} />
-            <View style={[styles.gradientLayer, { bottom: 0, height: 40, opacity: 0.55 }]} />
-            {/* Brand name */}
-            <View style={styles.labelArea}>
+            {/* Text label — bg only behind text, bottom-left */}
+            <View style={styles.labelWrap}>
               <Text style={styles.brandName} numberOfLines={1}>{brand.name}</Text>
             </View>
           </Pressable>
@@ -95,26 +91,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: colors.surface,
   },
-  gradientLayer: {
+  labelWrap: {
     position: "absolute",
-    left: 0,
-    right: 0,
-    backgroundColor: "#000000",
-  },
-  labelArea: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
+    bottom: spacing.md,
+    left: spacing.md,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
   },
   brandName: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: fonts.bold,
-    textShadowColor: "rgba(0,0,0,0.8)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
   },
 });
