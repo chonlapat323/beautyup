@@ -142,8 +142,7 @@ export function ShopFilterScreen() {
   const [selectedBrandName, setSelectedBrandName] = useState<string>("");
 
   const hPad = spacing["2xl"];
-  const cardGap = spacing.md;
-  const cardWidth = (width - hPad * 2 - cardGap) / 2;
+  const cardWidth = Math.round(width * 0.42);
 
   const availableCategories = useMemo(() => {
     if (!selectedBrandId) return [];
@@ -179,22 +178,28 @@ export function ShopFilterScreen() {
     >
       <StepIndicator current={step} />
 
-      {/* ── Brand step: 2-column image grid ─────────────────────────────── */}
+      {/* ── Brand step: horizontal scroll row ───────────────────────────── */}
       {step === "brand" && (
-        <View style={[styles.brandGrid, { paddingHorizontal: hPad, gap: cardGap }]}>
+        <>
           {brands.length === 0 && (
             <ActivityIndicator color={colors.primary} style={{ marginTop: spacing["3xl"] }} />
           )}
-          {brands.map((brand) => (
-            <BrandSlide
-              key={brand.id}
-              name={brand.name}
-              imageUrl={brand.imageUrl}
-              cardWidth={cardWidth}
-              onPress={() => selectBrand(brand.id, brand.name)}
-            />
-          ))}
-        </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.brandRow, { paddingHorizontal: hPad }]}
+          >
+            {brands.map((brand) => (
+              <BrandSlide
+                key={brand.id}
+                name={brand.name}
+                imageUrl={brand.imageUrl}
+                cardWidth={cardWidth}
+                onPress={() => selectBrand(brand.id, brand.name)}
+              />
+            ))}
+          </ScrollView>
+        </>
       )}
 
       {/* ── Category step: text cards ─────────────────────────────────────── */}
@@ -258,11 +263,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.semiBold,
   },
-  // Brand slides
-  brandGrid: {
+  // Brand row (horizontal scroll)
+  brandRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    gap: spacing.md,
     paddingBottom: spacing["2xl"],
+    paddingRight: spacing.sm,
   },
   brandCard: {
     height: 120,
