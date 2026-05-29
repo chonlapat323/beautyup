@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -16,7 +17,7 @@ import type { ShopBrowseStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, fonts, radius, spacing } from "@/theme";
 
-type Step = "brand" | "category" | "collection";
+type Step = "brand" | "category";
 
 const ACCENTS = [
   { bg: "#FFF0F5", border: "#F5C0D0", text: "#B94A72" },
@@ -29,9 +30,17 @@ function getAccent(index: number) {
   return ACCENTS[index % ACCENTS.length];
 }
 
-// ─── Reusable card ───────────────────────────────────────────────────────────
+// ─── Card ─────────────────────────────────────────────────────────────────────
 
-type CardProps = {
+function FilterCard({
+  title,
+  note,
+  bg,
+  border,
+  textColor,
+  accentBarColor,
+  onPress,
+}: {
   title: string;
   note?: string;
   bg: string;
@@ -39,9 +48,7 @@ type CardProps = {
   textColor: string;
   accentBarColor: string;
   onPress: () => void;
-};
-
-function FilterCard({ title, note, bg, border, textColor, accentBarColor, onPress }: CardProps) {
+}) {
   return (
     <Pressable
       onPress={onPress}
@@ -53,69 +60,40 @@ function FilterCard({ title, note, bg, border, textColor, accentBarColor, onPres
           {title}
         </Text>
         {note ? (
-          <Text style={[styles.cardNote, { color: textColor }]}>{note}</Text>
+          <Text style={[styles.cardNote]}>{note}</Text>
         ) : null}
       </View>
-      <MaterialIcons
-        name="chevron-right"
-        size={20}
-        color={textColor}
-        style={styles.chevron}
-      />
+      <MaterialIcons name="chevron-right" size={20} color={textColor} style={styles.chevron} />
     </Pressable>
   );
 }
 
-// ─── Step indicator ──────────────────────────────────────────────────────────
+// ─── Step indicator ───────────────────────────────────────────────────────────
 
-const STEP_ORDER: Step[] = ["brand", "category", "collection"];
+const STEP_ORDER: Step[] = ["brand", "category"];
 const STEP_LABELS: Record<Step, string> = {
   brand: "แบรนด์",
   category: "หมวดหมู่",
-  collection: "คอลเลกชัน",
 };
 
 function StepIndicator({ current }: { current: Step }) {
   const currentIndex = STEP_ORDER.indexOf(current);
-
   return (
     <View style={styles.stepRow}>
       {STEP_ORDER.map((step, i) => {
         const isDone = i < currentIndex;
         const isCurrent = i === currentIndex;
-
-        let bg: string;
-        let border: string;
-        let textColor: string;
-
-        if (isCurrent) {
-          bg = "#FFFFFF";
-          border = "#FFFFFF";
-          textColor = colors.primaryStrong;
-        } else if (isDone) {
-          bg = "rgba(255,255,255,0.2)";
-          border = "rgba(255,255,255,0.4)";
-          textColor = "rgba(255,255,255,0.85)";
-        } else {
-          bg = "transparent";
-          border = "rgba(255,255,255,0.2)";
-          textColor = "rgba(255,255,255,0.4)";
-        }
-
+        const bg = isCurrent ? "#FFFFFF" : isDone ? "rgba(255,255,255,0.2)" : "transparent";
+        const border = isCurrent ? "#FFFFFF" : isDone ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)";
+        const textColor = isCurrent ? colors.primaryStrong : isDone ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.4)";
         return (
           <View key={step} style={styles.stepItem}>
             <View style={[styles.stepChip, { backgroundColor: bg, borderColor: border }]}>
-              <Text style={[styles.stepLabel, { color: textColor }]}>
-                {STEP_LABELS[step]}
-              </Text>
+              <Text style={[styles.stepLabel, { color: textColor }]}>{STEP_LABELS[step]}</Text>
             </View>
-            {i < STEP_ORDER.length - 1 ? (
-              <MaterialIcons
-                name="chevron-right"
-                size={16}
-                color="rgba(255,255,255,0.35)"
-              />
-            ) : null}
+            {i < STEP_ORDER.length - 1 && (
+              <MaterialIcons name="chevron-right" size={16} color="rgba(255,255,255,0.35)" />
+            )}
           </View>
         );
       })}
@@ -123,23 +101,16 @@ function StepIndicator({ current }: { current: Step }) {
   );
 }
 
-// ─── Main screen ─────────────────────────────────────────────────────────────
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export function ShopFilterScreen() {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<ShopBrowseStackParamList>>();
-
+  const navigation = useNavigation<NativeStackNavigationProp<ShopBrowseStackParamList>>();
   const products = useAppStore((state) => state.products);
   const categories = useAppStore((state) => state.categories);
-  const collections = useAppStore((state) => state.collections);
 
   const [step, setStep] = useState<Step>("brand");
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const [selectedBrandName, setSelectedBrandName] = useState<string>("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
-
-  // ── Derived data ──────────────────────────────────────────────────────────
 
   const brands = useMemo(() => {
     const seen = new Map<string, string>();
@@ -154,101 +125,43 @@ export function ShopFilterScreen() {
   const availableCategories = useMemo(() => {
     if (!selectedBrandId) return [];
     const catIds = new Set(
-      products.filter((p) => p.brandId === selectedBrandId).map((p) => p.categoryId)
+      products.filter((p) => p.brandId === selectedBrandId).map((p) => p.categoryId),
     );
     return categories.filter((c) => catIds.has(c.id));
   }, [products, categories, selectedBrandId]);
 
-  const availableCollections = useMemo(() => {
-    if (!selectedBrandId) return [];
-    const matching = products.filter(
-      (p) =>
-        p.brandId === selectedBrandId &&
-        (selectedCategoryId == null || p.categoryId === selectedCategoryId) &&
-        p.collectionId != null
-    );
-    const seen = new Map<string, string>();
-    for (const p of matching) {
-      if (p.collectionId && !seen.has(p.collectionId)) {
-        seen.set(p.collectionId, p.collectionName ?? p.collectionId);
-      }
-    }
-    // Keep only collections that exist in the store
-    const storeColIds = new Set(collections.map((c) => c.id));
-    return Array.from(seen.entries())
-      .filter(([id]) => storeColIds.has(id))
-      .map(([id, name]) => ({ id, name }));
-  }, [products, collections, selectedBrandId, selectedCategoryId]);
-
-  // ── Handlers ──────────────────────────────────────────────────────────────
-
-  function handleBack() {
-    if (step === "category") setStep("brand");
-    else if (step === "collection") setStep("category");
-  }
-
   function selectBrand(id: string, name: string) {
     setSelectedBrandId(id);
     setSelectedBrandName(name);
-    setSelectedCategoryId(null);
-    setSelectedCategoryName("");
     setStep("category");
   }
 
-  function selectCategory(id: string | null, name: string) {
-    setSelectedCategoryId(id);
-    setSelectedCategoryName(name);
-    setStep("collection");
-  }
-
-  function selectCollection(id: string | null) {
+  function selectCategory(id: string | null) {
     navigation.navigate("ProductList", {
       brandId: selectedBrandId ?? undefined,
-      categoryId: selectedCategoryId ?? undefined,
-      collectionId: id ?? undefined,
+      categoryId: id ?? undefined,
     });
   }
-
-  // ── Header title / subtitle ───────────────────────────────────────────────
-
-  const headerTitle =
-    step === "brand"
-      ? "เลือกแบรนด์"
-      : step === "category"
-      ? "เลือกหมวดหมู่"
-      : "เลือกคอลเลกชัน";
-
-  const headerSubtitle =
-    step === "brand"
-      ? ""
-      : step === "category"
-      ? selectedBrandName
-      : `${selectedBrandName} · ${selectedCategoryName || "ทุกหมวดหมู่"}`;
-
-  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <Screen
       contentContainerStyle={styles.content}
       header={
         <AppHeader
-          title={headerTitle}
-          subtitle={headerSubtitle || undefined}
-          onBack={step !== "brand" ? handleBack : undefined}
+          title={step === "brand" ? "เลือกแบรนด์" : "เลือกหมวดหมู่"}
+          subtitle={step === "category" ? selectedBrandName : undefined}
+          onBack={step === "category" ? () => setStep("brand") : undefined}
         />
       }
     >
       <StepIndicator current={step} />
 
-      {step === "brand" && (
-        <>
-          {brands.length === 0 ? (
-            <ActivityIndicator
-              color={colors.primary}
-              style={{ marginTop: spacing["3xl"] }}
-            />
-          ) : null}
-          <View style={styles.list}>
+      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+        {step === "brand" && (
+          <>
+            {brands.length === 0 && (
+              <ActivityIndicator color={colors.primary} style={{ marginTop: spacing["3xl"] }} />
+            )}
             {brands.map((brand, index) => {
               const accent = getAccent(index);
               return (
@@ -263,75 +176,48 @@ export function ShopFilterScreen() {
                 />
               );
             })}
-          </View>
-        </>
-      )}
+          </>
+        )}
 
-      {step === "category" && (
-        <View style={styles.list}>
-          <FilterCard
-            title="ทุกหมวดหมู่"
-            bg="rgba(255,255,255,0.12)"
-            border="rgba(255,255,255,0.25)"
-            textColor="#FFFFFF"
-            accentBarColor="rgba(255,255,255,0.25)"
-            onPress={() => selectCategory(null, "")}
-          />
-          {availableCategories.map((cat, index) => {
-            const accent = getAccent(index);
-            return (
-              <FilterCard
-                key={cat.id}
-                title={cat.title}
-                bg={accent.bg}
-                border={accent.border}
-                textColor={accent.text}
-                accentBarColor={accent.border}
-                onPress={() => selectCategory(cat.id, cat.title)}
-              />
-            );
-          })}
-        </View>
-      )}
-
-      {step === "collection" && (
-        <View style={styles.list}>
-          <FilterCard
-            title="ทุกคอลเลกชัน"
-            bg="rgba(255,255,255,0.12)"
-            border="rgba(255,255,255,0.25)"
-            textColor="#FFFFFF"
-            accentBarColor="rgba(255,255,255,0.25)"
-            onPress={() => selectCollection(null)}
-          />
-          {availableCollections.map((col, index) => {
-            const accent = getAccent(index);
-            return (
-              <FilterCard
-                key={col.id}
-                title={col.name}
-                bg={accent.bg}
-                border={accent.border}
-                textColor={accent.text}
-                accentBarColor={accent.border}
-                onPress={() => selectCollection(col.id)}
-              />
-            );
-          })}
-        </View>
-      )}
+        {step === "category" && (
+          <>
+            <FilterCard
+              title="ทุกหมวดหมู่"
+              note={`ดูสินค้าทั้งหมดของ ${selectedBrandName}`}
+              bg="rgba(255,255,255,0.12)"
+              border="rgba(255,255,255,0.25)"
+              textColor="#FFFFFF"
+              accentBarColor="rgba(255,255,255,0.25)"
+              onPress={() => selectCategory(null)}
+            />
+            {availableCategories.map((cat, index) => {
+              const accent = getAccent(index);
+              return (
+                <FilterCard
+                  key={cat.id}
+                  title={cat.title}
+                  bg={accent.bg}
+                  border={accent.border}
+                  textColor={accent.text}
+                  accentBarColor={accent.border}
+                  onPress={() => selectCategory(cat.id)}
+                />
+              );
+            })}
+          </>
+        )}
+      </ScrollView>
     </Screen>
   );
 }
 
-// ─── Styles ──────────────────────────────────────────────────────────────────
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   content: {
     paddingTop: spacing.lg,
     paddingBottom: spacing["3xl"],
   },
-  // Step indicator
   stepRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -354,10 +240,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.semiBold,
   },
-  // Card list
   list: {
     gap: spacing.md,
     paddingHorizontal: spacing["2xl"],
+    paddingBottom: spacing["2xl"],
   },
   card: {
     minHeight: 68,
