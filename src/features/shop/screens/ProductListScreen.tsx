@@ -163,7 +163,7 @@ export function ProductListScreen() {
       </View>
 
       {/* Brand filter */}
-      {availableBrands.length > 0 && (
+      {!bundleId && availableBrands.length > 0 && (
         <View style={styles.filterSection}>
           <Text style={styles.filterLabel}>แบรนด์</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
@@ -187,7 +187,7 @@ export function ProductListScreen() {
       )}
 
       {/* Category filter */}
-      {availableCategories.length > 0 && (
+      {!bundleId && availableCategories.length > 0 && (
         <View style={styles.filterSection}>
           <Text style={styles.filterLabel}>หมวดหมู่</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
@@ -211,7 +211,7 @@ export function ProductListScreen() {
       )}
 
       {/* Collection filter */}
-      {availableCollections.length > 0 && (
+      {!bundleId && availableCollections.length > 0 && (
         <View style={styles.filterSection}>
           <Text style={styles.filterLabel}>คอลเลกชัน</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
