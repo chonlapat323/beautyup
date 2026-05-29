@@ -49,7 +49,7 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
                 <CommerceImage style={styles.image} uri={bundle.imageUrl} contentFit="cover" />
               ) : (
                 <View style={styles.imagePlaceholder}>
-                  <MaterialIcons name="water-drop" size={36} color="#C8D9CE" />
+                  <MaterialIcons name="local-drink" size={40} color="#C4CEC8" />
                 </View>
               )}
               {/* Item count badge */}
@@ -100,19 +100,21 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   card: {
-    width: 180,
+    width: 160,
     borderRadius: radius.lg,
     backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E8EDE9",
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowColor: "#214530",
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
   imageArea: {
     height: 130,
-    backgroundColor: "#F2F7F3",
+    backgroundColor: "#F0F0F0",
     position: "relative",
   },
   image: {
