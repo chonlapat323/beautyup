@@ -1,6 +1,6 @@
-import { useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { CommerceImage } from "@/components/ui/CommerceImage";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, fonts, radius, spacing } from "@/theme";
 
@@ -10,17 +10,7 @@ type Props = {
 };
 
 export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
-  const products = useAppStore((state) => state.products);
-
-  const brands = useMemo(() => {
-    const seen = new Map<string, string>();
-    for (const p of products) {
-      if (p.brandId && p.brandName && !seen.has(p.brandId)) {
-        seen.set(p.brandId, p.brandName);
-      }
-    }
-    return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
-  }, [products]);
+  const brands = useAppStore((state) => state.brands);
 
   if (brands.length === 0) return null;
 
@@ -38,7 +28,23 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
             style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
             onPress={() => onSelectBrand(brand.id, brand.name)}
           >
-            <Text style={styles.brandName} numberOfLines={2}>{brand.name}</Text>
+            {brand.imageUrl ? (
+              <CommerceImage
+                style={styles.image}
+                uri={brand.imageUrl}
+                contentFit="cover"
+              />
+            ) : (
+              <View style={styles.imagePlaceholder} />
+            )}
+            {/* Gradient overlay */}
+            <View style={styles.overlay} />
+            {/* Brand name bottom-left */}
+            <View style={styles.labelWrap}>
+              <Text style={styles.brandName} numberOfLines={2}>
+                {brand.name}
+              </Text>
+            </View>
           </Pressable>
         ))}
       </ScrollView>
@@ -62,30 +68,64 @@ const styles = StyleSheet.create({
     paddingRight: spacing.sm,
   },
   card: {
-    width: 140,
-    minHeight: 64,
+    width: 160,
+    height: 100,
     borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.gold,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    overflow: "hidden",
+    backgroundColor: colors.surfaceMuted,
     shadowColor: "#000",
-    shadowOpacity: 0.07,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
   cardPressed: {
-    opacity: 0.75,
+    opacity: 0.85,
+  },
+  image: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  imagePlaceholder: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.surface,
+  },
+  overlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 56,
+    backgroundColor: "transparent",
+    // gradient-like fade using multiple layers
+    borderBottomLeftRadius: radius.lg,
+    borderBottomRightRadius: radius.lg,
+    // dark scrim at bottom for text readability
+    opacity: 1,
+    backgroundImage: undefined,
+  },
+  labelWrap: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.sm,
+    paddingTop: spacing.lg,
+    // dark gradient for readability
+    backgroundColor: "rgba(0,0,0,0.45)",
   },
   brandName: {
-    color: colors.primaryStrong,
-    fontSize: 15,
+    color: "#FFFFFF",
+    fontSize: 13,
     fontFamily: fonts.bold,
-    textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 17,
   },
 });

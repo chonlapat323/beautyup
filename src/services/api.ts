@@ -1,4 +1,4 @@
-import type { Banner, Bundle, Category, Collection, Product, Shade } from "@/types/domain";
+import type { Banner, Brand, Bundle, Category, Collection, Product, Shade } from "@/types/domain";
 
 const API_BASE =
   (process.env.EXPO_PUBLIC_API_URL as string | undefined) ?? "http://localhost:3000/api";
@@ -197,6 +197,24 @@ export async function loadCatalogFromApi(): Promise<{
 }> {
   const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
   return { categories, products };
+}
+
+// ─── Brands ───────────────────────────────────────────────────────────────────
+
+type ApiBrandItem = {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+  isActive: boolean;
+};
+
+export async function fetchBrands(): Promise<Brand[]> {
+  const res = await fetch(`${API_BASE}/brands`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`Brands fetch failed: ${res.status}`);
+  const data = (await res.json()) as ApiBrandItem[];
+  return data.filter((b) => b.isActive).map((b) => ({ id: b.id, name: b.name, imageUrl: b.imageUrl ?? null }));
 }
 
 // ─── Collections ──────────────────────────────────────────────────────────────

@@ -107,20 +107,11 @@ export function ShopFilterScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopBrowseStackParamList>>();
   const products = useAppStore((state) => state.products);
   const categories = useAppStore((state) => state.categories);
+  const brands = useAppStore((state) => state.brands);
 
   const [step, setStep] = useState<Step>("brand");
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const [selectedBrandName, setSelectedBrandName] = useState<string>("");
-
-  const brands = useMemo(() => {
-    const seen = new Map<string, string>();
-    for (const p of products) {
-      if (p.brandId && p.brandName && !seen.has(p.brandId)) {
-        seen.set(p.brandId, p.brandName);
-      }
-    }
-    return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
-  }, [products]);
 
   const availableCategories = useMemo(() => {
     if (!selectedBrandId) return [];

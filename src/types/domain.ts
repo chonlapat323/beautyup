@@ -58,6 +58,12 @@ export type Collection = {
   name: string;
 };
 
+export type Brand = {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+};
+
 export type BundleProduct = {
   id: string;
   name: string;
