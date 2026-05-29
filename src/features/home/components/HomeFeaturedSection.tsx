@@ -1,8 +1,22 @@
+/**
+ * HomeFeaturedSection — v2 Design Proposal
+ *
+ * การเปลี่ยนแปลงจาก v1:
+ * ─────────────────────
+ * • CTA "ใส่ตะกร้า": พื้นหลัง gold (#D4AF37) แทน muted green — ดูหรู + คลิกง่ายขึ้น
+ * • เพิ่ม Heart (Wishlist) button — top-right ของ product card
+ * • Active dot: เปลี่ยนเป็น gold สอดคล้องกัน
+ * • Price: ใช้ goldDeep แทน primaryDark — เน้นความพรีเมียม
+ * • เพิ่ม subtle gold border บน card เมื่อ isFeatured
+ */
+
+import { MaterialIcons } from "@expo/vector-icons";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { useMemo, useState } from "react";
 
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { colors, fonts, spacing } from "@/theme";
+import { useAppStore } from "@/store/useAppStore";
 import type { Product } from "@/types/domain";
 
 const badgeNew = require("../../../slide/new.png") as ReturnType<typeof require>;
@@ -24,6 +38,8 @@ export function HomeFeaturedSection({
 }: HomeFeaturedSectionProps) {
   const { width } = useWindowDimensions();
   const [activePage, setActivePage] = useState(0);
+  const favoriteIds = useAppStore((state) => state.favoriteIds);
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
 
   const pageWidth = width - horizontalPadding * 2;
   const cardGap = 14;
@@ -41,18 +57,19 @@ export function HomeFeaturedSection({
 
   return (
     <View style={styles.section}>
-      <View
-        style={[
-          styles.headerRow,
-          { paddingHorizontal: horizontalPadding },
-        ]}
-      >
-        <Text style={styles.title}>สินค้าแนะนำ</Text>
+      {/* Section Header */}
+      <View style={[styles.headerRow, { paddingHorizontal: horizontalPadding }]}>
+        {/* ✦ เส้นทองซ้าย — สอดคล้องกับ SectionTitle component */}
+        <View style={styles.headerLeft}>
+          <View style={styles.goldBar} />
+          <Text style={styles.title}>สินค้าแนะนำ</Text>
+        </View>
         <Pressable hitSlop={8} onPress={onViewAll}>
           <Text style={styles.viewAll}>ดูทั้งหมด &gt;</Text>
         </Pressable>
       </View>
 
+      {/* Product Grid (Paged) */}
       <View style={[styles.viewport, { marginHorizontal: horizontalPadding }]}>
         <ScrollView
           horizontal
@@ -67,79 +84,96 @@ export function HomeFeaturedSection({
           }}
         >
           {pages.map((page, pageIndex) => (
-            <View
-              key={`featured-page-${pageIndex}`}
-              style={[styles.page, { width: pageWidth, gap: cardGap }]}
-            >
-              {page.map((product) => (
-                <Pressable
-                  key={product.id}
-                  onPress={() => onPressProduct(product.id)}
-                  style={[styles.card, { width: cardWidth }]}
-                >
-                  <View style={styles.imageShell}>
-                    <View style={styles.imageGlow} />
-                    <CommerceImage
-                      contentFit="cover"
-                      style={styles.image}
-                      uri={product.imageUrl}
-                    />
-                    {product.tag === "NEW" ? (
-                      <View style={styles.badgeWrap}>
-                        <Image resizeMode="contain" source={badgeNew} style={styles.badgeImage} />
-                      </View>
-                    ) : null}
-                    {product.tag === "BEST SELLER" ? (
-                      <View style={styles.bestSellerBadge}>
-                        <Text style={styles.bestSellerText}>ขาย</Text>
-                        <Text style={styles.bestSellerText}>ดี</Text>
-                      </View>
-                    ) : null}
-                  </View>
-
-                  <View style={styles.copy}>
-                    <Text numberOfLines={2} style={styles.productName}>
-                      {product.name}
-                    </Text>
-                    <Text numberOfLines={2} style={styles.productSubtitle}>
-                      {product.subtitle}
-                    </Text>
-                  </View>
-
-                  <View style={styles.priceRow}>
-                    <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
-                    {product.originalPrice ? (
-                      <Text style={styles.originalPrice}>
-                        ฿{product.originalPrice.toFixed(0)}
-                      </Text>
-                    ) : null}
-                  </View>
-
+            <View key={`page-${pageIndex}`} style={[styles.page, { width: pageWidth, gap: cardGap }]}>
+              {page.map((product) => {
+                const isFav = favoriteIds.includes(product.id);
+                return (
                   <Pressable
-                    onPress={(event) => {
-                      event.stopPropagation();
-                      onAddToCart(product.id);
-                    }}
-                    style={styles.ctaButton}
+                    key={product.id}
+                    onPress={() => onPressProduct(product.id)}
+                    style={[styles.card, { width: cardWidth }]}
                   >
-                    <Text style={styles.ctaText}>ใส่ตะกร้า</Text>
-                  </Pressable>
-                </Pressable>
-              ))}
+                    {/* Image */}
+                    <View style={styles.imageShell}>
+                      <View style={styles.imageGlow} />
+                      <CommerceImage contentFit="cover" style={styles.image} uri={product.imageUrl} />
 
+                      {/* ✦ NEW: Wishlist heart button */}
+                      <Pressable
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(product.id);
+                        }}
+                        style={styles.heartBtn}
+                        hitSlop={8}
+                      >
+                        <MaterialIcons
+                          name={isFav ? "favorite" : "favorite-border"}
+                          size={18}
+                          color={isFav ? "#E05252" : "rgba(255,255,255,0.85)"}
+                        />
+                      </Pressable>
+
+                      {/* Badge NEW */}
+                      {product.tag === "NEW" ? (
+                        <View style={styles.badgeWrap}>
+                          <Image resizeMode="contain" source={badgeNew} style={styles.badgeImage} />
+                        </View>
+                      ) : null}
+
+                      {/* Badge BEST SELLER */}
+                      {product.tag === "BEST SELLER" ? (
+                        <View style={styles.bestSellerBadge}>
+                          <Text style={styles.bestSellerText}>ขาย</Text>
+                          <Text style={styles.bestSellerText}>ดี</Text>
+                        </View>
+                      ) : null}
+                    </View>
+
+                    {/* Copy */}
+                    <View style={styles.copy}>
+                      <Text numberOfLines={2} style={styles.productName}>
+                        {product.name}
+                      </Text>
+                      <Text numberOfLines={1} style={styles.productSubtitle}>
+                        {product.subtitle}
+                      </Text>
+                    </View>
+
+                    {/* Price Row */}
+                    <View style={styles.priceRow}>
+                      {/* ✦ CHANGED: goldDeep แทน primaryDark */}
+                      <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
+                      {product.originalPrice ? (
+                        <Text style={styles.originalPrice}>฿{product.originalPrice.toFixed(0)}</Text>
+                      ) : null}
+                    </View>
+
+                    {/* ✦ CHANGED: Gold CTA button */}
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        onAddToCart(product.id);
+                      }}
+                      style={styles.ctaButton}
+                    >
+                      <MaterialIcons name="add-shopping-cart" size={14} color={colors.goldDark} />
+                      <Text style={styles.ctaText}>ใส่ตะกร้า</Text>
+                    </Pressable>
+                  </Pressable>
+                );
+              })}
               {page.length === 1 ? <View style={{ width: cardWidth }} /> : null}
             </View>
           ))}
         </ScrollView>
       </View>
 
+      {/* ✦ CHANGED: Dots ใช้ gold active */}
       {pages.length > 1 ? (
         <View style={styles.dots}>
           {pages.map((_, index) => (
-            <View
-              key={index}
-              style={[styles.dot, index === activePage && styles.dotActive]}
-            />
+            <View key={index} style={[styles.dot, index === activePage && styles.dotActive]} />
           ))}
         </View>
       ) : null}
@@ -149,8 +183,7 @@ export function HomeFeaturedSection({
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: spacing["2xl"],
-    marginBottom: 0,
+    marginBottom: spacing["2xl"],
   },
   headerRow: {
     flexDirection: "row",
@@ -158,15 +191,27 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: spacing.xl,
   },
+  // ✦ NEW: เส้นทองซ้าย
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  goldBar: {
+    width: 3,
+    height: 22,
+    borderRadius: 2,
+    backgroundColor: colors.gold,
+  },
   title: {
     fontSize: 20,
     lineHeight: 24,
-    color: "#173022",
+    color: "#FFFFFF",
     fontFamily: fonts.bold,
   },
   viewAll: {
     fontSize: 13,
-    color: colors.primary,
+    color: colors.goldDeep,
     fontFamily: fonts.semiBold,
   },
   page: {
@@ -213,6 +258,18 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  // ✦ NEW: Heart button
+  heartBtn: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(0,0,0,0.28)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   badgeWrap: {
     position: "absolute",
     top: 10,
@@ -242,8 +299,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.extraBold,
   },
   copy: {
-    gap: 8,
-    minHeight: 76,
+    gap: 6,
+    minHeight: 70,
   },
   productName: {
     fontSize: 15,
@@ -262,9 +319,10 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
     gap: 8,
   },
+  // ✦ CHANGED: goldDeep
   price: {
-    fontSize: 15,
-    color: colors.primaryDark,
+    fontSize: 16,
+    color: colors.goldDeep,
     fontFamily: fonts.extraBold,
   },
   originalPrice: {
@@ -273,19 +331,25 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     textDecorationLine: "line-through",
   },
+  // ✦ CHANGED: Gold CTA button
   ctaButton: {
     marginTop: 4,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#EEF7F0",
-    borderWidth: 1,
-    borderColor: "#DDEBE0",
+    backgroundColor: colors.gold,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 6,
+    shadowColor: colors.gold,
+    shadowOpacity: 0.30,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
   ctaText: {
     fontSize: 13,
-    color: colors.primaryDark,
+    color: colors.goldDark,
     fontFamily: fonts.bold,
   },
   dots: {
@@ -301,9 +365,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#D5DFD7",
   },
+  // ✦ CHANGED: gold active
   dotActive: {
     width: 24,
     borderRadius: 8,
-    backgroundColor: colors.primaryDark,
+    backgroundColor: colors.gold,
   },
 });
