@@ -84,20 +84,19 @@ function BrandSlide({
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.brandSlide,
-        { width: cardWidth },
-        pressed && { opacity: 0.82 },
-      ]}
+      style={({ pressed }) => [styles.brandCard, { width: cardWidth }, pressed && { opacity: 0.82 }]}
     >
-      <View style={styles.brandImageWrap}>
-        {imageUrl ? (
-          <CommerceImage style={styles.brandImage} uri={imageUrl} contentFit="cover" />
-        ) : (
-          <View style={styles.brandImagePlaceholder} />
-        )}
+      {imageUrl ? (
+        <CommerceImage style={styles.brandImage} uri={imageUrl} contentFit="cover" />
+      ) : (
+        <View style={styles.brandImagePlaceholder} />
+      )}
+      <View style={[styles.brandGradient, { bottom: 50, height: 35, opacity: 0.15 }]} />
+      <View style={[styles.brandGradient, { bottom: 20, height: 35, opacity: 0.35 }]} />
+      <View style={[styles.brandGradient, { bottom: 0, height: 35, opacity: 0.55 }]} />
+      <View style={styles.brandLabel}>
+        <Text style={styles.brandName} numberOfLines={1}>{name}</Text>
       </View>
-      <Text style={styles.brandName} numberOfLines={1}>{name}</Text>
     </Pressable>
   );
 }
@@ -268,15 +267,12 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     paddingBottom: spacing["2xl"],
   },
-  brandSlide: {
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  brandImageWrap: {
+  brandCard: {
     height: 120,
     borderRadius: radius.lg,
     overflow: "hidden",
     backgroundColor: colors.surfaceMuted,
+    marginBottom: spacing.md,
     shadowColor: "#000",
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -291,13 +287,34 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   brandImagePlaceholder: {
-    flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: colors.surface,
+  },
+  brandGradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    backgroundColor: "#000000",
+  },
+  brandLabel: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.sm,
   },
   brandName: {
     color: "#FFFFFF",
     fontSize: 14,
     fontFamily: fonts.bold,
+    textShadowColor: "rgba(0,0,0,0.8)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
   },
   // Category list
   list: {

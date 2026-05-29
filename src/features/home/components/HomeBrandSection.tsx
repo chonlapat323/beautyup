@@ -31,17 +31,22 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
         {brands.map((brand) => (
           <Pressable
             key={brand.id}
-            style={({ pressed }) => [styles.slide, { width: cardWidth }, pressed && { opacity: 0.85 }]}
+            style={({ pressed }) => [styles.card, { width: cardWidth }, pressed && { opacity: 0.88 }]}
             onPress={() => onSelectBrand(brand.id, brand.name)}
           >
-            <View style={styles.imageWrap}>
-              {brand.imageUrl ? (
-                <CommerceImage style={styles.image} uri={brand.imageUrl} contentFit="cover" />
-              ) : (
-                <View style={styles.imagePlaceholder} />
-              )}
+            {brand.imageUrl ? (
+              <CommerceImage style={styles.image} uri={brand.imageUrl} contentFit="cover" />
+            ) : (
+              <View style={styles.imagePlaceholder} />
+            )}
+            {/* Gradient layers — simulate bottom fade */}
+            <View style={[styles.gradientLayer, { bottom: 60, height: 40, opacity: 0.15 }]} />
+            <View style={[styles.gradientLayer, { bottom: 20, height: 40, opacity: 0.35 }]} />
+            <View style={[styles.gradientLayer, { bottom: 0, height: 40, opacity: 0.55 }]} />
+            {/* Brand name */}
+            <View style={styles.labelArea}>
+              <Text style={styles.brandName} numberOfLines={1}>{brand.name}</Text>
             </View>
-            <Text style={styles.brandName} numberOfLines={1}>{brand.name}</Text>
           </Pressable>
         ))}
       </ScrollView>
@@ -52,7 +57,7 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
 const styles = StyleSheet.create({
   wrapper: {
     marginTop: spacing["2xl"],
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   sectionTitle: {
     color: "#FFFFFF",
@@ -64,10 +69,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingRight: spacing.sm,
   },
-  slide: {
-    gap: spacing.sm,
-  },
-  imageWrap: {
+  card: {
     height: 160,
     borderRadius: radius.xl,
     overflow: "hidden",
@@ -86,12 +88,33 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   imagePlaceholder: {
-    flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: colors.surface,
+  },
+  gradientLayer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    backgroundColor: "#000000",
+  },
+  labelArea: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
   },
   brandName: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: fonts.bold,
+    textShadowColor: "rgba(0,0,0,0.8)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
   },
 });
