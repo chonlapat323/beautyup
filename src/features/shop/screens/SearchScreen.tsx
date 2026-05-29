@@ -29,7 +29,7 @@ import { CommerceImage } from "@/components/ui/CommerceImage";
 import { useAppStore } from "@/store/useAppStore";
 import type { ShopStackParamList } from "@/navigation/types";
 import type { Product } from "@/types/domain";
-import { colors, fonts, radius, spacing } from "@/theme";
+import { colors, fonts, radius } from "@/theme";
 
 // ── Popular search terms (static fallback) ────────────────
 const STATIC_POPULAR = ["ORDEVE", "Koleston", "Illumina", "ELUJUDA", "Shinefinity"];
