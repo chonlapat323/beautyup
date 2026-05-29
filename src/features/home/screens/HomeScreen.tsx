@@ -5,7 +5,6 @@ import { Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { HomeBrandSection } from "@/features/home/components/HomeBrandSection";
-import { HomeBrandGridSection } from "@/features/home/components/HomeBrandGridSection";
 import { HomeBundleSection } from "@/features/home/components/HomeBundleSection";
 import { HomeFeaturedSection } from "@/features/home/components/HomeFeaturedSection";
 import { HomeHeroSliderSection } from "@/features/home/components/HomeHeroSliderSection";
@@ -72,9 +71,9 @@ export function HomeScreen() {
         />
       ) : null}
 
-      <HomeBrandGridSection
+      <HomeBrandSection
         horizontalPadding={horizontalPadding}
-        onSelectBrand={(brandId) => navigation.navigate("ProductList", { brandId })}
+        onSelectBrand={(brandId, brandName) => navigation.navigate("ProductList", { brandId })}
         onViewAll={() => navigation.getParent()?.navigate("Shop")}
       />
 
