@@ -4,11 +4,11 @@ import { Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from 
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { HomeBrandSection } from "@/features/home/components/HomeBrandSection";
 import { HomeBundleSection } from "@/features/home/components/HomeBundleSection";
 import { HomeFeaturedSection } from "@/features/home/components/HomeFeaturedSection";
 import { HomeHeroSliderSection } from "@/features/home/components/HomeHeroSliderSection";
 import { HomeSkeleton } from "@/components/ui/Skeleton";
-import { HomeCategoriesSection } from "@/features/home/components/HomeCategoriesSection";
 import type { ShopStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, typography } from "@/theme";
@@ -18,7 +18,6 @@ export function HomeScreen() {
     useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const { width } = useWindowDimensions();
 
-  const categories = useAppStore((state) => state.categories);
   const products = useAppStore((state) => state.products);
   const banners = useAppStore((state) => state.banners);
   const social = useAppStore((state) => state.social);
@@ -35,15 +34,6 @@ export function HomeScreen() {
   const heroSlides = (banners.length > 0 ? banners : []).slice(0, 4);
 
   const horizontalPadding = width < 360 ? 18 : width >= 430 ? 28 : 24;
-  function openCategory(categoryId: string, requiresShadeSelection: boolean) {
-    if (requiresShadeSelection) {
-      navigation.navigate("ShadeSelection", { categoryId });
-      return;
-    }
-
-    navigation.navigate("ProductList", { categoryId });
-  }
-
   function openBanner(linkType: string, linkId?: string) {
     if (linkType === "product" && linkId) {
       navigation.navigate("ProductDetail", { productId: linkId });
@@ -51,12 +41,6 @@ export function HomeScreen() {
     }
 
     if (linkType === "category" && linkId) {
-      const category = categories.find((item) => item.id === linkId);
-      if (category?.requiresShadeSelection) {
-        navigation.navigate("ShadeSelection", { categoryId: linkId });
-        return;
-      }
-
       navigation.navigate("ProductList", { categoryId: linkId });
       return;
     }
@@ -81,13 +65,6 @@ export function HomeScreen() {
       contentContainerStyle={styles.content}
       onRefresh={loadCatalog}
     >
-      <HomeCategoriesSection
-        categories={categories}
-        horizontalPadding={horizontalPadding}
-        onSelectCategory={openCategory}
-        onViewAll={() => navigation.navigate("Categories")}
-      />
-
       {heroSlides.length > 0 ? (
         <HomeHeroSliderSection
           banners={heroSlides}
@@ -95,6 +72,13 @@ export function HomeScreen() {
           onPressBanner={openBanner}
         />
       ) : null}
+
+      <HomeBrandSection
+        horizontalPadding={horizontalPadding}
+        onSelectBrand={(brandId, brandName) =>
+          navigation.navigate("ProductList", { brandId })
+        }
+      />
 
       {featuredProducts.length > 0 ? (
         <HomeFeaturedSection

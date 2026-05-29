@@ -45,14 +45,15 @@ export function ProductListScreen() {
   const favoriteIds = useAppStore((state) => state.favoriteIds);
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
 
-  const { categoryId, bundleId } = route.params;
+  const { categoryId, bundleId, brandId: initialBrandId, collectionId: initialCollectionId } = route.params;
   const bundles = useAppStore((state) => state.bundles);
+  const collections = useAppStore((state) => state.collections);
 
   const [sort, setSort] = useState<SortKey>("all");
   const [search, setSearch] = useState("");
-  const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
+  const [selectedBrandId, setSelectedBrandId] = useState<string | null>(initialBrandId ?? null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(categoryId ?? null);
-  const [selectedBundleId, setSelectedBundleId] = useState<string | null>(bundleId ?? null);
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(initialCollectionId ?? null);
   const [listView, setListView] = useState(false);
 
   const brands = useMemo(() => {
@@ -68,9 +69,9 @@ export function ProductListScreen() {
   const filteredProducts = useMemo(() => {
     let result = products;
 
-    // Collection filter (bundle)
-    if (selectedBundleId) {
-      const bundle = bundles.find((b) => b.id === selectedBundleId);
+    // Bundle filter — silent, from home screen navigation (สูตร)
+    if (bundleId) {
+      const bundle = bundles.find((b) => b.id === bundleId);
       if (bundle) {
         const ids = new Set(bundle.items.map((i) => i.productId));
         result = result.filter((p) => ids.has(p.id));
@@ -87,6 +88,11 @@ export function ProductListScreen() {
       result = result.filter((p) => p.brandId === selectedBrandId);
     }
 
+    // Collection filter
+    if (selectedCollectionId) {
+      result = result.filter((p) => p.collectionId === selectedCollectionId);
+    }
+
     // Search filter
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -95,7 +101,7 @@ export function ProductListScreen() {
 
     // Sort
     return sortProducts(result, sort);
-  }, [products, bundles, selectedCategoryId, selectedBundleId, selectedBrandId, search, sort]);
+  }, [products, bundles, bundleId, selectedCategoryId, selectedCollectionId, selectedBrandId, search, sort]);
 
   return (
     <Screen
@@ -188,23 +194,23 @@ export function ProductListScreen() {
       )}
 
       {/* Collection filter */}
-      {bundles.length > 0 && (
+      {collections.length > 0 && (
         <View style={styles.filterSection}>
           <Text style={styles.filterLabel}>คอลเลกชัน</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
             <Pressable
-              style={[styles.filterChip, !selectedBundleId && styles.filterChipActive]}
-              onPress={() => setSelectedBundleId(null)}
+              style={[styles.filterChip, !selectedCollectionId && styles.filterChipActive]}
+              onPress={() => setSelectedCollectionId(null)}
             >
-              <Text style={[styles.filterChipText, !selectedBundleId && styles.filterChipTextActive]}>ทั้งหมด</Text>
+              <Text style={[styles.filterChipText, !selectedCollectionId && styles.filterChipTextActive]}>ทั้งหมด</Text>
             </Pressable>
-            {bundles.map((bundle) => (
+            {collections.map((col) => (
               <Pressable
-                key={bundle.id}
-                style={[styles.filterChip, selectedBundleId === bundle.id && styles.filterChipActive]}
-                onPress={() => setSelectedBundleId(bundle.id)}
+                key={col.id}
+                style={[styles.filterChip, selectedCollectionId === col.id && styles.filterChipActive]}
+                onPress={() => setSelectedCollectionId(col.id)}
               >
-                <Text style={[styles.filterChipText, selectedBundleId === bundle.id && styles.filterChipTextActive]}>{bundle.name}</Text>
+                <Text style={[styles.filterChipText, selectedCollectionId === col.id && styles.filterChipTextActive]}>{col.name}</Text>
               </Pressable>
             ))}
           </ScrollView>

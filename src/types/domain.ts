@@ -23,6 +23,8 @@ export type Product = {
   shadeId?: string;
   brandId?: string;
   brandName?: string;
+  collectionId?: string;
+  collectionName?: string;
   name: string;
   subtitle: string;
   price: number;
@@ -49,6 +51,11 @@ export type Banner = {
   linkId?: string;
   sortOrder: number;
   isActive: boolean;
+};
+
+export type Collection = {
+  id: string;
+  name: string;
 };
 
 export type BundleProduct = {

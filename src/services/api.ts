@@ -1,4 +1,4 @@
-import type { Banner, Bundle, Category, Product, Shade } from "@/types/domain";
+import type { Banner, Bundle, Category, Collection, Product, Shade } from "@/types/domain";
 
 const API_BASE =
   (process.env.EXPO_PUBLIC_API_URL as string | undefined) ?? "http://localhost:3000/api";
@@ -29,6 +29,7 @@ type ApiProduct = {
   categoryId: string;
   shadeId?: string | null;
   brand?: { id: string; name: string } | null;
+  collection?: { id: string; name: string } | null;
   images?: { id: string; url: string; sortOrder: number }[];
 };
 
@@ -98,6 +99,8 @@ function mapProduct(p: ApiProduct): Product {
     shadeId: p.shadeId ?? undefined,
     brandId: p.brand?.id ?? undefined,
     brandName: p.brand?.name ?? undefined,
+    collectionId: p.collection?.id ?? undefined,
+    collectionName: p.collection?.name ?? undefined,
     name: p.name,
     subtitle: p.description?.split(".")[0]?.trim() ?? "",
     price: specialPrice ?? basePrice,
@@ -194,6 +197,23 @@ export async function loadCatalogFromApi(): Promise<{
 }> {
   const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()]);
   return { categories, products };
+}
+
+// ─── Collections ──────────────────────────────────────────────────────────────
+
+type ApiCollection = {
+  id: string;
+  name: string;
+  isActive: boolean;
+};
+
+export async function fetchCollections(): Promise<Collection[]> {
+  const res = await fetch(`${API_BASE}/collections`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`Collections fetch failed: ${res.status}`);
+  const data = (await res.json()) as ApiCollection[];
+  return data.filter((c) => c.isActive).map((c) => ({ id: c.id, name: c.name }));
 }
 
 // ─── Bundles ──────────────────────────────────────────────────────────────────

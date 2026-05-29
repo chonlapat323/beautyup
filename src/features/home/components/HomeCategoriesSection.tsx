@@ -10,7 +10,7 @@ const centerLeafIcon = require("../../../logo/icon.png") as ReturnType<typeof re
 type HomeCategoriesSectionProps = {
   categories: Category[];
   horizontalPadding: number;
-  onSelectCategory: (categoryId: string, requiresShadeSelection: boolean) => void;
+  onSelectCategory: (categoryId: string) => void;
   onViewAll: () => void;
 };
 
@@ -43,7 +43,7 @@ export function HomeCategoriesSection({
           {categories.slice(0, 3).map((category) => (
             <Pressable
               key={category.id}
-              onPress={() => onSelectCategory(category.id, category.requiresShadeSelection)}
+              onPress={() => onSelectCategory(category.id)}
               style={styles.card}
             >
               <View style={styles.visual}>
@@ -56,7 +56,7 @@ export function HomeCategoriesSection({
                 {category.title}
               </Text>
               <Pressable
-                onPress={() => onSelectCategory(category.id, category.requiresShadeSelection)}
+                onPress={() => onSelectCategory(category.id)}
                 style={styles.shopButton}
               >
                 <Text style={styles.shopButtonText}>ช้อป</Text>
