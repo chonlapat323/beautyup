@@ -102,7 +102,7 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand, onViewAll }
                 </View>
 
                 <Text numberOfLines={1} style={styles.brandName}>{brand.name}</Text>
-                {sub ? <Text numberOfLines={1} style={styles.brandSub}>{sub}</Text> : null}
+                <Text numberOfLines={1} style={styles.brandSub}>{sub || " "}</Text>
 
                 {/* ✦ Gold shop button */}
                 <Pressable
