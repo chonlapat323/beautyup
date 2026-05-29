@@ -142,7 +142,11 @@ export function ShopFilterScreen() {
   const [selectedBrandName, setSelectedBrandName] = useState<string>("");
 
   const hPad = spacing["2xl"];
-  const cardWidth = Math.round(width * 0.42);
+  const cardGap = spacing.md;
+  // ≤4 brands: fill entire row; >4: fixed width + scroll
+  const cardWidth = brands.length <= 4
+    ? Math.floor((width - hPad * 2 - cardGap * (brands.length - 1)) / brands.length)
+    : Math.round(width * 0.38);
 
   const availableCategories = useMemo(() => {
     if (!selectedBrandId) return [];
@@ -186,6 +190,7 @@ export function ShopFilterScreen() {
           )}
           <ScrollView
             horizontal
+            scrollEnabled={brands.length > 4}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={[styles.brandRow, { paddingHorizontal: hPad }]}
           >
@@ -263,12 +268,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.semiBold,
   },
-  // Brand row (horizontal scroll)
+  // Brand row
   brandRow: {
     flexDirection: "row",
     gap: spacing.md,
     paddingBottom: spacing["2xl"],
-    paddingRight: spacing.sm,
   },
   brandCard: {
     height: 120,
