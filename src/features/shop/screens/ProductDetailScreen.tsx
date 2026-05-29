@@ -144,12 +144,7 @@ export function ProductDetailScreen() {
             ) : null}
           </View>
 
-          {/* Subtitle */}
-          {product.subtitle ? (
-            <Text style={styles.subtitle}>{product.subtitle}</Text>
-          ) : null}
-
-          {/* ✦ Gold price */}
+          {/* ✦ Gold price — ขึ้นมาก่อน */}
           <View style={styles.priceRow}>
             <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
             {product.originalPrice ? (
