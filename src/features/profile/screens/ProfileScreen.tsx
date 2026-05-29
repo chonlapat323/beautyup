@@ -75,18 +75,16 @@ export function ProfileScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="บัญชีของฉัน"
-          subtitle="จัดการข้อมูลส่วนตัวและติดตามคำสั่งซื้อ"
-          onBack={() => navigation.goBack()}
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "บัญชีของฉัน" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="บัญชีของฉัน"
+        subtitle="จัดการข้อมูลส่วนตัวและติดตามคำสั่งซื้อ"
+        onBack={() => navigation.goBack()}
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "บัญชีของฉัน" },
+        ]}
+      />
       <View style={styles.card}>
         <Text style={styles.name}>{member?.fullName ?? "-"}</Text>
         <Text style={styles.meta}>{memberTypeLabel}</Text>

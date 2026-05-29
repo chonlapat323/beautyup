@@ -119,18 +119,16 @@ export function ProductListScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title={selectedCategoryId ? (categories.find((c) => c.id === selectedCategoryId)?.title ?? "สินค้า") : "สินค้าทั้งหมด"}
-          subtitle="เลือกสินค้าที่เหมาะกับคุณ"
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "สินค้า" },
-          ]}
-          onBack={() => navigation.goBack()}
-        />
-      }
     >
+      <AppHeader
+        title={selectedCategoryId ? (categories.find((c) => c.id === selectedCategoryId)?.title ?? "สินค้า") : "สินค้าทั้งหมด"}
+        subtitle="เลือกสินค้าที่เหมาะกับคุณ"
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "สินค้า" },
+        ]}
+        onBack={() => navigation.goBack()}
+      />
       {/* Search row */}
       <View style={styles.searchRow}>
         <View style={styles.searchWrap}>

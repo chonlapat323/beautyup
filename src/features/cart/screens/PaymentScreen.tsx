@@ -452,20 +452,18 @@ export function PaymentScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="ชำระเงิน"
-          subtitle="เลือกวิธีชำระเงินและยืนยันการสั่งซื้อ"
-          onBack={() => navigation.goBack()}
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
-            { label: "ตรวจสอบคำสั่งซื้อ", onPress: () => navigation.navigate("Checkout") },
-            { label: "ชำระเงิน" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="ชำระเงิน"
+        subtitle="เลือกวิธีชำระเงินและยืนยันการสั่งซื้อ"
+        onBack={() => navigation.goBack()}
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
+          { label: "ตรวจสอบคำสั่งซื้อ", onPress: () => navigation.navigate("Checkout") },
+          { label: "ชำระเงิน" },
+        ]}
+      />
       {creditAmount > 0 && (
         <View style={styles.creditSummaryBox}>
           <Text style={styles.creditSummaryText}>

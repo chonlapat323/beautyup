@@ -190,7 +190,7 @@ export function AddressFormScreen() {
     }
   }
 
-  const header = (
+  const appHeader = (
     <AppHeader
       title={pageTitle}
       breadcrumbs={[
@@ -204,14 +204,16 @@ export function AddressFormScreen() {
 
   if (isLoading) {
     return (
-      <Screen contentContainerStyle={styles.content} header={header}>
+      <Screen contentContainerStyle={styles.content}>
+        {appHeader}
         <Text style={styles.loading}>กำลังโหลด...</Text>
       </Screen>
     );
   }
 
   return (
-    <Screen contentContainerStyle={styles.content} header={header}>
+    <Screen contentContainerStyle={styles.content}>
+      {appHeader}
       <View style={styles.card}>
         <Field
           label="ชื่อร้านหรือบริษัทของท่าน (ถ้ามี)"

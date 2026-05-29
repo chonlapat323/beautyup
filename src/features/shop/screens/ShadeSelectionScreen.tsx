@@ -71,18 +71,16 @@ export function ShadeSelectionScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="เลือกเฉดสี"
-          subtitle={category?.title ?? "สีผมและบลีช"}
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
-            { label: "เลือกเฉดสี" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="เลือกเฉดสี"
+        subtitle={category?.title ?? "สีผมและบลีช"}
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "หมวดหมู่สินค้า", onPress: () => navigateToCategories(navigation) },
+          { label: "เลือกเฉดสี" },
+        ]}
+      />
       {isLoading ? (
         <ActivityIndicator color={colors.primary} style={styles.loader} />
       ) : error ? (

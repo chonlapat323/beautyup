@@ -54,19 +54,17 @@ export function MyRedemptionsScreen() {
   return (
     <Screen
       scrollable={false}
-      header={
-        <AppHeader
-          title="ของรางวัลของฉัน"
-          subtitle="ติดตามสถานะของรางวัลที่แลก"
-          onBack={() => navigation.goBack()}
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
-            { label: "ของรางวัล" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="ของรางวัลของฉัน"
+        subtitle="ติดตามสถานะของรางวัลที่แลก"
+        onBack={() => navigation.goBack()}
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
+          { label: "ของรางวัล" },
+        ]}
+      />
       {loading ? (
         <ActivityIndicator style={styles.loader} color={colors.primary} />
       ) : redemptions.length === 0 ? (

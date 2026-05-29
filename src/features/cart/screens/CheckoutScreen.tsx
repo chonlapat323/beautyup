@@ -77,18 +77,16 @@ export function CheckoutScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="ตรวจสอบคำสั่งซื้อ"
-          subtitle="เลือกที่อยู่จัดส่งและยืนยันรายการของคุณ"
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
-            { label: "ตรวจสอบคำสั่งซื้อ" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="ตรวจสอบคำสั่งซื้อ"
+        subtitle="เลือกที่อยู่จัดส่งและยืนยันรายการของคุณ"
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
+          { label: "ตรวจสอบคำสั่งซื้อ" },
+        ]}
+      />
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>ที่อยู่จัดส่ง</Text>
 

@@ -30,17 +30,15 @@ export function CategoriesScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="หมวดหมู่สินค้า"
-          onBack={() => navigation.goBack()}
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "หมวดหมู่สินค้า" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="หมวดหมู่สินค้า"
+        onBack={() => navigation.goBack()}
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "หมวดหมู่สินค้า" },
+        ]}
+      />
       {isLoading ? (
         <CategoriesListSkeleton />
       ) : categories.length === 0 ? (

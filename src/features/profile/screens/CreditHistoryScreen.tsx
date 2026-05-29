@@ -127,7 +127,7 @@ export function CreditHistoryScreen() {
     );
   }
 
-  const header = (
+  const appHeader = (
     <AppHeader
       title="ประวัติเครดิต"
       subtitle="รายการรับเข้า / ใช้งาน / ถอน"
@@ -140,7 +140,8 @@ export function CreditHistoryScreen() {
 
   if (isLoading) {
     return (
-      <Screen scrollable={false} header={header}>
+      <Screen scrollable={false}>
+        {appHeader}
         <ActivityIndicator style={{ marginTop: spacing["3xl"] }} color={colors.primary} />
       </Screen>
     );
@@ -148,7 +149,8 @@ export function CreditHistoryScreen() {
 
   if (error) {
     return (
-      <Screen scrollable={false} header={header}>
+      <Screen scrollable={false}>
+        {appHeader}
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>{error}</Text>
           <Pressable style={styles.retryBtn} onPress={load}>
@@ -161,14 +163,16 @@ export function CreditHistoryScreen() {
 
   if (items.length === 0) {
     return (
-      <Screen scrollable={false} header={header}>
+      <Screen scrollable={false}>
+        {appHeader}
         <Text style={styles.empty}>ยังไม่มีรายการเครดิต</Text>
       </Screen>
     );
   }
 
   return (
-    <Screen scrollable={false} header={header}>
+    <Screen scrollable={false}>
+      {appHeader}
       <FlatList
         style={{ flex: 1 }}
         data={items}

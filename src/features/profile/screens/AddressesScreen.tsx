@@ -68,19 +68,17 @@ export function AddressesScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="ที่อยู่ของฉัน"
-          subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า"
-          onBack={() => navigation.goBack()}
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "บัญชีของฉัน", onPress: () => navigateToProfileHome(navigation) },
-            { label: "ที่อยู่ของฉัน" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="ที่อยู่ของฉัน"
+        subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า"
+        onBack={() => navigation.goBack()}
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "บัญชีของฉัน", onPress: () => navigateToProfileHome(navigation) },
+          { label: "ที่อยู่ของฉัน" },
+        ]}
+      />
       {isLoading ? (
         <Text style={styles.placeholder}>กำลังโหลด...</Text>
       ) : addresses.length === 0 ? (

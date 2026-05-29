@@ -63,17 +63,15 @@ export function WithdrawalScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="ถอนเครดิต"
-          subtitle="ส่งคำขอถอนเครดิตไปยังแอดมิน"
-          breadcrumbs={[
-            { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
-            { label: "ถอนเครดิต" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="ถอนเครดิต"
+        subtitle="ส่งคำขอถอนเครดิตไปยังแอดมิน"
+        breadcrumbs={[
+          { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
+          { label: "ถอนเครดิต" },
+        ]}
+      />
       <View style={styles.card}>
         {/* Balance */}
         <View style={styles.balanceBox}>

@@ -73,17 +73,15 @@ export function BankAccountScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="บัญชีธนาคาร"
-          subtitle="บัญชีสำหรับรับเงินถอนเครดิต"
-          breadcrumbs={[
-            { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
-            { label: "บัญชีธนาคาร" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="บัญชีธนาคาร"
+        subtitle="บัญชีสำหรับรับเงินถอนเครดิต"
+        breadcrumbs={[
+          { label: "บัญชีของฉัน", onPress: () => navigation.goBack() },
+          { label: "บัญชีธนาคาร" },
+        ]}
+      />
       <View style={styles.card}>
         {saved ? (
           <View style={styles.successBox}>

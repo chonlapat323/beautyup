@@ -18,20 +18,18 @@ export function OrderSuccessScreen() {
   return (
     <Screen
       contentContainerStyle={styles.content}
-      header={
-        <AppHeader
-          title="สั่งซื้อสำเร็จ"
-          subtitle="ระบบได้รับการชำระเงินของคุณเรียบร้อยแล้ว"
-          onBack={() => navigateToHome(navigation)}
-          breadcrumbs={[
-            { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-            { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
-            { label: "ตรวจสอบคำสั่งซื้อ", onPress: () => navigation.navigate("Checkout") },
-            { label: "สำเร็จ" },
-          ]}
-        />
-      }
     >
+      <AppHeader
+        title="สั่งซื้อสำเร็จ"
+        subtitle="ระบบได้รับการชำระเงินของคุณเรียบร้อยแล้ว"
+        onBack={() => navigateToHome(navigation)}
+        breadcrumbs={[
+          { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
+          { label: "ตะกร้าสินค้า", onPress: () => navigation.navigate("Cart") },
+          { label: "ตรวจสอบคำสั่งซื้อ", onPress: () => navigation.navigate("Checkout") },
+          { label: "สำเร็จ" },
+        ]}
+      />
       <View style={styles.hero}>
         <Text style={styles.label}>ยืนยันคำสั่งซื้อแล้ว</Text>
         <Text style={styles.title}>ขอบคุณสำหรับคำสั่งซื้อ</Text>
