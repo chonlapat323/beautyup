@@ -57,10 +57,8 @@ export function ProductDetailScreen() {
       : product.imageUrl
         ? [product.imageUrl]
         : [];
-  // Tab bar floating height (position absolute, bottom: 6, height ~68) + margin
-  const TAB_BAR_OFFSET = 74;
-  // ✦ CHANGED: ความสูง bottom bar ลดลงมากจาก ~140 → ~72px
-  const bottomBarHeight = 72 + Math.max(insets.bottom, 12) + TAB_BAR_OFFSET;
+  // ✦ CHANGED: ความสูง bottom bar + floating tab bar offset
+  const bottomBarHeight = 72 + Math.max(insets.bottom, 12) + 76;
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
