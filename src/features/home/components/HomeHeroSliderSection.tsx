@@ -141,7 +141,7 @@ export function HomeHeroSliderSection({
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: spacing["2xl"],
+    marginBottom: 0,
   },
   card: {
     overflow: "hidden",

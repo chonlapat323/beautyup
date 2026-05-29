@@ -149,7 +149,8 @@ export function HomeFeaturedSection({
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: spacing["2xl"],
+    marginTop: spacing["2xl"],
+    marginBottom: 0,
   },
   headerRow: {
     flexDirection: "row",

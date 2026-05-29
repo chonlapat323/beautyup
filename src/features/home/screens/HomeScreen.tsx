@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   socialRow: {
-    marginTop: 32,
+    marginTop: 24,
     gap: 12,
   },
   socialLabel: {

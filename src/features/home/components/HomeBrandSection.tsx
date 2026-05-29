@@ -52,7 +52,7 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: spacing.lg,
+    marginTop: spacing["2xl"],
     gap: spacing.sm,
   },
   sectionTitle: {
