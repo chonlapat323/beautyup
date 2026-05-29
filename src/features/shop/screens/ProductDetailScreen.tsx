@@ -77,7 +77,7 @@ export function ProductDetailScreen() {
       >
         {/* ✦ Minimal page header */}
         <View style={styles.pageHeader}>
-          <Text style={styles.pageTitle} numberOfLines={2}>{product.name}</Text>
+          <Text style={styles.pageTitle} numberOfLines={3}>{product.name}</Text>
           <Pressable onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={10}>
             <MaterialIcons name="arrow-back-ios" size={12} color={colors.goldDeep} />
             <Text style={styles.backText}>ย้อนกลับ</Text>
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 20,
     fontFamily: fonts.extraBold,
-    lineHeight: 26,
+    lineHeight: 30,
     flex: 1,
     paddingRight: 10,
   },
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
 
   // Price — ✦ gold
   priceRow: { flexDirection: "row", alignItems: "baseline", gap: 10 },
-  price: { color: colors.gold, fontSize: 30, fontFamily: fonts.extraBold, lineHeight: 34 },
+  price: { color: colors.gold, fontSize: 30, fontFamily: fonts.extraBold, lineHeight: 40 },
   originalPrice: { color: "rgba(255,255,255,0.45)", fontSize: 16, textDecorationLine: "line-through", fontFamily: fonts.medium },
 
   // Shade
