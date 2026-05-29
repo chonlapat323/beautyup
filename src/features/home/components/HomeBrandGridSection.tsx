@@ -42,15 +42,13 @@ export function HomeBrandGridSection({ horizontalPadding, onSelectBrand, onViewA
               style={styles.card}
             >
               <View style={styles.visual}>
-                <View style={styles.iconWrap}>
-                  {brand.imageUrl ? (
-                    <CommerceImage contentFit="cover" style={styles.icon} uri={brand.imageUrl} />
-                  ) : (
-                    <View style={styles.iconPlaceholder}>
-                      <Text style={styles.iconInitial}>{brand.name.charAt(0).toUpperCase()}</Text>
-                    </View>
-                  )}
-                </View>
+                {brand.imageUrl ? (
+                  <CommerceImage contentFit="cover" style={styles.visualImage} uri={brand.imageUrl} />
+                ) : (
+                  <View style={styles.iconPlaceholder}>
+                    <Text style={styles.iconInitial}>{brand.name.charAt(0).toUpperCase()}</Text>
+                  </View>
+                )}
               </View>
 
               <Text numberOfLines={2} style={styles.label}>{brand.name}</Text>
@@ -163,21 +161,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     overflow: "hidden",
   },
-  iconWrap: {
-    width: 58,
-    height: 58,
-    borderRadius: 18,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#DBE9DF",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  icon: {
-    width: 46,
-    height: 46,
-    borderRadius: 14,
+  visualImage: {
+    width: "100%",
+    height: "100%",
   },
   iconPlaceholder: {
     width: 46,
