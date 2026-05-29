@@ -7,12 +7,14 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { CommerceImage } from "@/components/ui/CommerceImage";
 import type { ShopBrowseStackParamList } from "@/navigation/types";
 import { useAppStore } from "@/store/useAppStore";
 import { colors, fonts, radius, spacing } from "@/theme";
@@ -30,7 +32,7 @@ function getAccent(index: number) {
   return ACCENTS[index % ACCENTS.length];
 }
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
+// ─── Category card (text) ─────────────────────────────────────────────────────
 
 function FilterCard({
   title,
@@ -59,11 +61,43 @@ function FilterCard({
         <Text numberOfLines={2} style={[styles.cardTitle, { color: textColor }]}>
           {title}
         </Text>
-        {note ? (
-          <Text style={[styles.cardNote]}>{note}</Text>
-        ) : null}
+        {note ? <Text style={styles.cardNote}>{note}</Text> : null}
       </View>
       <MaterialIcons name="chevron-right" size={20} color={textColor} style={styles.chevron} />
+    </Pressable>
+  );
+}
+
+// ─── Brand image card ─────────────────────────────────────────────────────────
+
+function BrandSlide({
+  name,
+  imageUrl,
+  cardWidth,
+  onPress,
+}: {
+  name: string;
+  imageUrl?: string | null;
+  cardWidth: number;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.brandCard,
+        { width: cardWidth },
+        pressed && { opacity: 0.82 },
+      ]}
+    >
+      {imageUrl ? (
+        <CommerceImage style={styles.brandImage} uri={imageUrl} contentFit="cover" />
+      ) : (
+        <View style={styles.brandImagePlaceholder} />
+      )}
+      <View style={styles.brandOverlay}>
+        <Text style={styles.brandName} numberOfLines={2}>{name}</Text>
+      </View>
     </Pressable>
   );
 }
@@ -71,10 +105,7 @@ function FilterCard({
 // ─── Step indicator ───────────────────────────────────────────────────────────
 
 const STEP_ORDER: Step[] = ["brand", "category"];
-const STEP_LABELS: Record<Step, string> = {
-  brand: "แบรนด์",
-  category: "หมวดหมู่",
-};
+const STEP_LABELS: Record<Step, string> = { brand: "แบรนด์", category: "หมวดหมู่" };
 
 function StepIndicator({ current }: { current: Step }) {
   const currentIndex = STEP_ORDER.indexOf(current);
@@ -105,6 +136,7 @@ function StepIndicator({ current }: { current: Step }) {
 
 export function ShopFilterScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopBrowseStackParamList>>();
+  const { width } = useWindowDimensions();
   const products = useAppStore((state) => state.products);
   const categories = useAppStore((state) => state.categories);
   const brands = useAppStore((state) => state.brands);
@@ -112,6 +144,10 @@ export function ShopFilterScreen() {
   const [step, setStep] = useState<Step>("brand");
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const [selectedBrandName, setSelectedBrandName] = useState<string>("");
+
+  const hPad = spacing["2xl"];
+  const cardGap = spacing.md;
+  const cardWidth = (width - hPad * 2 - cardGap) / 2;
 
   const availableCategories = useMemo(() => {
     if (!selectedBrandId) return [];
@@ -147,57 +183,52 @@ export function ShopFilterScreen() {
     >
       <StepIndicator current={step} />
 
-      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
-        {step === "brand" && (
-          <>
-            {brands.length === 0 && (
-              <ActivityIndicator color={colors.primary} style={{ marginTop: spacing["3xl"] }} />
-            )}
-            {brands.map((brand, index) => {
-              const accent = getAccent(index);
-              return (
-                <FilterCard
-                  key={brand.id}
-                  title={brand.name}
-                  bg={accent.bg}
-                  border={accent.border}
-                  textColor={accent.text}
-                  accentBarColor={accent.border}
-                  onPress={() => selectBrand(brand.id, brand.name)}
-                />
-              );
-            })}
-          </>
-        )}
-
-        {step === "category" && (
-          <>
-            <FilterCard
-              title="ทุกหมวดหมู่"
-              note={`ดูสินค้าทั้งหมดของ ${selectedBrandName}`}
-              bg="rgba(255,255,255,0.12)"
-              border="rgba(255,255,255,0.25)"
-              textColor="#FFFFFF"
-              accentBarColor="rgba(255,255,255,0.25)"
-              onPress={() => selectCategory(null)}
+      {/* ── Brand step: 2-column image grid ─────────────────────────────── */}
+      {step === "brand" && (
+        <View style={[styles.brandGrid, { paddingHorizontal: hPad, gap: cardGap }]}>
+          {brands.length === 0 && (
+            <ActivityIndicator color={colors.primary} style={{ marginTop: spacing["3xl"] }} />
+          )}
+          {brands.map((brand) => (
+            <BrandSlide
+              key={brand.id}
+              name={brand.name}
+              imageUrl={brand.imageUrl}
+              cardWidth={cardWidth}
+              onPress={() => selectBrand(brand.id, brand.name)}
             />
-            {availableCategories.map((cat, index) => {
-              const accent = getAccent(index);
-              return (
-                <FilterCard
-                  key={cat.id}
-                  title={cat.title}
-                  bg={accent.bg}
-                  border={accent.border}
-                  textColor={accent.text}
-                  accentBarColor={accent.border}
-                  onPress={() => selectCategory(cat.id)}
-                />
-              );
-            })}
-          </>
-        )}
-      </ScrollView>
+          ))}
+        </View>
+      )}
+
+      {/* ── Category step: text cards ─────────────────────────────────────── */}
+      {step === "category" && (
+        <ScrollView contentContainerStyle={[styles.list, { paddingHorizontal: hPad }]} showsVerticalScrollIndicator={false}>
+          <FilterCard
+            title="ทุกหมวดหมู่"
+            note={`ดูสินค้าทั้งหมดของ ${selectedBrandName}`}
+            bg="rgba(255,255,255,0.12)"
+            border="rgba(255,255,255,0.25)"
+            textColor="#FFFFFF"
+            accentBarColor="rgba(255,255,255,0.25)"
+            onPress={() => selectCategory(null)}
+          />
+          {availableCategories.map((cat, index) => {
+            const accent = getAccent(index);
+            return (
+              <FilterCard
+                key={cat.id}
+                title={cat.title}
+                bg={accent.bg}
+                border={accent.border}
+                textColor={accent.text}
+                accentBarColor={accent.border}
+                onPress={() => selectCategory(cat.id)}
+              />
+            );
+          })}
+        </ScrollView>
+      )}
     </Screen>
   );
 }
@@ -231,9 +262,57 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.semiBold,
   },
+  // Brand grid
+  brandGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  brandCard: {
+    height: 120,
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    backgroundColor: colors.surfaceMuted,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+    marginBottom: spacing.md,
+  },
+  brandImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  brandImagePlaceholder: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.surface,
+  },
+  brandOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.sm,
+    paddingTop: spacing.lg,
+    backgroundColor: "rgba(0,0,0,0.45)",
+  },
+  brandName: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontFamily: fonts.bold,
+    lineHeight: 18,
+  },
+  // Category list
   list: {
     gap: spacing.md,
-    paddingHorizontal: spacing["2xl"],
     paddingBottom: spacing["2xl"],
   },
   card: {
