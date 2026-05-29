@@ -99,7 +99,7 @@ export function HomeHeroSliderSection({
                 <CommerceImage
                   style={styles.productImage}
                   uri={banner.imageUrl}
-                  contentFit="contain"
+                  contentFit="cover"
                 />
               ) : (
                 <View style={styles.imagePlaceholder}>
@@ -210,6 +210,7 @@ const styles = StyleSheet.create({
   productImage: {
     width: "100%",
     height: "100%",
+    borderRadius: 20,
   },
   imagePlaceholder: {
     width: "100%",
@@ -229,11 +230,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#D5DFD7",
+    backgroundColor: "rgba(255,255,255,0.3)",
   },
   dotActive: {
     width: 24,
     borderRadius: 8,
-    backgroundColor: colors.primaryDark,
+    backgroundColor: colors.gold,
   },
 });
