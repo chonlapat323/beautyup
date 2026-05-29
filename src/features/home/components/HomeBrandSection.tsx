@@ -15,7 +15,7 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
 
   if (brands.length === 0) return null;
 
-  const cardWidth = width - horizontalPadding * 2 - spacing.lg;
+  const cardWidth = width - horizontalPadding * 2 - spacing["2xl"];
 
   return (
     <View style={[styles.wrapper, { paddingHorizontal: horizontalPadding }]}>
@@ -24,7 +24,7 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
         horizontal
         showsHorizontalScrollIndicator={false}
         decelerationRate="fast"
-        snapToInterval={cardWidth + spacing.md}
+        snapToInterval={cardWidth + spacing.sm}
         snapToAlignment="start"
         contentContainerStyle={styles.scroll}
       >
@@ -52,8 +52,8 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: spacing["2xl"],
-    gap: spacing.md,
+    marginTop: spacing.lg,
+    gap: spacing.sm,
   },
   sectionTitle: {
     color: "#FFFFFF",
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   scroll: {
-    gap: spacing.md,
+    gap: spacing.sm,
     paddingRight: spacing.sm,
   },
   card: {
