@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { CommerceImage } from "@/components/ui/CommerceImage";
@@ -12,10 +13,10 @@ type Props = {
 export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
   const brands = useAppStore((state) => state.brands);
   const { width } = useWindowDimensions();
+  const [activeIndex, setActiveIndex] = useState(0);
 
   if (brands.length === 0) return null;
 
-  // Same as banner: card fills full width within horizontal padding
   const cardWidth = width - horizontalPadding * 2;
   const cardHeight = Math.round(cardWidth * 0.52);
 
@@ -27,6 +28,10 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         style={{ marginTop: spacing.sm }}
+        onMomentumScrollEnd={(e) => {
+          const index = Math.round(e.nativeEvent.contentOffset.x / cardWidth);
+          setActiveIndex(index);
+        }}
       >
         {brands.map((brand) => (
           <Pressable
@@ -49,6 +54,15 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand }: Props) {
           </Pressable>
         ))}
       </ScrollView>
+
+      {/* Pagination dots — same as banner */}
+      {brands.length > 1 && (
+        <View style={styles.dots}>
+          {brands.map((_, i) => (
+            <View key={i} style={[styles.dot, i === activeIndex && styles.dotActive]} />
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -93,5 +107,23 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontFamily: fonts.bold,
+  },
+  dots: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 12,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#D5DFD7",
+  },
+  dotActive: {
+    width: 24,
+    borderRadius: 8,
+    backgroundColor: colors.primaryDark,
   },
 });
