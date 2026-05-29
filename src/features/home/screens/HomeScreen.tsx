@@ -50,10 +50,8 @@ export function HomeScreen() {
 
   if (isLoading) {
     return (
-      <Screen
-        header={<AppHeader showSearch onSearchPress={() => navigation.navigate("Search")} />}
-        contentContainerStyle={styles.content}
-      >
+      <Screen contentContainerStyle={styles.content}>
+        <AppHeader dark showSearch onSearchPress={() => navigation.navigate("Search")} />
         <HomeSkeleton />
       </Screen>
     );
@@ -61,10 +59,10 @@ export function HomeScreen() {
 
   return (
     <Screen
-      header={<AppHeader showSearch onSearchPress={() => navigation.navigate("Search")} />}
       contentContainerStyle={styles.content}
       onRefresh={loadCatalog}
     >
+      <AppHeader dark showSearch onSearchPress={() => navigation.navigate("Search")} />
       {heroSlides.length > 0 ? (
         <HomeHeroSliderSection
           banners={heroSlides}
@@ -142,7 +140,7 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   content: {
-    paddingTop: 16,
+    paddingTop: 0,
     paddingBottom: 44,
     backgroundColor: colors.background,
   },

@@ -16,6 +16,7 @@ type AppHeaderProps = {
   showSearch?: boolean;
   onSearchPress?: () => void;
   onBack?: () => void;
+  dark?: boolean; // true = transparent bg, white text (for home screen scrollable mode)
 };
 
 function getGreeting() {
@@ -32,6 +33,7 @@ export function AppHeader({
   showSearch = false,
   onSearchPress,
   onBack,
+  dark = false,
 }: AppHeaderProps) {
   const { width } = useWindowDimensions();
   const member = useAppStore((state) => state.member);
@@ -46,6 +48,7 @@ export function AppHeader({
     <View
       style={[
         styles.container,
+        dark && styles.containerDark,
         {
           paddingHorizontal: horizontalPadding,
           paddingBottom: shellBottomPadding,
@@ -69,8 +72,8 @@ export function AppHeader({
           </View>
 
           <View style={styles.profileCopy}>
-            <Text style={styles.greeting}>{getGreeting()}</Text>
-            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.memberName}>
+            <Text style={[styles.greeting, dark && styles.greetingDark]}>{getGreeting()}</Text>
+            <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.memberName, dark && styles.memberNameDark]}>
               {displayName}
             </Text>
           </View>
@@ -162,6 +165,18 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 },
     elevation: 5,
+  },
+  containerDark: {
+    backgroundColor: "transparent",
+    borderBottomWidth: 0,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  greetingDark: {
+    color: "rgba(255,255,255,0.65)",
+  },
+  memberNameDark: {
+    color: "#FFFFFF",
   },
   topRow: {
     flexDirection: "row",
