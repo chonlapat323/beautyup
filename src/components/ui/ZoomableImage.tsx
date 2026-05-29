@@ -8,9 +8,10 @@ type Props = {
   uri: string;
   width: number;
   height: number;
+  contentFit?: "cover" | "contain" | "fill";
 };
 
-export function ZoomableImage({ uri, width, height }: Props) {
+export function ZoomableImage({ uri, width, height, contentFit = "contain" }: Props) {
   const baseScale = useRef(new Animated.Value(1)).current;
   const pinchScale = useRef(new Animated.Value(1)).current;
   const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
@@ -50,7 +51,7 @@ export function ZoomableImage({ uri, width, height }: Props) {
           simultaneousHandlers={doubleTapRef}
         >
           <Animated.View style={{ width, height, transform: [{ scale }] }}>
-            <CommerceImage uri={uri} style={{ width, height }} contentFit="contain" />
+            <CommerceImage uri={uri} style={{ width, height }} contentFit={contentFit} />
           </Animated.View>
         </PinchGestureHandler>
       </Animated.View>

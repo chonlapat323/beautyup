@@ -115,7 +115,7 @@ export function ProductDetailScreen() {
           >
             {images.map((uri, index) => (
               <View key={index} style={[styles.slideItem, { width: cardWidth }]}>
-                <ZoomableImage uri={uri} width={cardWidth} height={Math.round(cardWidth * 0.9)} />
+                <ZoomableImage uri={uri} width={cardWidth} height={Math.round(cardWidth * 0.85)} contentFit="cover" />
               </View>
             ))}
           </ScrollView>
@@ -302,9 +302,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   slideItem: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
+    overflow: "hidden",
   },
   dots: { flexDirection: "row", justifyContent: "center", gap: 5, marginTop: 10 },
   dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.3)" },
