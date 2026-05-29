@@ -159,14 +159,10 @@ function PointsPillInline() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F7FBF8",
-    borderBottomWidth: 1,
-    borderBottomColor: colors.goldMuted,
-    shadowColor: colors.gold,
-    shadowOpacity: 0.10,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
+    backgroundColor: "transparent",
+    borderBottomWidth: 0,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   containerDark: {
     backgroundColor: "transparent",
@@ -292,7 +288,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 40,
     fontFamily: fonts.extraBold,
-    color: "#173022",
+    color: "#FFFFFF",
     paddingTop: 2,
     flex: 1,
   },
@@ -300,7 +296,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontFamily: fonts.medium,
-    color: "#5E7767",
+    color: "rgba(255,255,255,0.7)",
   },
   breadcrumbRow: {
     flexDirection: "row",
@@ -322,16 +318,16 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
   breadcrumbLink: {
-    color: colors.goldDeep,
+    color: colors.gold,
   },
   breadcrumbCurrent: {
-    color: "#6B8474",
+    color: "rgba(255,255,255,0.5)",
   },
   breadcrumbSeparator: {
     fontSize: 12,
     lineHeight: 16,
     fontFamily: fonts.medium,
-    color: "#8AA091",
+    color: "rgba(255,255,255,0.3)",
   },
   // Points pill — ทองคำขับบนพื้นขาว
   pill: {
