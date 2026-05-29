@@ -88,7 +88,7 @@ export function HomeHeroSliderSection({
                     }],
                   }}
                 >
-                  <MaterialIcons color="#FFFFFF" name="arrow-forward" size={14} />
+                  <MaterialIcons color={colors.goldDark} name="arrow-forward" size={14} />
                 </Animated.View>
               </Pressable>
             </View>
