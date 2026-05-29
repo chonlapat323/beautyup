@@ -197,7 +197,7 @@ export function ShopFilterScreen() {
               <View style={styles.brandRowLabel}>
                 <Text style={styles.brandRowName}>{brand.name}</Text>
               </View>
-              <MaterialIcons name="chevron-right" size={20} color="rgba(255,255,255,0.8)" style={{ marginRight: spacing.md }} />
+              <MaterialIcons name="chevron-right" size={20} color={colors.primary} style={{ marginRight: spacing.md }} />
             </Pressable>
           ))}
         </View>
@@ -275,9 +275,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
     shadowColor: "#000",
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
@@ -296,12 +298,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   brandRowName: {
-    color: "#FFFFFF",
+    color: "#1A3A2A",
     fontSize: 18,
     fontFamily: fonts.bold,
-    textShadowColor: "rgba(0,0,0,0.5)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
   },
   brandCard: {
     height: 120,
