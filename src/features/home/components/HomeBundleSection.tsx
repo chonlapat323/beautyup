@@ -1,6 +1,19 @@
-import { MaterialIcons } from "@expo/vector-icons";
+/**
+ * HomeBundleSection — v2 Design Proposal
+ *
+ * การเปลี่ยนแปลงจาก v1:
+ * ─────────────────────
+ * • Section header: เพิ่ม gold bar ซ้าย (สอดคล้องกับ sections อื่น)
+ * • Card: เพิ่มความสูงรูป 140→160px, corner radius ใหญ่ขึ้น (radius.lg)
+ * • Item count: เปลี่ยนจาก muted text → gold pill badge
+ * • Card border: เพิ่ม subtle gold border แทน borderSoft
+ * • Description: แสดง bundle.description ถ้ามี (1 บรรทัด)
+ * • Pressable: เพิ่ม android_ripple + opacity feedback
+ */
+
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CommerceImage } from "@/components/ui/CommerceImage";
@@ -20,13 +33,18 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
 
   return (
     <View style={[styles.section, { paddingHorizontal: horizontalPadding }]}>
-      {/* Header */}
+
+      {/* ✦ CHANGED: Section header — gold bar + layout สอดคล้องกับ sections อื่น */}
       <View style={styles.header}>
-        <Text style={styles.sectionTitle}>สูตรพิเศษ</Text>
-        <Text style={styles.sectionSub}>คลิกเพื่อดูสินค้าในสูตร</Text>
+        <View style={styles.titleRow}>
+          <View style={styles.goldBar} />
+          <View>
+            <Text style={styles.sectionTitle}>สูตรพิเศษ</Text>
+            <Text style={styles.sectionSub}>คลิกเพื่อดูสินค้าในสูตร</Text>
+          </View>
+        </View>
       </View>
 
-      {/* Cards */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -35,7 +53,8 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
         {bundles.map((bundle) => (
           <Pressable
             key={bundle.id}
-            style={({ pressed }) => [styles.card, pressed && { opacity: 0.88 }]}
+            style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+            android_ripple={{ color: colors.goldSoft, borderless: false }}
             onPress={() =>
               navigation.navigate("ProductList", {
                 bundleId: bundle.id,
@@ -43,31 +62,31 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
               })
             }
           >
-            {/* Image area */}
-            <View style={styles.imageArea}>
-              {bundle.imageUrl ? (
-                <CommerceImage style={styles.image} uri={bundle.imageUrl} contentFit="cover" />
-              ) : (
-                <View style={styles.imagePlaceholder}>
-                  <MaterialIcons name="local-drink" size={40} color="#C4CEC8" />
-                </View>
-              )}
-              {/* Item count badge */}
-              <View style={styles.badge}>
-                <MaterialIcons name="auto-awesome" size={11} color={colors.goldDark} />
-                <Text style={styles.badgeText}>{bundle.items.length} รายการ</Text>
+            {/* ✦ CHANGED: รูปสูงขึ้น 160px */}
+            <View style={styles.imageWrap}>
+              <CommerceImage
+                style={styles.cardImage}
+                uri={bundle.imageUrl}
+                contentFit="cover"
+              />
+              {/* ✦ NEW: Gold item count badge บนรูป */}
+              <View style={styles.countBadge}>
+                <MaterialIcons name="inventory-2" size={10} color={colors.goldDark} />
+                <Text style={styles.countText}>{bundle.items.length} รายการ</Text>
               </View>
             </View>
 
-            {/* Card body */}
             <View style={styles.cardBody}>
               <Text style={styles.cardName} numberOfLines={2}>{bundle.name}</Text>
+              {/* ✦ NEW: Description ถ้ามี */}
               {bundle.description ? (
-                <Text style={styles.cardDesc} numberOfLines={2}>{bundle.description}</Text>
+                <Text style={styles.cardDesc} numberOfLines={1}>{bundle.description}</Text>
               ) : null}
+
+              {/* ✦ NEW: ปุ่มดูสินค้า subtle */}
               <View style={styles.cta}>
                 <Text style={styles.ctaText}>ดูสินค้า</Text>
-                <MaterialIcons name="chevron-right" size={14} color={colors.primary} />
+                <MaterialIcons name="chevron-right" size={14} color={colors.goldDeep} />
               </View>
             </View>
           </Pressable>
@@ -80,96 +99,110 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
 const styles = StyleSheet.create({
   section: {
     marginTop: spacing["2xl"],
+    marginBottom: spacing["2xl"],
   },
   header: {
-    marginBottom: spacing.md,
-    gap: 2,
+    marginBottom: spacing.lg,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  // ✦ NEW: Gold bar ซ้าย
+  goldBar: {
+    width: 3,
+    height: 36,
+    borderRadius: 2,
+    backgroundColor: colors.gold,
+    marginTop: 2,
   },
   sectionTitle: {
     color: "#FFFFFF",
     fontSize: 18,
     fontFamily: fonts.bold,
+    lineHeight: 22,
   },
   sectionSub: {
     color: "rgba(255,255,255,0.65)",
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: fonts.medium,
+    marginTop: 3,
   },
   scroll: {
     gap: spacing.md,
     paddingBottom: spacing.sm,
+    paddingRight: 4,
   },
   card: {
-    width: 160,
-    borderRadius: radius.lg,
-    backgroundColor: "#FFFFFF",
+    width: 168,
+    borderRadius: radius.lg,       // ✦ CHANGED: lg แทน md
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E8EDE9",
+    borderColor: colors.goldMuted,  // ✦ CHANGED: subtle gold border
     overflow: "hidden",
-    shadowColor: "#214530",
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-  imageArea: {
-    height: 130,
-    backgroundColor: "#F0F0F0",
+  cardPressed: {
+    opacity: 0.88,
+  },
+  imageWrap: {
     position: "relative",
   },
-  image: {
-    width: "100%",
-    height: "100%",
+  cardImage: {
+    width: 168,
+    height: 160,                    // ✦ CHANGED: 120→160px
+    backgroundColor: colors.surfaceMuted,
   },
-  imagePlaceholder: {
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badge: {
+  // ✦ NEW: Gold pill badge บนรูป
+  countBadge: {
     position: "absolute",
-    bottom: spacing.sm,
-    left: spacing.sm,
+    bottom: 8,
+    right: 8,
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: colors.goldSoft,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.gold,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
+    backgroundColor: colors.gold,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
-  badgeText: {
-    fontSize: 11,
-    fontFamily: fonts.semiBold,
+  countText: {
     color: colors.goldDark,
+    fontSize: 10,
+    fontFamily: fonts.bold,
   },
   cardBody: {
-    padding: spacing.md,
-    gap: spacing.xs,
+    padding: 12,
+    gap: 4,
   },
   cardName: {
-    color: "#1A3A2A",
-    fontSize: 15,
-    fontFamily: fonts.bold,
-    lineHeight: 20,
+    color: colors.textPrimary,
+    fontSize: 13,
+    fontFamily: fonts.semiBold,
+    lineHeight: 18,
+    minHeight: 36,
   },
+  // ✦ NEW
   cardDesc: {
-    color: "#6B8474",
-    fontSize: 12,
-    fontFamily: fonts.regular,
-    lineHeight: 16,
+    color: colors.textMuted,
+    fontSize: 11,
+    fontFamily: fonts.medium,
+    lineHeight: 15,
   },
+  // ✦ NEW: inline CTA
   cta: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: spacing.xs,
+    marginTop: 4,
   },
   ctaText: {
-    color: colors.primary,
-    fontSize: 12,
+    color: colors.goldDeep,
+    fontSize: 11,
     fontFamily: fonts.semiBold,
   },
 });
