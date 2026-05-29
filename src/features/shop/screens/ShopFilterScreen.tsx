@@ -142,11 +142,6 @@ export function ShopFilterScreen() {
   const [selectedBrandName, setSelectedBrandName] = useState<string>("");
 
   const hPad = spacing["2xl"];
-  const cardGap = spacing.md;
-  // ≤4 brands: fill entire row; >4: fixed width + scroll
-  const cardWidth = brands.length <= 4
-    ? Math.floor((width - hPad * 2 - cardGap * (brands.length - 1)) / brands.length)
-    : Math.round(width * 0.38);
 
   const availableCategories = useMemo(() => {
     if (!selectedBrandId) return [];
@@ -182,29 +177,30 @@ export function ShopFilterScreen() {
     >
       <StepIndicator current={step} />
 
-      {/* ── Brand step: horizontal scroll row ───────────────────────────── */}
+      {/* ── Brand step: full-width rows ──────────────────────────────────── */}
       {step === "brand" && (
-        <>
+        <View style={[styles.brandList, { paddingHorizontal: hPad }]}>
           {brands.length === 0 && (
             <ActivityIndicator color={colors.primary} style={{ marginTop: spacing["3xl"] }} />
           )}
-          <ScrollView
-            horizontal
-            scrollEnabled={brands.length > 4}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={[styles.brandRow, { paddingHorizontal: hPad }]}
-          >
-            {brands.map((brand) => (
-              <BrandSlide
-                key={brand.id}
-                name={brand.name}
-                imageUrl={brand.imageUrl}
-                cardWidth={cardWidth}
-                onPress={() => selectBrand(brand.id, brand.name)}
-              />
-            ))}
-          </ScrollView>
-        </>
+          {brands.map((brand) => (
+            <Pressable
+              key={brand.id}
+              style={({ pressed }) => [styles.brandRow, pressed && { opacity: 0.85 }]}
+              onPress={() => selectBrand(brand.id, brand.name)}
+            >
+              {brand.imageUrl ? (
+                <CommerceImage style={styles.brandRowImage} uri={brand.imageUrl} contentFit="cover" />
+              ) : (
+                <View style={styles.brandRowImagePlaceholder} />
+              )}
+              <View style={styles.brandRowLabel}>
+                <Text style={styles.brandRowName}>{brand.name}</Text>
+              </View>
+              <MaterialIcons name="chevron-right" size={20} color="rgba(255,255,255,0.8)" style={{ marginRight: spacing.md }} />
+            </Pressable>
+          ))}
+        </View>
       )}
 
       {/* ── Category step: text cards ─────────────────────────────────────── */}
@@ -268,11 +264,44 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.semiBold,
   },
-  // Brand row
-  brandRow: {
-    flexDirection: "row",
+  // Brand full-width rows
+  brandList: {
     gap: spacing.md,
     paddingBottom: spacing["2xl"],
+  },
+  brandRow: {
+    height: 90,
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.surfaceMuted,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  brandRowImage: {
+    width: 110,
+    height: 90,
+  },
+  brandRowImagePlaceholder: {
+    width: 110,
+    height: 90,
+    backgroundColor: colors.surface,
+  },
+  brandRowLabel: {
+    flex: 1,
+    paddingHorizontal: spacing.lg,
+  },
+  brandRowName: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontFamily: fonts.bold,
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   brandCard: {
     height: 120,
