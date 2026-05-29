@@ -45,7 +45,7 @@ export function ProductListScreen() {
   const favoriteIds = useAppStore((state) => state.favoriteIds);
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
 
-  const { categoryId, bundleId, brandId: initialBrandId, collectionId: initialCollectionId } = route.params;
+  const { categoryId, bundleId, bundleName, brandId: initialBrandId, collectionId: initialCollectionId } = route.params;
   const bundles = useAppStore((state) => state.bundles);
   const collections = useAppStore((state) => state.collections);
 
@@ -121,11 +121,17 @@ export function ProductListScreen() {
       contentContainerStyle={styles.content}
     >
       <AppHeader
-        title={selectedCategoryId ? (categories.find((c) => c.id === selectedCategoryId)?.title ?? "สินค้า") : "สินค้าทั้งหมด"}
-        subtitle="เลือกสินค้าที่เหมาะกับคุณ"
+        title={
+          bundleId
+            ? (bundleName ?? "สูตรพิเศษ")
+            : selectedCategoryId
+            ? (categories.find((c) => c.id === selectedCategoryId)?.title ?? "สินค้า")
+            : "สินค้าทั้งหมด"
+        }
+        subtitle={bundleId ? "สินค้าในสูตรนี้" : "เลือกสินค้าที่เหมาะกับคุณ"}
         breadcrumbs={[
           { label: "หน้าหลัก", onPress: () => navigateToHome(navigation) },
-          { label: "สินค้า" },
+          { label: bundleId ? "สูตรพิเศษ" : "สินค้า" },
         ]}
         onBack={() => navigation.goBack()}
       />
