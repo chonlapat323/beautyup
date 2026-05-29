@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "flex-start",
     backgroundColor: colors.background,
+    paddingBottom: 90,
   },
   fixed: {
     flex: 1,
