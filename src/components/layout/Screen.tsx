@@ -4,9 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/theme";
 
-// Floating tab bar clearance — tab height (58) + bottom margin (6) + safe buffer (12)
-const TAB_BAR_CLEARANCE = 76;
-
 type ScreenProps = PropsWithChildren<{
   scrollable?: boolean;
   contentContainerStyle?: ScrollViewProps["contentContainerStyle"];
@@ -29,11 +26,6 @@ export function Screen({
     try { await onRefresh(); } finally { setRefreshing(false); }
   }
 
-  // Compute paddingBottom: always at least TAB_BAR_CLEARANCE
-  const passedStyle = StyleSheet.flatten(contentContainerStyle) as Record<string, unknown> | undefined;
-  const passedPaddingBottom = typeof passedStyle?.paddingBottom === "number" ? passedStyle.paddingBottom : 0;
-  const safePaddingBottom = Math.max(passedPaddingBottom, TAB_BAR_CLEARANCE);
-
   if (!scrollable) {
     return (
       <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
@@ -53,7 +45,7 @@ export function Screen({
         {header}
         <ScrollView
           style={styles.scrollArea}
-          contentContainerStyle={[styles.content, contentContainerStyle, { paddingBottom: safePaddingBottom }]}
+          contentContainerStyle={[styles.content, contentContainerStyle]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           refreshControl={
@@ -90,6 +82,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "flex-start",
     backgroundColor: colors.background,
+    paddingBottom: 24,
   },
   fixed: {
     flex: 1,

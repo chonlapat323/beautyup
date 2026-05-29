@@ -57,8 +57,8 @@ export function ProductDetailScreen() {
       : product.imageUrl
         ? [product.imageUrl]
         : [];
-  // ✦ CHANGED: ความสูง bottom bar + floating tab bar offset
-  const bottomBarHeight = 72 + Math.max(insets.bottom, 12) + 76;
+  // ✦ CHANGED: ความสูง bottom bar
+  const bottomBarHeight = 72 + Math.max(insets.bottom, 12);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   // ✦ CHANGED: Compact bottom bar
   bottomBar: {
     position: "absolute",
-    left: 0, right: 0, bottom: 74,
+    left: 0, right: 0, bottom: 0,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
