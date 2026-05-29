@@ -42,6 +42,7 @@ export function ProductDetailScreen() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const carouselRef = useRef<ScrollView>(null);
+  const cardWidth = width - 40;
 
   if (!foundProduct) return null;
 
@@ -56,8 +57,6 @@ export function ProductDetailScreen() {
       : product.imageUrl
         ? [product.imageUrl]
         : [];
-  const imageHeight = Math.round(width * 0.85);
-
   // ✦ CHANGED: ความสูง bottom bar ลดลงมากจาก ~140 → ~72px
   const bottomBarHeight = 72 + Math.max(insets.bottom, 12);
 
@@ -104,35 +103,52 @@ export function ProductDetailScreen() {
           ))}
         </View>
 
-        {/* Image Carousel */}
-        <View style={[styles.carouselWrap, { height: imageHeight }]}>
+        {/* Image Carousel — white rounded card */}
+        <View style={styles.carouselCard}>
           <ScrollView
             ref={carouselRef}
             horizontal pagingEnabled
             showsHorizontalScrollIndicator={false}
             onMomentumScrollEnd={(e) =>
-              setActiveSlide(Math.round(e.nativeEvent.contentOffset.x / width))
+              setActiveSlide(Math.round(e.nativeEvent.contentOffset.x / (width - 40)))
             }
           >
             {images.map((uri, index) => (
-              <View key={index} style={{ width, height: imageHeight, alignItems: "center", justifyContent: "center" }}>
-                <ZoomableImage uri={uri} width={width} height={imageHeight} />
+              <View key={index} style={[styles.slideItem, { width: cardWidth }]}>
+                <ZoomableImage uri={uri} width={cardWidth} height={Math.round(cardWidth * 0.9)} />
               </View>
             ))}
           </ScrollView>
-
-          {/* ✦ Gold dots */}
-          {images.length > 1 && (
-            <View style={styles.dots} pointerEvents="none">
-              {images.map((_, i) => (
-                <View key={i} style={[styles.dot, i === activeSlide && styles.dotActive]} />
-              ))}
-            </View>
-          )}
         </View>
+
+        {/* Dots — below card */}
+        {images.length > 1 && (
+          <View style={styles.dots}>
+            {images.map((_, i) => (
+              <View key={i} style={[styles.dot, i === activeSlide && styles.dotActive]} />
+            ))}
+          </View>
+        )}
 
         {/* Body */}
         <View style={styles.body}>
+          {/* Brand + tag */}
+          <View style={styles.metaRow}>
+            {product.brandName ? (
+              <Text style={styles.brandName}>{product.brandName}</Text>
+            ) : null}
+            {product.tag ? (
+              <View style={styles.tagBadge}>
+                <Text style={styles.tagText}>{product.tag}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          {/* Subtitle */}
+          {product.subtitle ? (
+            <Text style={styles.subtitle}>{product.subtitle}</Text>
+          ) : null}
+
           {/* ✦ Gold price */}
           <View style={styles.priceRow}>
             <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
@@ -271,15 +287,38 @@ const styles = StyleSheet.create({
   bcSep: { color: "rgba(255,255,255,0.3)", fontSize: 10 },
   bcCur: { color: "rgba(255,255,255,0.45)", fontSize: 10, fontFamily: fonts.medium },
 
-  // Carousel
-  carouselWrap: { position: "relative", backgroundColor: colors.surfaceMuted },
-  dots: { position: "absolute", bottom: 10, left: 0, right: 0, flexDirection: "row", justifyContent: "center", gap: 5 },
-  dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: "rgba(0,0,0,0.2)" },
-  // ✦ Gold dot
+  // Carousel — white card
+  carouselCard: {
+    marginHorizontal: 20,
+    borderRadius: 24,
+    backgroundColor: "#F8FCF9",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.goldMuted,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  slideItem: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+  },
+  dots: { flexDirection: "row", justifyContent: "center", gap: 5, marginTop: 10 },
+  dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.3)" },
   dotActive: { width: 16, borderRadius: 6, backgroundColor: colors.gold },
 
   // Body
-  body: { paddingHorizontal: 20, paddingTop: 20, gap: 14 },
+  body: { paddingHorizontal: 20, paddingTop: 16, gap: 10 },
+
+  // Brand + tag row
+  metaRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  brandName: { color: colors.gold, fontSize: 12, fontFamily: fonts.semiBold, letterSpacing: 0.5 },
+  tagBadge: { backgroundColor: colors.primaryDark, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
+  tagText: { color: "#FFFFFF", fontSize: 10, fontFamily: fonts.bold },
+  subtitle: { color: "rgba(255,255,255,0.6)", fontSize: 12, fontFamily: fonts.medium },
 
   // Price — ✦ gold
   priceRow: { flexDirection: "row", alignItems: "baseline", gap: 10 },
