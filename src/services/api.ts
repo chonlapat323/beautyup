@@ -804,6 +804,24 @@ export async function mobileGetMyRedemption(token: string, id: string): Promise<
   return res.json() as Promise<MyRedemptionDetail>;
 }
 
+export async function mobileUploadProfileImage(token: string, imageUri: string): Promise<{ profileImageUrl: string }> {
+  const formData = new FormData();
+  const filename = imageUri.split("/").pop() ?? "profile.jpg";
+  const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
+  const mimeType = ext === "png" ? "image/png" : "image/jpeg";
+  formData.append("image", { uri: imageUri, name: filename, type: mimeType } as unknown as Blob);
+  const res = await fetch(`${API_BASE}/mobile/me/profile-image`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "อัปโหลดรูปโปรไฟล์ไม่สำเร็จ");
+  }
+  return res.json() as Promise<{ profileImageUrl: string }>;
+}
+
 export async function mobileRegisterPushToken(token: string, expoPushToken: string): Promise<void> {
   const res = await fetch(`${API_BASE}/mobile/me/push-token`, {
     method: "PATCH",
