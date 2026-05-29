@@ -31,20 +31,25 @@ import type { ShopStackParamList } from "@/navigation/types";
 import type { Product } from "@/types/domain";
 import { colors, fonts, radius, spacing } from "@/theme";
 
-// ── Popular / suggested search terms ──────────────────────
-const POPULAR_TERMS = ["ORDEVE", "Koleston", "Illumina", "ELUJUDA", "Shinefinity"];
-const CATEGORY_CHIPS = [
-  { id: "color-bleach", label: "สีผมและบลีช", icon: "palette" },
-  { id: "shampoo-mask", label: "แชมพูและมาสก์", icon: "water-drop" },
-  { id: "leave-in", label: "ลีฟอิน", icon: "auto-fix-high" },
-];
+// ── Popular search terms (static fallback) ────────────────
+const STATIC_POPULAR = ["ORDEVE", "Koleston", "Illumina", "ELUJUDA", "Shinefinity"];
 
 export function SearchScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
   const products = useAppStore((s) => s.products);
+  const categories = useAppStore((s) => s.categories);
+  const brands = useAppStore((s) => s.brands);
   const favoriteIds = useAppStore((s) => s.favoriteIds);
   const toggleFavorite = useAppStore((s) => s.toggleFavorite);
   const addToCart = useAppStore((s) => s.addToCart);
+
+  // Popular terms: brand names from store
+  const popularTerms = brands.length > 0
+    ? brands.slice(0, 5).map((b) => b.name)
+    : STATIC_POPULAR;
+
+  // Category chips: real categories from store (max 4)
+  const categoryChips = categories.slice(0, 4);
 
   const [query, setQuery] = useState("");
 
@@ -135,10 +140,10 @@ export function SearchScreen() {
         <Text style={styles.suggestSub}>พิมพ์ชื่อสินค้า แบรนด์ หรือเฉดสี</Text>
       </View>
 
-      {/* ✦ Popular searches — gold */}
-      <Text style={styles.suggestLabel}>ค้นหายอดนิยม</Text>
+      {/* ✦ Popular searches — brand names */}
+      <Text style={styles.suggestLabel}>แบรนด์ยอดนิยม</Text>
       <View style={styles.chipRow}>
-        {POPULAR_TERMS.map((term) => (
+        {popularTerms.map((term) => (
           <Pressable key={term} style={styles.chipGold} onPress={() => applySearch(term)}>
             <MaterialIcons name="local-fire-department" size={12} color={colors.gold} />
             <Text style={styles.chipGoldText}>{term}</Text>
@@ -146,20 +151,24 @@ export function SearchScreen() {
         ))}
       </View>
 
-      {/* Category shortcuts */}
-      <Text style={[styles.suggestLabel, { marginTop: 14 }]}>หมวดหมู่</Text>
-      <View style={styles.chipRow}>
-        {CATEGORY_CHIPS.map((cat) => (
-          <Pressable
-            key={cat.id}
-            style={styles.chip}
-            onPress={() => navigation.navigate("ProductList", { categoryId: cat.id })}
-          >
-            <MaterialIcons name={cat.icon as any} size={13} color="rgba(255,255,255,0.65)" />
-            <Text style={styles.chipText}>{cat.label}</Text>
-          </Pressable>
-        ))}
-      </View>
+      {/* Category shortcuts — real categories */}
+      {categoryChips.length > 0 && (
+        <>
+          <Text style={[styles.suggestLabel, { marginTop: 14 }]}>หมวดหมู่</Text>
+          <View style={styles.chipRow}>
+            {categoryChips.map((cat) => (
+              <Pressable
+                key={cat.id}
+                style={styles.chip}
+                onPress={() => navigation.navigate("ProductList", { categoryId: cat.id })}
+              >
+                <MaterialIcons name="category" size={13} color="rgba(255,255,255,0.65)" />
+                <Text style={styles.chipText}>{cat.title}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 
