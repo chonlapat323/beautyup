@@ -82,6 +82,7 @@ export function HomeScreen() {
         <HomeBundleSection
           bundles={bundles}
           horizontalPadding={horizontalPadding}
+          onViewAll={() => navigation.getParent()?.navigate("Shop")}
         />
       ) : null}
 

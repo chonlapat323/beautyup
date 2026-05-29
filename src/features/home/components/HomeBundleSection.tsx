@@ -24,9 +24,10 @@ import type { Bundle } from "@/types/domain";
 type Props = {
   bundles: Bundle[];
   horizontalPadding: number;
+  onViewAll?: () => void;
 };
 
-export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
+export function HomeBundleSection({ bundles, horizontalPadding, onViewAll }: Props) {
   const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
 
   if (bundles.length === 0) return null;
@@ -43,6 +44,11 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
             <Text style={styles.sectionSub}>คลิกเพื่อดูสินค้าในสูตร</Text>
           </View>
         </View>
+        {onViewAll ? (
+          <Pressable hitSlop={8} onPress={onViewAll}>
+            <Text style={styles.viewAll}>ดูทั้งหมด &gt;</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       <ScrollView
@@ -103,11 +109,19 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: spacing.lg,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   titleRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 10,
+  },
+  viewAll: {
+    fontSize: 13,
+    color: colors.goldDeep,
+    fontFamily: fonts.semiBold,
   },
   // ✦ NEW: Gold bar ซ้าย
   goldBar: {
