@@ -57,8 +57,10 @@ export function ProductDetailScreen() {
       : product.imageUrl
         ? [product.imageUrl]
         : [];
+  // Tab bar floating height (position absolute, bottom: 6, height ~68) + margin
+  const TAB_BAR_OFFSET = 74;
   // ✦ CHANGED: ความสูง bottom bar ลดลงมากจาก ~140 → ~72px
-  const bottomBarHeight = 72 + Math.max(insets.bottom, 12);
+  const bottomBarHeight = 72 + Math.max(insets.bottom, 12) + TAB_BAR_OFFSET;
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -351,7 +353,7 @@ const styles = StyleSheet.create({
   // ✦ CHANGED: Compact bottom bar
   bottomBar: {
     position: "absolute",
-    left: 0, right: 0, bottom: 0,
+    left: 0, right: 0, bottom: 74,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
