@@ -75,7 +75,7 @@ export function HomeScreen() {
       <HomeBrandGridSection
         horizontalPadding={horizontalPadding}
         onSelectBrand={(brandId) => navigation.navigate("ProductList", { brandId })}
-        onViewAll={() => navigation.navigate("Categories")}
+        onViewAll={() => navigation.getParent()?.navigate("Shop")}
       />
 
       <HomeBrandSection
