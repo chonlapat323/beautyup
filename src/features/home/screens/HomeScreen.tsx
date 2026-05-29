@@ -78,12 +78,7 @@ export function HomeScreen() {
         onViewAll={() => navigation.getParent()?.navigate("Shop")}
       />
 
-      <HomeBrandSection
-        horizontalPadding={horizontalPadding}
-        onSelectBrand={(brandId, brandName) =>
-          navigation.navigate("ProductList", { brandId })
-        }
-      />
+      {/* HomeBrandSection slide — hidden per user request */}
 
       {featuredProducts.length > 0 ? (
         <HomeFeaturedSection

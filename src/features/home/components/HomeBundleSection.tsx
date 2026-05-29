@@ -1,10 +1,11 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import type { ShopStackParamList } from "@/navigation/types";
-import { colors, fonts, radius, spacing, typography } from "@/theme";
+import { colors, fonts, radius, spacing } from "@/theme";
 import type { Bundle } from "@/types/domain";
 
 type Props = {
@@ -19,11 +20,13 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
 
   return (
     <View style={[styles.section, { paddingHorizontal: horizontalPadding }]}>
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.sectionTitle}>สูตรพิเศษ</Text>
         <Text style={styles.sectionSub}>คลิกเพื่อดูสินค้าในสูตร</Text>
       </View>
 
+      {/* Cards */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -32,7 +35,7 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
         {bundles.map((bundle) => (
           <Pressable
             key={bundle.id}
-            style={styles.card}
+            style={({ pressed }) => [styles.card, pressed && { opacity: 0.88 }]}
             onPress={() =>
               navigation.navigate("ProductList", {
                 bundleId: bundle.id,
@@ -40,10 +43,32 @@ export function HomeBundleSection({ bundles, horizontalPadding }: Props) {
               })
             }
           >
-            <CommerceImage style={styles.cardImage} uri={bundle.imageUrl} />
+            {/* Image area */}
+            <View style={styles.imageArea}>
+              {bundle.imageUrl ? (
+                <CommerceImage style={styles.image} uri={bundle.imageUrl} contentFit="cover" />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <MaterialIcons name="water-drop" size={36} color="#C8D9CE" />
+                </View>
+              )}
+              {/* Item count badge */}
+              <View style={styles.badge}>
+                <MaterialIcons name="auto-awesome" size={11} color={colors.goldDark} />
+                <Text style={styles.badgeText}>{bundle.items.length} รายการ</Text>
+              </View>
+            </View>
+
+            {/* Card body */}
             <View style={styles.cardBody}>
               <Text style={styles.cardName} numberOfLines={2}>{bundle.name}</Text>
-              <Text style={styles.cardMeta}>{bundle.items.length} รายการ</Text>
+              {bundle.description ? (
+                <Text style={styles.cardDesc} numberOfLines={2}>{bundle.description}</Text>
+              ) : null}
+              <View style={styles.cta}>
+                <Text style={styles.ctaText}>ดูสินค้า</Text>
+                <MaterialIcons name="chevron-right" size={14} color={colors.primary} />
+              </View>
             </View>
           </Pressable>
         ))}
@@ -58,6 +83,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: spacing.md,
+    gap: 2,
   },
   sectionTitle: {
     color: "#FFFFFF",
@@ -65,41 +91,83 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
   sectionSub: {
-    color: "rgba(255,255,255,0.7)",
+    color: "rgba(255,255,255,0.65)",
     fontSize: 12,
     fontFamily: fonts.medium,
-    marginTop: 2,
   },
   scroll: {
     gap: spacing.md,
     paddingBottom: spacing.sm,
   },
   card: {
-    width: 160,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
+    width: 180,
+    borderRadius: radius.lg,
+    backgroundColor: "#FFFFFF",
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
-  cardImage: {
-    width: 160,
-    height: 120,
-    backgroundColor: colors.surfaceMuted,
+  imageArea: {
+    height: 130,
+    backgroundColor: "#F2F7F3",
+    position: "relative",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  imagePlaceholder: {
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badge: {
+    position: "absolute",
+    bottom: spacing.sm,
+    left: spacing.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: colors.goldSoft,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.gold,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontFamily: fonts.semiBold,
+    color: colors.goldDark,
   },
   cardBody: {
     padding: spacing.md,
-    gap: 2,
+    gap: spacing.xs,
   },
   cardName: {
-    color: colors.textPrimary,
-    fontSize: 13,
-    fontFamily: fonts.semiBold,
-    minHeight: 36,
+    color: "#1A3A2A",
+    fontSize: 15,
+    fontFamily: fonts.bold,
+    lineHeight: 20,
   },
-  cardMeta: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontFamily: fonts.medium,
+  cardDesc: {
+    color: "#6B8474",
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    lineHeight: 16,
+  },
+  cta: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: spacing.xs,
+  },
+  ctaText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontFamily: fonts.semiBold,
   },
 });
