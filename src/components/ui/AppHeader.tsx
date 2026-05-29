@@ -55,32 +55,34 @@ export function AppHeader({
         },
       ]}
     >
-      <View style={styles.topRow}>
-        <View style={styles.profileGroup}>
-          <View style={styles.avatarShell}>
-            <View style={styles.avatarWrap}>
-              {member?.profileImageUrl ? (
-                <Image
-                  source={{ uri: member.profileImageUrl }}
-                  style={{ width: "100%", height: "100%", borderRadius: 999 }}
-                  resizeMode="cover"
-                />
-              ) : (
-                <Text style={styles.avatarText}>{initials}</Text>
-              )}
+      {dark && (
+        <View style={styles.topRow}>
+          <View style={styles.profileGroup}>
+            <View style={styles.avatarShell}>
+              <View style={styles.avatarWrap}>
+                {member?.profileImageUrl ? (
+                  <Image
+                    source={{ uri: member.profileImageUrl }}
+                    style={{ width: "100%", height: "100%", borderRadius: 999 }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Text style={styles.avatarText}>{initials}</Text>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.profileCopy}>
+              <Text style={[styles.greeting, styles.greetingDark]}>{getGreeting()}</Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.memberName, styles.memberNameDark]}>
+                {displayName}
+              </Text>
             </View>
           </View>
 
-          <View style={styles.profileCopy}>
-            <Text style={[styles.greeting, dark && styles.greetingDark]}>{getGreeting()}</Text>
-            <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.memberName, dark && styles.memberNameDark]}>
-              {displayName}
-            </Text>
-          </View>
+          <PointsPillInline />
         </View>
-
-        <PointsPillInline />
-      </View>
+      )}
 
       {showSearch ? (
         <Pressable onPress={onSearchPress} style={styles.searchBar}>
@@ -182,8 +184,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    paddingTop: 18,
-    paddingBottom: 14,
+    paddingTop: 16,
+    paddingBottom: 12,
     gap: 12,
   },
   profileGroup: {
