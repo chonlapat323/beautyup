@@ -78,7 +78,12 @@ export function HomeScreen() {
         onViewAll={() => navigation.getParent()?.navigate("Shop")}
       />
 
-      {/* HomeBrandSection slide — hidden per user request */}
+      {bundles.length > 0 ? (
+        <HomeBundleSection
+          bundles={bundles}
+          horizontalPadding={horizontalPadding}
+        />
+      ) : null}
 
       {featuredProducts.length > 0 ? (
         <HomeFeaturedSection
@@ -89,13 +94,6 @@ export function HomeScreen() {
             navigation.navigate("ProductDetail", { productId })
           }
           onAddToCart={addToCart}
-        />
-      ) : null}
-
-      {bundles.length > 0 ? (
-        <HomeBundleSection
-          bundles={bundles}
-          horizontalPadding={horizontalPadding}
         />
       ) : null}
 
