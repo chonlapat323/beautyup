@@ -70,7 +70,7 @@ export const useAppStore = create<AppStore>()(
       catalogError: false,
 
       signIn: (token, member) => set({ isAuthenticated: true, token, member }),
-      signOut: () => set({ isAuthenticated: false, token: null, member: null, orders: [] }),
+      signOut: () => set({ isAuthenticated: false, token: null, member: null, orders: [], cart: [], selectedShadeId: undefined }),
       updateMemberPoints: (delta) =>
         set((state) => ({
           member: state.member ? { ...state.member, pointBalance: state.member.pointBalance + delta } : null,

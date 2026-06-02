@@ -79,7 +79,7 @@ export function PaymentScreen() {
           if (result.status === "successful" && result.order) {
             clearPolling();
             clearCart();
-            await loadOrders();
+            await Promise.all([loadOrders(), refreshProfile()]);
             const mapped = mapApiOrder(result.order);
             navigation.replace("OrderSuccess", { orderId: mapped.id });
           } else if (result.status === "failed" || result.status === "expired") {
@@ -110,7 +110,7 @@ export function PaymentScreen() {
           if (result.status === "successful" && result.order) {
             clearKBankPolling();
             clearCart();
-            await loadOrders();
+            await Promise.all([loadOrders(), refreshProfile()]);
             const mapped = mapApiOrder(result.order);
             navigation.replace("OrderSuccess", { orderId: mapped.id });
           } else if (["failed", "expired", "cancelled"].includes(result.status)) {
@@ -174,7 +174,7 @@ export function PaymentScreen() {
           if (result.status === "successful" && result.order) {
             clearKBankQRPolling();
             clearCart();
-            await loadOrders();
+            await Promise.all([loadOrders(), refreshProfile()]);
             const mapped = mapApiOrder(result.order);
             navigation.replace("OrderSuccess", { orderId: mapped.id });
           } else if (["failed", "expired", "cancelled"].includes(result.status)) {
@@ -246,12 +246,14 @@ export function PaymentScreen() {
         shippingPhone,
         shippingAddr,
         undefined,
-        creditAmount,
+        creditAmount > 0 ? creditAmount : undefined,
         note,
       );
       clearCart();
       await Promise.all([loadOrders(), refreshProfile()]);
       const mapped = mapApiOrder(order);
+      clearCart();
+      await Promise.all([loadOrders(), refreshProfile()]);
       navigation.replace("OrderSuccess", { orderId: mapped.id });
     } catch (error) {
       setModal({ title: "ชำระเงินไม่สำเร็จ", message: error instanceof Error ? error.message : "กรุณาลองใหม่อีกครั้ง" });
@@ -409,7 +411,7 @@ export function PaymentScreen() {
           if (result.status === "successful" && result.order) {
             clearTrueMoneyPolling();
             clearCart();
-            await loadOrders();
+            await Promise.all([loadOrders(), refreshProfile()]);
             const mapped = mapApiOrder(result.order);
             navigation.replace("OrderSuccess", { orderId: mapped.id });
           } else if (result.status === "failed" || result.status === "expired") {
