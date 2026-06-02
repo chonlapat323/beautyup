@@ -1,59 +1,59 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import { fonts } from "@/theme";
 import type { Carrier } from "@/config/carriers";
 
-/**
- * แสดง carrier badge ด้วยสีแบรนด์ + ชื่อย่อ
- * ใช้เป็น placeholder จนกว่าจะมี logo PNG จริง
- */
 type Props = {
   carrier: Carrier;
   size?: "sm" | "md" | "lg";
+  showName?: boolean;
 };
 
 const SIZES = {
-  sm: { container: 28, fontSize: 7, radius: 6 },
-  md: { container: 40, fontSize: 9, radius: 8 },
-  lg: { container: 52, fontSize: 11, radius: 10 },
+  sm: { img: 24, radius: 6, fontSize: 7 },
+  md: { img: 36, radius: 8, fontSize: 9 },
+  lg: { img: 48, radius: 10, fontSize: 11 },
 };
 
-export function CarrierBadge({ carrier, size = "md" }: Props) {
+export function CarrierBadge({ carrier, size = "md", showName = false }: Props) {
   const s = SIZES[size];
+
   return (
-    <View
-      style={[
-        styles.badge,
-        {
-          width: s.container,
-          height: s.container,
-          borderRadius: s.radius,
-          backgroundColor: carrier.color,
-        },
-      ]}
-    >
-      <Text
-        style={[
-          styles.text,
-          { fontSize: s.fontSize, color: carrier.textColor },
-        ]}
-        numberOfLines={1}
-        adjustsFontSizeToFit
-      >
-        {carrier.shortName}
-      </Text>
+    <View style={styles.wrap}>
+      <View style={[styles.imgBox, { width: s.img, height: s.img, borderRadius: s.radius, backgroundColor: carrier.color + "22" }]}>
+        {carrier.logoUrl ? (
+          <Image
+            source={{ uri: carrier.logoUrl }}
+            style={{ width: s.img - 8, height: s.img - 8, borderRadius: s.radius - 2 }}
+            resizeMode="contain"
+          />
+        ) : (
+          // ไปรษณีย์ไทย — mail icon
+          <MaterialIcons name="mail" size={s.img * 0.55} color={carrier.color} />
+        )}
+      </View>
+      {showName && (
+        <Text style={[styles.name, { fontSize: s.fontSize }]} numberOfLines={1}>
+          {carrier.name}
+        </Text>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  badge: {
+  wrap: {
+    alignItems: "center",
+    gap: 4,
+  },
+  imgBox: {
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 2,
+    overflow: "hidden",
   },
-  text: {
-    fontFamily: fonts.bold,
+  name: {
+    fontFamily: fonts.semiBold,
+    color: "#1a1a1a",
     textAlign: "center",
-    letterSpacing: -0.3,
   },
 });

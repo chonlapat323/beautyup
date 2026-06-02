@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
+import { CarrierBadge } from "@/components/ui/CarrierBadge";
 import { CARRIERS } from "@/config/carriers";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import type { ProfileStackParamList } from "@/navigation/types";
@@ -193,13 +194,14 @@ export function RedemptionDetailScreen() {
             <View style={styles.trackingCard}>
               <View style={styles.trackingHeader}>
                 {/* Carrier name */}
-                {detail.carrierId ? (
-                  <View style={styles.carrierPill}>
-                    <Text style={styles.carrierText}>
-                      {CARRIERS.find((c) => c.id === detail.carrierId)?.name ?? detail.carrierId}
-                    </Text>
-                  </View>
-                ) : (
+                {detail.carrierId ? (() => {
+                  const carrier = CARRIERS.find((c) => c.id === detail.carrierId);
+                  return carrier ? (
+                    <CarrierBadge carrier={carrier} size="sm" showName />
+                  ) : (
+                    <Text style={styles.trackingTitle}>{detail.carrierId}</Text>
+                  );
+                })() : (
                   <Text style={styles.trackingTitle}>TRACKING NUMBER</Text>
                 )}
                 {detail.trackingNumber && (
