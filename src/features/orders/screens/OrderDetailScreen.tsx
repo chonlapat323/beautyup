@@ -6,7 +6,9 @@ import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppModal } from "@/components/ui/AppModal";
+import { CarrierBadge } from "@/components/ui/CarrierBadge";
 import { CommerceImage } from "@/components/ui/CommerceImage";
+import { CARRIERS } from "@/config/carriers";
 import { navigateToHome, navigateToOrderHistory } from "@/navigation/helpers";
 import type { OrderStackParamList } from "@/navigation/types";
 import { mobileGetOrderDocuments } from "@/services/api";
@@ -126,7 +128,17 @@ export function OrderDetailScreen() {
           ) : null}
           {order.shippingAddr ? <Text style={styles.shippingAddr}>{order.shippingAddr}</Text> : null}
           {order.trackingNumber ? (
-            <View style={styles.trackingRow}>
+            <View style={styles.trackingCard}>
+              {/* Carrier */}
+              {order.carrierId ? (() => {
+                const carrier = CARRIERS.find((c) => c.id === order.carrierId);
+                return carrier ? (
+                  <View style={styles.carrierRow}>
+                    <CarrierBadge carrier={carrier} size="sm" />
+                    <Text style={styles.carrierName}>{carrier.name}</Text>
+                  </View>
+                ) : null;
+              })() : null}
               <Text style={styles.trackingLabel}>เลขพัสดุ</Text>
               <Text style={styles.trackingNumber}>{order.trackingNumber}</Text>
             </View>
@@ -298,6 +310,26 @@ const styles = StyleSheet.create({
   shippingAddr: {
     color: colors.textSecondary,
     ...typography.caption,
+  },
+  trackingCard: {
+    marginTop: spacing.sm,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.goldMuted,
+  },
+  carrierRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  carrierName: {
+    color: colors.textPrimary,
+    fontSize: 13,
+    fontWeight: "600",
   },
   trackingRow: {
     flexDirection: "row",

@@ -884,5 +884,6 @@ export function mapApiOrder(o: ApiOrder): import("@/types/domain").Order {
     shippingPhone: o.shippingPhone,
     shippingAddr: o.shippingAddr,
     trackingNumber: o.trackingNumber ?? undefined,
+    carrierId: (o as any).carrierId ?? null,
   };
 }

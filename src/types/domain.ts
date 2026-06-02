@@ -109,4 +109,5 @@ export type Order = {
   shippingPhone?: string;
   shippingAddr?: string;
   trackingNumber?: string;
+  carrierId?: string | null;
 };
