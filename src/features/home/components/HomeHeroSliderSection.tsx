@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     fontSize: 10,
-    lineHeight: 13,
+    lineHeight: 16,
     letterSpacing: 1.8,
     textTransform: "uppercase",
     color: colors.gold,
@@ -174,13 +174,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    lineHeight: 33,
+    lineHeight: 38,
     color: "#FFFFFF",
     fontFamily: fonts.extraBold,
   },
   body: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 20,
     color: "rgba(255,255,255,0.80)",
     fontFamily: fonts.medium,
   },
