@@ -22,6 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
+import { FLOAT_TAB_HEIGHT, FLOAT_TAB_MARGIN } from "@/navigation/AppTabs";
 import { ZoomableImage } from "@/components/ui/ZoomableImage";
 import { navigateToCategories, navigateToHome } from "@/navigation/helpers";
 import type { ShopStackParamList } from "@/navigation/types";
@@ -57,7 +58,7 @@ export function ProductDetailScreen() {
       : product.imageUrl
         ? [product.imageUrl]
         : [];
-  // ✦ CHANGED: ความสูง bottom bar
+  const tabOffset = FLOAT_TAB_HEIGHT + FLOAT_TAB_MARGIN + (insets.bottom > 0 ? insets.bottom : 0);
   const bottomBarHeight = 72 + Math.max(insets.bottom, 12);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -72,7 +73,7 @@ export function ProductDetailScreen() {
       <Screen
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: bottomBarHeight + spacing.lg },
+          { paddingBottom: bottomBarHeight + tabOffset + spacing.lg },
         ]}
       >
         {/* ✦ Minimal page header */}
@@ -351,7 +352,7 @@ const styles = StyleSheet.create({
   // ✦ CHANGED: Compact bottom bar
   bottomBar: {
     position: "absolute",
-    left: 0, right: 0, bottom: 0,
+    left: 0, right: 0, bottom: 0,  // sits above tab bar via paddingBottom on Screen
     flexDirection: "row",
     alignItems: "center",
     gap: 10,

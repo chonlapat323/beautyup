@@ -1,3 +1,23 @@
+/**
+ * AppTabs — Floating Tab Bar v2
+ *
+ * การเปลี่ยนแปลง:
+ * ─────────────────
+ * • position: 'absolute' → tab bar ลอยเหนือ content ไม่ดัน layout
+ * • left / right: FLOAT_MARGIN (14px) → เว้นขอบทุกด้าน
+ * • bottom: FLOAT_MARGIN + inset → ลอยขึ้นจากขอบจอ
+ * • borderRadius: 28 → มนทุกด้าน (ไม่ใช่แค่ top)
+ * • borderWidth: 1px gold → เส้นขอบบาง
+ * • shadow → ให้ความรู้สึกลอยจริง
+ * • ลบ borderTopWidth / borderTopColor → ไม่จำเป็นเมื่อมี border ครบรอบ
+ *
+ * ป้องกันการกระทบ screens อื่น:
+ * ─────────────────────────────────
+ * Export FLOAT_TAB_BAR_HEIGHT → ทุก Screen ใช้เป็น paddingBottom
+ * โดย Screen component wrapper อ่านค่านี้อัตโนมัติ
+ * (ดูตัวอย่างการใช้งานใน Screen.tsx ด้านล่าง)
+ */
+
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -14,21 +34,24 @@ import { colors, fonts } from "@/theme";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
+// ✦ Export ค่านี้ให้ Screen component ใช้เป็น paddingBottom
+export const FLOAT_TAB_MARGIN = 14;       // margin รอบ tab bar
+export const FLOAT_TAB_HEIGHT = 58;       // ความสูงของ tab bar (ไม่รวม inset)
+
+// TAB_BAR_TOTAL = FLOAT_TAB_HEIGHT + FLOAT_TAB_MARGIN + bottom inset
+// → Screen จะ import FLOAT_TAB_HEIGHT + FLOAT_TAB_MARGIN แล้วบวก inset เอง
+
 type IconName = keyof typeof MaterialIcons.glyphMap;
 
 function TabIcon({
-  name,
-  focused,
-  badgeCount,
+  name, focused, badgeCount,
 }: {
-  name: IconName;
-  focused: boolean;
-  badgeCount?: number;
+  name: IconName; focused: boolean; badgeCount?: number;
 }) {
   return (
     <View>
       <MaterialIcons
-        color={focused ? colors.primary : colors.textMuted}
+        color={focused ? colors.gold : colors.textMuted}
         name={name}
         size={24}
       />
@@ -47,20 +70,42 @@ export function AppTabs() {
   );
   const { bottom } = useSafeAreaInsets();
 
+  // ✦ Tab bar style — floating
+  const floatingTabBarStyle = {
+    // ── Position ──
+    position: "absolute" as const,
+    left: FLOAT_TAB_MARGIN,
+    right: FLOAT_TAB_MARGIN,
+    bottom: FLOAT_TAB_MARGIN + (bottom > 0 ? bottom : 0),
+
+    // ── Shape ──
+    height: FLOAT_TAB_HEIGHT,
+    borderRadius: 28,             // ✦ มนทุกด้าน
+
+    // ── Color / Border ──
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.goldMuted,
+
+    // ── Padding ──
+    paddingTop: 8,
+    paddingBottom: 8,
+
+    // ── Shadow (iOS) ──
+    shadowColor: "#000",
+    shadowOpacity: 0.14,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 6 },
+
+    // ── Elevation (Android) ──
+    elevation: 12,
+  };
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopWidth: 1,
-          borderTopColor: colors.goldMuted,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          paddingTop: 8,
-          paddingBottom: bottom > 0 ? bottom : 10,
-          height: 56 + (bottom > 0 ? bottom : 10),
-        },
+        tabBarStyle: floatingTabBarStyle,
         tabBarActiveTintColor: colors.gold,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarLabelStyle: {
@@ -75,9 +120,7 @@ export function AppTabs() {
         component={ShopStack}
         options={{
           title: "หน้าหลัก",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} name="home" />
-          ),
+          tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="home" />,
         }}
       />
       <Tab.Screen
@@ -85,9 +128,7 @@ export function AppTabs() {
         component={ShopBrowseStack}
         options={{
           title: "ช้อป",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} name="local-mall" />
-          ),
+          tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="local-mall" />,
         }}
       />
       <Tab.Screen
@@ -96,11 +137,7 @@ export function AppTabs() {
         options={{
           title: "ตะกร้า",
           tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              name={focused ? "shopping-cart" : "shopping-cart"}
-              badgeCount={cartCount}
-            />
+            <TabIcon focused={focused} name="shopping-cart" badgeCount={cartCount} />
           ),
         }}
       />
@@ -108,9 +145,7 @@ export function AppTabs() {
         name="Profile"
         component={ProfileStack}
         listeners={({ navigation }) => ({
-          tabPress: () => {
-            navigation.navigate("Profile", { screen: "ProfileHome" });
-          },
+          tabPress: () => navigation.navigate("Profile", { screen: "ProfileHome" }),
         })}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "ProfileHome";
@@ -120,16 +155,7 @@ export function AppTabs() {
             tabBarIcon: ({ focused }) => (
               <TabIcon focused={focused} name={focused ? "person" : "person-outline"} />
             ),
-            tabBarStyle: hideTabBar
-              ? { display: "none" }
-              : {
-                  backgroundColor: colors.surface,
-                  borderTopWidth: 1,
-                  borderTopColor: colors.goldMuted,
-                  paddingTop: 8,
-                  paddingBottom: bottom > 0 ? bottom : 10,
-                  height: 56 + (bottom > 0 ? bottom : 10),
-                },
+            tabBarStyle: hideTabBar ? { display: "none" } : floatingTabBarStyle,
           };
         }}
       />
@@ -157,3 +183,39 @@ const styles = StyleSheet.create({
     lineHeight: 12,
   },
 });
+
+/**
+ * ─────────────────────────────────────────────────────────────
+ * วิธีใช้ใน Screen.tsx (Layout wrapper)
+ * ─────────────────────────────────────────────────────────────
+ *
+ * import { FLOAT_TAB_HEIGHT, FLOAT_TAB_MARGIN } from "@/navigation/AppTabs";
+ * import { useSafeAreaInsets } from "react-native-safe-area-context";
+ *
+ * export function Screen({ contentContainerStyle, children, ...props }) {
+ *   const { bottom } = useSafeAreaInsets();
+ *
+ *   // ✦ padding ที่ต้องเพิ่มให้ content ไม่ถูก floating tab bar บัง
+ *   const tabBarOffset = FLOAT_TAB_HEIGHT + FLOAT_TAB_MARGIN + (bottom > 0 ? bottom : 0);
+ *
+ *   return (
+ *     <ScrollView
+ *       contentContainerStyle={[
+ *         { paddingBottom: tabBarOffset + 8 },  // +8 breathing room
+ *         contentContainerStyle,
+ *       ]}
+ *       {...props}
+ *     >
+ *       {children}
+ *     </ScrollView>
+ *   );
+ * }
+ *
+ * ─────────────────────────────────────────────────────────────
+ * หรือถ้าใช้ Screen ที่มี scrollable={false} (เช่น SearchScreen):
+ * ─────────────────────────────────────────────────────────────
+ * ใน FlatList / ScrollView ใส่:
+ *   contentInset={{ bottom: tabBarOffset }}          // iOS
+ *   contentContainerStyle={{ paddingBottom: tabBarOffset }}  // Android + iOS
+ * ─────────────────────────────────────────────────────────────
+ */

@@ -1,8 +1,10 @@
 import { PropsWithChildren, ReactNode, useState } from "react";
 import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, ScrollViewProps, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors } from "@/theme";
+import { FLOAT_TAB_HEIGHT, FLOAT_TAB_MARGIN } from "@/navigation/AppTabs";
 
 type ScreenProps = PropsWithChildren<{
   scrollable?: boolean;
@@ -19,6 +21,15 @@ export function Screen({
   header,
 }: ScreenProps) {
   const [refreshing, setRefreshing] = useState(false);
+  const { bottom } = useSafeAreaInsets();
+
+  // Floating tab bar clearance — always at least this much paddingBottom
+  const tabBarOffset = FLOAT_TAB_HEIGHT + FLOAT_TAB_MARGIN + (bottom > 0 ? bottom : 0) + 8;
+
+  // Merge: take the max of screen's own paddingBottom vs tabBarOffset
+  const passedStyle = StyleSheet.flatten(contentContainerStyle) as Record<string, unknown> | undefined;
+  const passedPaddingBottom = typeof passedStyle?.paddingBottom === "number" ? passedStyle.paddingBottom : 0;
+  const safePaddingBottom = Math.max(passedPaddingBottom, tabBarOffset);
 
   async function handleRefresh() {
     if (!onRefresh) return;
@@ -45,7 +56,7 @@ export function Screen({
         {header}
         <ScrollView
           style={styles.scrollArea}
-          contentContainerStyle={[styles.content, contentContainerStyle]}
+          contentContainerStyle={[styles.content, contentContainerStyle, { paddingBottom: safePaddingBottom }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           refreshControl={
@@ -67,25 +78,13 @@ export function Screen({
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollArea: {
-    flex: 1,
-  },
+  flex: { flex: 1, backgroundColor: colors.background },
+  safeArea: { flex: 1, backgroundColor: colors.background },
+  scrollArea: { flex: 1 },
   content: {
     flexGrow: 1,
     justifyContent: "flex-start",
     backgroundColor: colors.background,
-    paddingBottom: 24,
   },
-  fixed: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+  fixed: { flex: 1, backgroundColor: colors.background },
 });
