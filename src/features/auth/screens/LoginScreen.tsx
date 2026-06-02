@@ -2,9 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
+import { AppModal } from "@/components/ui/AppModal";
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import type { ProfileStackParamList } from "@/navigation/types";
 import { mobileLogin } from "@/services/api";
@@ -19,27 +20,21 @@ export function LoginScreen() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorModal, setErrorModal] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | null>(null);
 
   async function handleLogin() {
-    if (!identifier.trim()) {
-      Alert.alert("กรุณากรอกอีเมลหรือเบอร์โทร");
-      return;
-    }
-    if (!password) {
-      Alert.alert("กรุณากรอกรหัสผ่าน");
-      return;
-    }
-    if (password.length < 6) {
-      Alert.alert("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
-      return;
-    }
+    setFieldError(null);
+    if (!identifier.trim()) { setFieldError("กรุณากรอกอีเมลหรือเบอร์โทร"); return; }
+    if (!password) { setFieldError("กรุณากรอกรหัสผ่าน"); return; }
+    if (password.length < 6) { setFieldError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"); return; }
     setIsLoading(true);
     try {
       const { token, member } = await mobileLogin(identifier, password);
       signIn(token, member);
       navigation.popToTop();
     } catch (e) {
-      Alert.alert("เข้าสู่ระบบไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
+      setErrorModal(e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
     } finally {
       setIsLoading(false);
     }
@@ -47,6 +42,14 @@ export function LoginScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
+      <AppModal
+        visible={errorModal !== null}
+        type="error"
+        title="เข้าสู่ระบบไม่สำเร็จ"
+        message={errorModal ?? ""}
+        confirmLabel="ตกลง"
+        onConfirm={() => setErrorModal(null)}
+      />
       <View style={styles.brandBlock}>
         <BrandLockup size="hero" />
 
@@ -84,6 +87,7 @@ export function LoginScreen() {
           </Pressable>
         </View>
 
+        {fieldError ? <Text style={styles.fieldError}>{fieldError}</Text> : null}
         <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleLogin()} disabled={isLoading}>
           <Text style={styles.buttonText}>{isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}</Text>
         </Pressable>
@@ -167,6 +171,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     justifyContent: "center",
     alignItems: "center",
+  },
+  fieldError: {
+    color: "#dc2626",
+    fontSize: 12,
+    marginBottom: 8,
+    paddingHorizontal: 4,
   },
   button: {
     height: 56,

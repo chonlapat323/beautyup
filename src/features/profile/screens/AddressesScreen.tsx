@@ -1,10 +1,11 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { AppModal } from "@/components/ui/AppModal";
 import { navigateToHome, navigateToProfileHome } from "@/navigation/helpers";
 import type { ProfileStackParamList } from "@/navigation/types";
 import type { MemberAddress } from "@/services/api";
@@ -17,6 +18,8 @@ export function AddressesScreen() {
   const token = useAppStore((state) => state.token);
   const [addresses, setAddresses] = useState<MemberAddress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [modal, setModal] = useState<{ title: string; message: string; type: "error" | "confirm"; onConfirm?: () => void } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<MemberAddress | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -30,7 +33,7 @@ export function AddressesScreen() {
     try {
       setAddresses(await mobileGetAddresses(token));
     } catch {
-      Alert.alert("โหลดที่อยู่ไม่สำเร็จ");
+      setModal({ title: "โหลดที่อยู่ไม่สำเร็จ", message: "กรุณาลองใหม่อีกครั้ง", type: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -42,33 +45,43 @@ export function AddressesScreen() {
       await mobileSetDefaultAddress(token, addr.id);
       await load();
     } catch (error) {
-      Alert.alert("เกิดข้อผิดพลาด", error instanceof Error ? error.message : "กรุณาลองใหม่");
+      setModal({ title: "เกิดข้อผิดพลาด", message: error instanceof Error ? error.message : "กรุณาลองใหม่", type: "error" });
     }
   }
 
-  async function handleDelete(addr: MemberAddress) {
-    Alert.alert("ลบที่อยู่", `ต้องการลบ "${addr.label ?? addr.addressLine1}"?`, [
-      { text: "ยกเลิก", style: "cancel" },
-      {
-        text: "ลบ",
-        style: "destructive",
-        onPress: async () => {
-          if (!token) return;
-          try {
-            await mobileDeleteAddress(token, addr.id);
-            await load();
-          } catch (error) {
-            Alert.alert("ลบไม่สำเร็จ", error instanceof Error ? error.message : "กรุณาลองใหม่");
-          }
-        },
+  function handleDelete(addr: MemberAddress) {
+    setPendingDelete(addr);
+    setModal({
+      title: "ลบที่อยู่",
+      message: `ต้องการลบ "${addr.label ?? addr.addressLine1}"?`,
+      type: "confirm",
+      onConfirm: async () => {
+        if (!token) return;
+        setModal(null);
+        try {
+          await mobileDeleteAddress(token, addr.id);
+          await load();
+        } catch (error) {
+          setModal({ title: "ลบไม่สำเร็จ", message: error instanceof Error ? error.message : "กรุณาลองใหม่", type: "error" });
+        } finally {
+          setPendingDelete(null);
+        }
       },
-    ]);
+    });
   }
 
   return (
-    <Screen
-      contentContainerStyle={styles.content}
-    >
+    <Screen contentContainerStyle={styles.content}>
+      <AppModal
+        visible={modal !== null}
+        type={modal?.type ?? "error"}
+        title={modal?.title ?? ""}
+        message={modal?.message}
+        confirmLabel={modal?.type === "confirm" ? "ลบ" : "ตกลง"}
+        cancelLabel="ยกเลิก"
+        onConfirm={() => { modal?.onConfirm ? modal.onConfirm() : setModal(null); }}
+        onCancel={() => setModal(null)}
+      />
       <AppHeader
         title="ที่อยู่ของฉัน"
         subtitle="จัดการที่อยู่สำหรับจัดส่งสินค้า"
