@@ -22,9 +22,9 @@
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator, Pressable, ScrollView,
+  ActivityIndicator, BackHandler, Pressable, ScrollView,
   StyleSheet, Text, View,
 } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -55,6 +55,18 @@ export function ShopFilterScreen() {
   const [step, setStep] = useState<Step>("brand");
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const [selectedBrandName, setSelectedBrandName] = useState<string>("");
+
+  // Hardware back on category step → go back to brand step, not exit screen
+  useEffect(() => {
+    const handler = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (step === "category") {
+        setStep("brand");
+        return true; // consume — don't navigate away
+      }
+      return false; // let React Navigation handle (exit screen)
+    });
+    return () => handler.remove();
+  }, [step]);
 
   const availableCategories = useMemo(() => {
     if (!selectedBrandId) return [];

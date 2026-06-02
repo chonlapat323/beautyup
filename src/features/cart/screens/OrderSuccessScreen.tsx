@@ -1,5 +1,6 @@
 import { CommonActions, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect } from "react";
+import { BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
@@ -14,6 +15,15 @@ export function OrderSuccessScreen() {
   const route = useRoute<RouteProp<ShopStackParamList, "OrderSuccess">>();
   const orderId = route.params.orderId;
   const order = useAppStore((state) => state.orders.find((o) => o.id === orderId));
+
+  // Prevent back navigation — redirect to home instead of going back to Payment/Checkout
+  useEffect(() => {
+    const handler = BackHandler.addEventListener("hardwareBackPress", () => {
+      navigateToHome(navigation);
+      return true; // consume the event
+    });
+    return () => handler.remove();
+  }, [navigation]);
 
   return (
     <Screen
