@@ -349,15 +349,17 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: radius.pill,
     borderWidth: 1.5,
-    borderColor: colors.primary,
+    borderColor: colors.gold,
+    backgroundColor: "rgba(212,175,55,0.12)",
     paddingVertical: spacing.lg,
     alignItems: "center",
   },
   docButtonDisabled: {
-    borderColor: colors.textMuted,
+    borderColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "transparent",
   },
   docButtonText: {
-    color: colors.primary,
+    color: colors.gold,
     ...typography.title,
   },
 });
