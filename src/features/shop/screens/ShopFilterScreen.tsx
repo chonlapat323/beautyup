@@ -210,7 +210,8 @@ export function ShopFilterScreen() {
           {availableCategories.map((cat) => (
             <CategoryCard
               key={cat.id}
-              icon={(CAT_ICONS[cat.id] ?? "label") as any}
+              icon={(CAT_ICONS[cat.slug] ?? "label") as any}
+              imageUrl={cat.imageUrl}
               title={cat.title}
               note={cat.subtitle}
               accentVariant="jade"
@@ -225,9 +226,9 @@ export function ShopFilterScreen() {
 
 // ✦ Category card component
 function CategoryCard({
-  icon, title, note, accentVariant, onPress,
+  icon, imageUrl, title, note, accentVariant, onPress,
 }: {
-  icon: string; title: string; note?: string;
+  icon: string; imageUrl?: string; title: string; note?: string;
   accentVariant: "all" | "jade";
   onPress: () => void;
 }) {
@@ -242,17 +243,23 @@ function CategoryCard({
         accentVariant === "jade" && styles.catAccentBarJade,
       ]} />
 
-      {/* Icon */}
-      <View style={[
-        styles.catIconWrap,
-        accentVariant === "jade" && styles.catIconWrapJade,
-      ]}>
-        <MaterialIcons
-          name={icon as any}
-          size={19}
-          color={accentVariant === "jade" ? colors.primary : colors.goldDeep}
-        />
-      </View>
+      {/* Image or Icon */}
+      {imageUrl ? (
+        <View style={styles.catImgWrap}>
+          <CommerceImage style={styles.catImg} uri={imageUrl} contentFit="cover" />
+        </View>
+      ) : (
+        <View style={[
+          styles.catIconWrap,
+          accentVariant === "jade" && styles.catIconWrapJade,
+        ]}>
+          <MaterialIcons
+            name={icon as any}
+            size={19}
+            color={accentVariant === "jade" ? colors.primary : colors.goldDeep}
+          />
+        </View>
+      )}
 
       {/* Text */}
       <View style={styles.catBody}>
@@ -336,6 +343,12 @@ const styles = StyleSheet.create({
   },
   catAccentBar: { width: 4, alignSelf: "stretch", backgroundColor: colors.gold },
   catAccentBarJade: { backgroundColor: colors.primary },
+  catImgWrap: {
+    width: 72, height: 72, flexShrink: 0,
+    marginHorizontal: 10, borderRadius: 12, overflow: "hidden",
+    backgroundColor: colors.surfaceMuted,
+  },
+  catImg: { width: 72, height: 72 },
   catIconWrap: {
     width: 40, height: 40, borderRadius: 20,
     backgroundColor: colors.goldSoft,
