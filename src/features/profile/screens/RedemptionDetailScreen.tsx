@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
+import { CARRIERS } from "@/config/carriers";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import type { ProfileStackParamList } from "@/navigation/types";
 import { mobileGetMyRedemption } from "@/services/api";
@@ -191,7 +192,16 @@ export function RedemptionDetailScreen() {
             <Text style={styles.sectionLabel}>หมายเลขพัสดุ</Text>
             <View style={styles.trackingCard}>
               <View style={styles.trackingHeader}>
-                <Text style={styles.trackingTitle}>TRACKING NUMBER</Text>
+                {/* Carrier name */}
+                {detail.carrierId ? (
+                  <View style={styles.carrierPill}>
+                    <Text style={styles.carrierText}>
+                      {CARRIERS.find((c) => c.id === detail.carrierId)?.name ?? detail.carrierId}
+                    </Text>
+                  </View>
+                ) : (
+                  <Text style={styles.trackingTitle}>TRACKING NUMBER</Text>
+                )}
                 {detail.trackingNumber && (
                   <Pressable style={styles.copyBtn} onPress={handleCopy}>
                     <MaterialIcons name={copied ? "check" : "content-copy"} size={11} color={colors.goldDeep} />
@@ -291,6 +301,8 @@ const styles = StyleSheet.create({
   trackingCard: { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.goldMuted, padding: 14 },
   trackingHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
   trackingTitle: { color: colors.textMuted, fontSize: 9, fontFamily: fonts.bold, letterSpacing: 0.8 },
+  carrierPill: { backgroundColor: colors.goldSoft, borderWidth: 1, borderColor: "rgba(212,175,55,0.35)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
+  carrierText: { color: colors.goldDeep, fontSize: 11, fontFamily: fonts.bold },
   copyBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: colors.goldSoft, borderWidth: 1, borderColor: "rgba(212,175,55,0.3)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
   copyBtnText: { color: colors.goldDeep, fontSize: 9, fontFamily: fonts.bold },
   trackingNumber: { color: colors.textPrimary, fontSize: 16, fontFamily: "JetBrainsMono_700Bold", letterSpacing: 1.5 },

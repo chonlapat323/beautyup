@@ -782,6 +782,7 @@ export type MyRedemption = {
 
 export type MyRedemptionDetail = MyRedemption & {
   trackingNumber: string | null;
+  carrierId: string | null;
   shippingRecipient: string | null;
   shippingPhone: string | null;
   shippingAddress: string | null;
