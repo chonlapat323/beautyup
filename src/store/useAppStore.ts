@@ -13,7 +13,6 @@ type AppStore = {
   isAuthenticated: boolean;
   token: string | null;
   member: MemberInfo | null;
-  selectedShadeId?: string;
   cart: CartItem[];
   orders: Order[];
   categories: Category[];
@@ -34,7 +33,6 @@ type AppStore = {
   signOut: () => void;
   updateMemberPoints: (delta: number) => void;
   refreshProfile: () => Promise<void>;
-  setSelectedShade: (shadeId?: string) => void;
   loadCatalog: () => Promise<void>;
   loadOrders: () => Promise<void>;
   favoriteIds: string[];
@@ -50,7 +48,6 @@ export const useAppStore = create<AppStore>()(
       isAuthenticated: false,
       token: null,
       member: null,
-      selectedShadeId: undefined,
       cart: [],
       orders: [],
       categories: [],
@@ -70,7 +67,7 @@ export const useAppStore = create<AppStore>()(
       catalogError: false,
 
       signIn: (token, member) => set({ isAuthenticated: true, token, member }),
-      signOut: () => set({ isAuthenticated: false, token: null, member: null, orders: [], cart: [], selectedShadeId: undefined }),
+      signOut: () => set({ isAuthenticated: false, token: null, member: null, orders: [], cart: [] }),
       updateMemberPoints: (delta) =>
         set((state) => ({
           member: state.member ? { ...state.member, pointBalance: state.member.pointBalance + delta } : null,
@@ -85,8 +82,6 @@ export const useAppStore = create<AppStore>()(
           // keep existing member data on error
         }
       },
-      setSelectedShade: (shadeId) => set({ selectedShadeId: shadeId }),
-
       loadCatalog: async () => {
         set({ isLoadingCatalog: true, catalogError: false });
         try {
