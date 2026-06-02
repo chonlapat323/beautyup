@@ -1,17 +1,21 @@
 /**
- * RedemptionDetailScreen — v2 Design Proposal
+ * RedemptionDetailScreen — v3 Design Proposal
+ * (เพิ่มจาก v2: Carrier section)
  *
- * การเปลี่ยนแปลงจาก v1:
+ * การเปลี่ยนแปลงจาก v2:
  * ─────────────────────
- * • ไม่ใช้ AppHeader — minimal header + breadcrumb
- * • Product card: gold top accent bar + gold points pill (แทน plain text)
- * • Status: เปลี่ยนจาก plain badge → Visual Timeline (4 steps)
- *   PENDING → PREPARING → SHIPPED → DELIVERED
- *   - done: gold dot + checkmark
- *   - active: gold ring + pulsing
- *   - pending: muted dot
- * • Tracking: เพิ่ม copy button, mono font, gold border box
- * • Address: icon header + divider, cleaner layout
+ * • Tracking section เปลี่ยนจาก plain card → 2-part card:
+ *   ┌─ Carrier row ────────────────────────────────────────┐
+ *   │  [Logo/Icon] CarrierName · ผู้ให้บริการขนส่ง  [status]│
+ *   ├─ Tracking number ────────────────────────────────────┤
+ *   │  TRACKING NUMBER label        [คัดลอก btn]           │
+ *   │  TH123456789 (mono font)                             │
+ *   │  กดคัดลอกเพื่อติดตามพัสดุ                             │
+ *   └──────────────────────────────────────────────────────┘
+ * • Carrier map: carrierId → { name, color, shortName }
+ * • Status dot บน carrier card แสดง "ระหว่างทาง" เมื่อ SHIPPED
+ * • Timeline: done steps แสดง connector สีทอง
+ * • Section label รวม: "ข้อมูลการจัดส่ง" (แทน "หมายเลขพัสดุ")
  */
 
 import { MaterialIcons } from "@expo/vector-icons";
@@ -22,8 +26,6 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
-import { CarrierBadge } from "@/components/ui/CarrierBadge";
-import { CARRIERS } from "@/config/carriers";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import type { ProfileStackParamList } from "@/navigation/types";
 import { mobileGetMyRedemption } from "@/services/api";
@@ -33,22 +35,46 @@ import { colors, fonts, radius, spacing } from "@/theme";
 
 type RedemptionStatus = MyRedemptionDetail["status"];
 
+// ── Carrier map (carrierId → display info) ──────────────────
+const CARRIER_MAP: Record<string, { name: string; shortName: string; color: string; textColor: string }> = {
+  "thpost":   { name: "ไปรษณีย์ไทย",  shortName: "ไปรษณีย์", color: "#C8102E", textColor: "#fff" },
+  "kerry":    { name: "Kerry Express", shortName: "Kerry",    color: "#FF6B00", textColor: "#fff" },
+  "flash":    { name: "Flash Express", shortName: "Flash",    color: "#E50012", textColor: "#fff" },
+  "jnt":      { name: "J&T Express",   shortName: "J&T",      color: "#E4231F", textColor: "#fff" },
+  "dhl":      { name: "DHL Express",   shortName: "DHL",      color: "#FFCC00", textColor: "#CC0000" },
+};
+
+function getCarrier(carrierId: string | null) {
+  if (!carrierId) return null;
+  return CARRIER_MAP[carrierId.toLowerCase()] ?? {
+    name: carrierId,
+    shortName: carrierId.slice(0, 4).toUpperCase(),
+    color: colors.primary,
+    textColor: "#fff",
+  };
+}
+
+// ── Status badge for carrier ────────────────────────────────
+function getCarrierStatusLabel(status: RedemptionStatus): string | null {
+  if (status === "SHIPPED")   return "ระหว่างทาง";
+  if (status === "DELIVERED") return "ส่งถึงแล้ว";
+  return null;
+}
+
 // ── Timeline steps ──────────────────────────────────────────
-const TIMELINE_STEPS: { status: RedemptionStatus; label: string; icon: string; sub: string }[] = [
-  { status: "PENDING",   label: "รอดำเนินการ",      icon: "hourglass-empty",  sub: "รับคำสั่งแลกแต้มแล้ว" },
-  { status: "PREPARING", label: "กำลังเตรียมพัสดุ", icon: "inventory-2",      sub: "กำลังจัดเตรียมสินค้า" },
-  { status: "SHIPPED",   label: "จัดส่งแล้ว",       icon: "local-shipping",   sub: "อยู่ระหว่างการจัดส่ง" },
-  { status: "DELIVERED", label: "ส่งถึงแล้ว",        icon: "home",             sub: "ได้รับสินค้าแล้ว" },
+const TIMELINE_STEPS: { status: RedemptionStatus; label: string; icon: string }[] = [
+  { status: "PENDING",   label: "รอดำเนินการ",      icon: "hourglass-empty"  },
+  { status: "PREPARING", label: "กำลังเตรียมพัสดุ", icon: "inventory-2"      },
+  { status: "SHIPPED",   label: "จัดส่งแล้ว",        icon: "local-shipping"   },
+  { status: "DELIVERED", label: "ส่งถึงแล้ว",        icon: "home"             },
 ];
 
 const STATUS_ORDER: RedemptionStatus[] = ["PENDING", "PREPARING", "SHIPPED", "DELIVERED"];
 
-function getStepState(stepStatus: RedemptionStatus, currentStatus: RedemptionStatus): "done" | "active" | "pending" {
-  const stepIdx = STATUS_ORDER.indexOf(stepStatus);
-  const currentIdx = STATUS_ORDER.indexOf(currentStatus);
-  if (stepIdx < currentIdx) return "done";
-  if (stepIdx === currentIdx) return "active";
-  return "pending";
+function getStepState(stepStatus: RedemptionStatus, currentStatus: RedemptionStatus) {
+  const si = STATUS_ORDER.indexOf(stepStatus);
+  const ci = STATUS_ORDER.indexOf(currentStatus);
+  return si < ci ? "done" : si === ci ? "active" : "pending";
 }
 
 export function RedemptionDetailScreen() {
@@ -62,9 +88,7 @@ export function RedemptionDetailScreen() {
   useEffect(() => {
     if (!token) return;
     mobileGetMyRedemption(token, route.params.redemptionId)
-      .then(setDetail)
-      .catch(() => null)
-      .finally(() => setLoading(false));
+      .then(setDetail).catch(() => null).finally(() => setLoading(false));
   }, [token, route.params.redemptionId]);
 
   function formatDate(iso: string | null) {
@@ -82,12 +106,16 @@ export function RedemptionDetailScreen() {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  const carrier = detail ? getCarrier(detail.carrierId) : null;
+  const carrierStatusLabel = detail ? getCarrierStatusLabel(detail.status) : null;
+  const showTrackingSection = carrier || detail?.trackingNumber;
+
   return (
     <Screen contentContainerStyle={styles.content}>
 
-      {/* ✦ Minimal page header */}
+      {/* Minimal header */}
       <View style={styles.pageHeader}>
-        <Text style={styles.pageTitle}>รายละเอียด{"\n"}ของรางวัล</Text>
+        <Text style={styles.pageTitle}>{"รายละเอียด\nของรางวัล"}</Text>
         <Pressable onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={10}>
           <MaterialIcons name="arrow-back-ios" size={12} color={colors.goldDeep} />
           <Text style={styles.backText}>ย้อนกลับ</Text>
@@ -120,7 +148,7 @@ export function RedemptionDetailScreen() {
         </View>
       ) : (
         <>
-          {/* ✦ Product card */}
+          {/* Product card */}
           <View style={styles.productCard}>
             <View style={styles.productImgWrap}>
               <CommerceImage uri={detail.rewardProduct.imageUrl ?? undefined} style={styles.productImg} contentFit="cover" />
@@ -128,7 +156,6 @@ export function RedemptionDetailScreen() {
             </View>
             <View style={styles.productInfo}>
               <Text style={styles.productName}>{detail.rewardProduct.name}</Text>
-              {/* ✦ Gold points pill */}
               <View style={styles.ptsPill}>
                 <MaterialIcons name="auto-awesome" size={11} color={colors.gold} />
                 <Text style={styles.ptsText}>ใช้ {detail.pointsSpent.toLocaleString()} แต้ม</Text>
@@ -137,37 +164,30 @@ export function RedemptionDetailScreen() {
             </View>
           </View>
 
-          {/* ✦ Status Timeline */}
+          {/* Status timeline */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>สถานะการจัดส่ง</Text>
             <View style={styles.timelineCard}>
               {TIMELINE_STEPS.map((step, i) => {
                 const state = getStepState(step.status, detail.status);
                 const isLast = i === TIMELINE_STEPS.length - 1;
+                const isDoneConnector = state === "done";
                 return (
                   <View key={step.status} style={styles.tlItem}>
-                    {/* Connector line */}
                     {!isLast && (
-                      <View style={[styles.tlLine, state === "done" && styles.tlLineDone]} />
+                      <View style={[styles.tlLine, isDoneConnector && styles.tlLineDone]} />
                     )}
-                    {/* Dot */}
                     <View style={[
                       styles.tlDot,
                       state === "done" && styles.tlDotDone,
                       state === "active" && styles.tlDotActive,
-                      state === "pending" && styles.tlDotPending,
                     ]}>
                       <MaterialIcons
                         name={state === "done" ? "check" : step.icon as any}
-                        size={12}
-                        color={
-                          state === "done" ? colors.goldDark :
-                          state === "active" ? colors.gold :
-                          "rgba(212,175,55,0.3)"
-                        }
+                        size={11}
+                        color={state === "done" ? colors.goldDark : state === "active" ? colors.gold : "rgba(212,175,55,0.25)"}
                       />
                     </View>
-                    {/* Label */}
                     <View style={[styles.tlCopy, isLast && { paddingBottom: 0 }]}>
                       <Text style={[
                         styles.tlTitle,
@@ -177,9 +197,8 @@ export function RedemptionDetailScreen() {
                         {step.label}
                       </Text>
                       <Text style={[styles.tlSub, state === "active" && styles.tlSubActive]}>
-                        {state === "active" ? "กำลังดำเนินการอยู่" :
-                         state === "done" ? formatDate(detail.statusUpdatedAt) :
-                         "รอดำเนินการ"}
+                        {state === "done"   ? formatDate(detail.statusUpdatedAt) :
+                         state === "active" ? "กำลังดำเนินการอยู่" : "รอดำเนินการ"}
                       </Text>
                     </View>
                   </View>
@@ -188,47 +207,67 @@ export function RedemptionDetailScreen() {
             </View>
           </View>
 
-          {/* ✦ Tracking number */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>หมายเลขพัสดุ</Text>
-            <View style={styles.trackingCard}>
-              {/* ── Carrier row ── */}
-              {detail.carrierId ? (() => {
-                const carrier = CARRIERS.find((c) => c.id === detail.carrierId);
-                return carrier ? (
+          {/* ✦ Tracking + Carrier card */}
+          {showTrackingSection && (
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>ข้อมูลการจัดส่ง</Text>
+              <View style={styles.trackingCard}>
+
+                {/* ✦ Carrier row */}
+                {carrier && (
                   <View style={styles.carrierRow}>
-                    <CarrierBadge carrier={carrier} size="lg" />
+                    {/* Logo */}
+                    <View style={styles.carrierLogoWrap}>
+                      <View style={[styles.carrierLogoFallback, { backgroundColor: carrier.color }]}>
+                        <Text style={[styles.carrierLogoText, { color: carrier.textColor }]}>
+                          {carrier.shortName}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* Name */}
                     <View style={styles.carrierInfo}>
                       <Text style={styles.carrierName}>{carrier.name}</Text>
                       <Text style={styles.carrierSub}>ผู้ให้บริการขนส่ง</Text>
                     </View>
+
+                    {/* ✦ Status dot */}
+                    {carrierStatusLabel && (
+                      <View style={styles.carrierStatus}>
+                        <View style={styles.statusDot} />
+                        <Text style={styles.statusText}>{carrierStatusLabel}</Text>
+                      </View>
+                    )}
                   </View>
-                ) : null;
-              })() : null}
-
-              {/* ── Divider ── */}
-              {detail.carrierId && <View style={styles.trackingDivider} />}
-
-              {/* ── Tracking number row ── */}
-              <View style={styles.trackingHeader}>
-                <Text style={styles.trackingTitle}>TRACKING NUMBER</Text>
-                {detail.trackingNumber && (
-                  <Pressable style={styles.copyBtn} onPress={handleCopy}>
-                    <MaterialIcons name={copied ? "check" : "content-copy"} size={11} color={colors.goldDeep} />
-                    <Text style={styles.copyBtnText}>{copied ? "คัดลอกแล้ว" : "คัดลอก"}</Text>
-                  </Pressable>
                 )}
-              </View>
-              {detail.trackingNumber ? (
-                <Text style={styles.trackingNumber}>{detail.trackingNumber}</Text>
-              ) : (
-                <View style={styles.noTracking}>
-                  <MaterialIcons name="access-time" size={15} color="rgba(255,255,255,0.3)" />
-                  <Text style={styles.noTrackingText}>ยังไม่มีหมายเลขพัสดุ</Text>
+
+                {/* Tracking number */}
+                <View style={styles.trackingBody}>
+                  <View style={styles.trackingHeader}>
+                    <Text style={styles.trackingLabel}>TRACKING NUMBER</Text>
+                    {detail.trackingNumber && (
+                      <Pressable style={styles.copyBtn} onPress={handleCopy}>
+                        <MaterialIcons name={copied ? "check" : "content-copy"} size={11} color={colors.goldDeep} />
+                        <Text style={styles.copyBtnText}>{copied ? "คัดลอกแล้ว" : "คัดลอก"}</Text>
+                      </Pressable>
+                    )}
+                  </View>
+
+                  {detail.trackingNumber ? (
+                    <>
+                      <Text style={styles.trackingNumber}>{detail.trackingNumber}</Text>
+                      <Text style={styles.trackingHint}>กดคัดลอกเพื่อติดตามพัสดุ</Text>
+                    </>
+                  ) : (
+                    <View style={styles.noTracking}>
+                      <MaterialIcons name="access-time" size={14} color="rgba(0,0,0,0.25)" />
+                      <Text style={styles.noTrackingText}>ยังไม่มีหมายเลขพัสดุ</Text>
+                    </View>
+                  )}
                 </View>
-              )}
+              </View>
             </View>
-          </View>
+          )}
 
           {/* Shipping address */}
           {detail.shippingRecipient && (
@@ -243,12 +282,8 @@ export function RedemptionDetailScreen() {
                 </View>
                 <View style={styles.addressDivider} />
                 <Text style={styles.addressName}>{detail.shippingRecipient}</Text>
-                {detail.shippingPhone && (
-                  <Text style={styles.addressSub}>{detail.shippingPhone}</Text>
-                )}
-                {detail.shippingAddress && (
-                  <Text style={styles.addressSub}>{detail.shippingAddress}</Text>
-                )}
+                {detail.shippingPhone && <Text style={styles.addressSub}>{detail.shippingPhone}</Text>}
+                {detail.shippingAddress && <Text style={styles.addressSub}>{detail.shippingAddress}</Text>}
               </View>
             </View>
           )}
@@ -260,8 +295,6 @@ export function RedemptionDetailScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingBottom: spacing["3xl"], backgroundColor: colors.background },
-
-  // Header
   pageHeader: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingHorizontal: 18, paddingTop: 16, paddingBottom: 8 },
   pageTitle: { color: "#fff", fontSize: 22, fontFamily: fonts.extraBold, lineHeight: 28 },
   backBtn: { flexDirection: "row", alignItems: "center", gap: 2, paddingTop: 6 },
@@ -271,15 +304,14 @@ const styles = StyleSheet.create({
   bcLink: { color: colors.gold, fontSize: 10, fontFamily: fonts.semiBold },
   bcSep: { color: "rgba(255,255,255,0.3)", fontSize: 10 },
   bcCur: { color: "rgba(255,255,255,0.45)", fontSize: 10, fontFamily: fonts.medium },
-
   loader: { marginTop: 40 },
   empty: { marginTop: 40, alignItems: "center", gap: 8 },
   emptyText: { color: "rgba(255,255,255,0.6)", fontSize: 14, fontFamily: fonts.medium },
 
-  // Product card
-  productCard: { marginHorizontal: 14, marginBottom: 14, backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.goldMuted, overflow: "hidden", flexDirection: "row" },
-  productImgWrap: { width: 100, height: 100, position: "relative", flexShrink: 0 },
-  productImg: { width: 100, height: 100, backgroundColor: colors.surfaceMuted },
+  // Product
+  productCard: { marginHorizontal: 14, marginBottom: 12, backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.goldMuted, overflow: "hidden", flexDirection: "row" },
+  productImgWrap: { width: 92, height: 92, position: "relative", flexShrink: 0 },
+  productImg: { width: 92, height: 92, backgroundColor: colors.surfaceMuted },
   productImgAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3, backgroundColor: colors.gold },
   productInfo: { flex: 1, padding: 12, gap: 6 },
   productName: { color: colors.textPrimary, fontSize: 13, fontFamily: fonts.bold, lineHeight: 18 },
@@ -288,39 +320,54 @@ const styles = StyleSheet.create({
   productDate: { color: colors.textMuted, fontSize: 9, fontFamily: fonts.medium },
 
   // Section
-  section: { marginHorizontal: 14, marginBottom: 14 },
+  section: { marginHorizontal: 14, marginBottom: 12 },
   sectionLabel: { color: "rgba(255,255,255,0.5)", fontSize: 8, fontFamily: fonts.bold, letterSpacing: 1, textTransform: "uppercase", marginBottom: 9 },
 
   // Timeline
   timelineCard: { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.goldMuted, padding: 14 },
-  tlItem: { flexDirection: "row", alignItems: "flex-start", gap: 10, position: "relative" },
-  tlLine: { position: "absolute", left: 13, top: 26, width: 2, bottom: 0, backgroundColor: "rgba(212,175,55,0.15)" },
+  tlItem: { flexDirection: "row", alignItems: "flex-start", gap: 9, position: "relative" },
+  tlLine: { position: "absolute", left: 11, top: 23, width: 2, bottom: 0, backgroundColor: "rgba(212,175,55,0.18)" },
   tlLineDone: { backgroundColor: colors.gold },
-  tlDot: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 },
+  tlDot: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: "rgba(212,175,55,0.2)", backgroundColor: colors.surface, alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 },
   tlDotDone: { backgroundColor: colors.gold, borderColor: colors.gold },
-  tlDotActive: { backgroundColor: colors.surface, borderColor: colors.gold, shadowColor: colors.gold, shadowOpacity: 0.35, shadowRadius: 8, shadowOffset: { width: 0, height: 0 }, elevation: 3 },
-  tlDotPending: { backgroundColor: colors.surface, borderColor: "rgba(212,175,55,0.2)" },
-  tlCopy: { flex: 1, paddingBottom: 16 },
-  tlTitle: { fontSize: 13, fontFamily: fonts.bold, color: colors.textPrimary },
+  tlDotActive: { borderColor: colors.gold, shadowColor: colors.gold, shadowOpacity: 0.35, shadowRadius: 6, shadowOffset: { width: 0, height: 0 }, elevation: 2 },
+  tlCopy: { flex: 1, paddingBottom: 14 },
+  tlTitle: { fontSize: 12, fontFamily: fonts.bold, color: colors.textPrimary },
   tlTitleActive: { color: colors.goldDeep },
   tlTitlePending: { color: colors.textMuted },
-  tlSub: { fontSize: 10, fontFamily: fonts.medium, color: colors.textMuted, marginTop: 2 },
+  tlSub: { fontSize: 9, fontFamily: fonts.medium, color: colors.textMuted, marginTop: 2 },
   tlSubActive: { color: colors.gold },
 
-  // Tracking
-  trackingCard: { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.goldMuted, padding: 14 },
-  trackingHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
-  trackingTitle: { color: colors.textMuted, fontSize: 9, fontFamily: fonts.bold, letterSpacing: 0.8 },
-  carrierRow: { flexDirection: "row", alignItems: "center", gap: 14, paddingBottom: 4 },
-  carrierInfo: { flex: 1, gap: 2 },
-  carrierName: { color: colors.textPrimary, fontSize: 15, fontFamily: fonts.bold },
-  carrierSub: { color: colors.textMuted, fontSize: 10, fontFamily: fonts.medium },
-  trackingDivider: { height: 1, backgroundColor: colors.goldMuted, marginVertical: 12 },
+  // ✦ Tracking + Carrier card
+  trackingCard: { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.goldMuted, overflow: "hidden" },
+
+  // Carrier row
+  carrierRow: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    padding: 12, borderBottomWidth: 1,
+    borderBottomColor: "rgba(212,175,55,0.12)",
+    backgroundColor: "rgba(212,175,55,0.025)",
+  },
+  carrierLogoWrap: { width: 46, height: 46, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: "rgba(212,175,55,0.2)", alignItems: "center", justifyContent: "center", flexShrink: 0, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  carrierLogoFallback: { width: 36, height: 36, borderRadius: 8, alignItems: "center", justifyContent: "center" },
+  carrierLogoText: { fontSize: 9, fontFamily: fonts.extraBold, letterSpacing: -0.3 },
+  carrierInfo: { flex: 1 },
+  carrierName: { fontSize: 14, fontFamily: fonts.bold, color: colors.textPrimary },
+  carrierSub: { fontSize: 9, fontFamily: fonts.medium, color: colors.textMuted, marginTop: 1 },
+  carrierStatus: { flexDirection: "row", alignItems: "center", gap: 4 },
+  statusDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.gold },
+  statusText: { fontSize: 9, fontFamily: fonts.bold, color: colors.goldDeep },
+
+  // Tracking body
+  trackingBody: { padding: 12 },
+  trackingHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
+  trackingLabel: { color: colors.textMuted, fontSize: 8, fontFamily: fonts.bold, letterSpacing: 1 },
   copyBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: colors.goldSoft, borderWidth: 1, borderColor: "rgba(212,175,55,0.3)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
   copyBtnText: { color: colors.goldDeep, fontSize: 9, fontFamily: fonts.bold },
-  trackingNumber: { color: colors.textPrimary, fontSize: 16, fontFamily: "JetBrainsMono_700Bold", letterSpacing: 1.5 },
-  noTracking: { flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 6 },
-  noTrackingText: { color: "rgba(255,255,255,0.55)", fontSize: 13, fontFamily: fonts.medium },
+  trackingNumber: { color: colors.textPrimary, fontSize: 18, fontFamily: "JetBrainsMono_700Bold", letterSpacing: 2 },
+  trackingHint: { color: colors.textMuted, fontSize: 9, fontFamily: fonts.medium, marginTop: 3 },
+  noTracking: { flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 4 },
+  noTrackingText: { color: colors.textSecondary, fontSize: 12, fontFamily: fonts.medium },
 
   // Address
   addressCard: { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.goldMuted, padding: 14 },
