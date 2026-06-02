@@ -192,18 +192,26 @@ export function RedemptionDetailScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>หมายเลขพัสดุ</Text>
             <View style={styles.trackingCard}>
+              {/* ── Carrier row ── */}
+              {detail.carrierId ? (() => {
+                const carrier = CARRIERS.find((c) => c.id === detail.carrierId);
+                return carrier ? (
+                  <View style={styles.carrierRow}>
+                    <CarrierBadge carrier={carrier} size="lg" />
+                    <View style={styles.carrierInfo}>
+                      <Text style={styles.carrierName}>{carrier.name}</Text>
+                      <Text style={styles.carrierSub}>ผู้ให้บริการขนส่ง</Text>
+                    </View>
+                  </View>
+                ) : null;
+              })() : null}
+
+              {/* ── Divider ── */}
+              {detail.carrierId && <View style={styles.trackingDivider} />}
+
+              {/* ── Tracking number row ── */}
               <View style={styles.trackingHeader}>
-                {/* Carrier name */}
-                {detail.carrierId ? (() => {
-                  const carrier = CARRIERS.find((c) => c.id === detail.carrierId);
-                  return carrier ? (
-                    <CarrierBadge carrier={carrier} size="sm" showName />
-                  ) : (
-                    <Text style={styles.trackingTitle}>{detail.carrierId}</Text>
-                  );
-                })() : (
-                  <Text style={styles.trackingTitle}>TRACKING NUMBER</Text>
-                )}
+                <Text style={styles.trackingTitle}>TRACKING NUMBER</Text>
                 {detail.trackingNumber && (
                   <Pressable style={styles.copyBtn} onPress={handleCopy}>
                     <MaterialIcons name={copied ? "check" : "content-copy"} size={11} color={colors.goldDeep} />
@@ -303,8 +311,11 @@ const styles = StyleSheet.create({
   trackingCard: { backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.goldMuted, padding: 14 },
   trackingHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
   trackingTitle: { color: colors.textMuted, fontSize: 9, fontFamily: fonts.bold, letterSpacing: 0.8 },
-  carrierPill: { backgroundColor: colors.goldSoft, borderWidth: 1, borderColor: "rgba(212,175,55,0.35)", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
-  carrierText: { color: colors.goldDeep, fontSize: 11, fontFamily: fonts.bold },
+  carrierRow: { flexDirection: "row", alignItems: "center", gap: 14, paddingBottom: 4 },
+  carrierInfo: { flex: 1, gap: 2 },
+  carrierName: { color: colors.textPrimary, fontSize: 15, fontFamily: fonts.bold },
+  carrierSub: { color: colors.textMuted, fontSize: 10, fontFamily: fonts.medium },
+  trackingDivider: { height: 1, backgroundColor: colors.goldMuted, marginVertical: 12 },
   copyBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: colors.goldSoft, borderWidth: 1, borderColor: "rgba(212,175,55,0.3)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 },
   copyBtnText: { color: colors.goldDeep, fontSize: 9, fontFamily: fonts.bold },
   trackingNumber: { color: colors.textPrimary, fontSize: 16, fontFamily: "JetBrainsMono_700Bold", letterSpacing: 1.5 },
