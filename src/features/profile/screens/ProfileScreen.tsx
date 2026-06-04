@@ -21,7 +21,8 @@ import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Image, Pressable, Share, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, Share, StyleSheet, Text, View } from "react-native";
+import { AppModal } from "@/components/ui/AppModal";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
@@ -76,6 +77,7 @@ export function ProfileScreen() {
 
   const [copied, setCopied] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [commission, setCommission] = useState<{
     pendingAmount: number; pendingCount: number;
     paidAmount: number; paidCount: number;
@@ -89,7 +91,8 @@ export function ProfileScreen() {
   async function handlePickProfileImage() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("ต้องการสิทธิ์", "กรุณาอนุญาตให้เข้าถึงคลังรูปภาพ");
+      setPhotoError("กรุณาอนุญาตให้เข้าถึงคลังรูปภาพในการตั้งค่า");
+      return;
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -105,7 +108,7 @@ export function ProfileScreen() {
       await mobileUploadProfileImage(token, result.assets[0].uri);
       await refreshProfile();
     } catch {
-      Alert.alert("ผิดพลาด", "อัปโหลดรูปไม่สำเร็จ กรุณาลองใหม่");
+      setPhotoError("อัปโหลดรูปไม่สำเร็จ กรุณาลองใหม่");
     } finally {
       setUploadingPhoto(false);
     }
@@ -139,6 +142,15 @@ export function ProfileScreen() {
   // ── Authenticated screen ─────────────────────────────────
   return (
     <Screen contentContainerStyle={styles.content}>
+
+      <AppModal
+        visible={photoError !== null}
+        type="error"
+        title="อัปโหลดรูปไม่สำเร็จ"
+        message={photoError ?? ""}
+        confirmLabel="ตกลง"
+        onConfirm={() => setPhotoError(null)}
+      />
 
       {/* ✦ Hero — avatar + name + type + email */}
       <View style={styles.hero}>

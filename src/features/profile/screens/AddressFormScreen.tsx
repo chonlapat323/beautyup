@@ -2,7 +2,6 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Modal,
   Pressable,
   ScrollView,
@@ -11,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { AppModal } from "@/components/ui/AppModal";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/ui/AppHeader";
@@ -73,6 +73,8 @@ export function AddressFormScreen() {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [isLoading, setIsLoading] = useState(Boolean(addressId));
   const [isSaving, setIsSaving] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [errorModal, setErrorModal] = useState<string | null>(null);
 
   // Subdistrict picker state
   const [subdistrictOptions, setSubdistrictOptions] = useState<string[]>([]);
@@ -105,7 +107,7 @@ export function AddressFormScreen() {
           });
         }
       })
-      .catch(() => Alert.alert("โหลดข้อมูลที่อยู่ไม่สำเร็จ"))
+      .catch(() => setErrorModal("โหลดข้อมูลที่อยู่ไม่สำเร็จ"))
       .finally(() => setIsLoading(false));
   }, [addressId, token]);
 
@@ -140,26 +142,12 @@ export function AddressFormScreen() {
   }
 
   async function handleSave() {
-    if (!form.recipient.trim()) {
-      Alert.alert("กรุณากรอกชื่อผู้รับ");
-      return;
-    }
-    if (!form.phone.trim()) {
-      Alert.alert("กรุณากรอกเบอร์โทร");
-      return;
-    }
-    if (!/^\d{10}$/.test(form.phone.trim())) {
-      Alert.alert("เบอร์โทรต้องเป็นตัวเลข 10 หลัก");
-      return;
-    }
-    if (!form.addressLine1.trim()) {
-      Alert.alert("กรุณากรอกที่อยู่");
-      return;
-    }
-    if (form.postalCode && !/^\d{5}$/.test(form.postalCode.trim())) {
-      Alert.alert("รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก");
-      return;
-    }
+    setFieldError(null);
+    if (!form.recipient.trim()) { setFieldError("กรุณากรอกชื่อผู้รับ"); return; }
+    if (!form.phone.trim()) { setFieldError("กรุณากรอกเบอร์โทร"); return; }
+    if (!/^\d{10}$/.test(form.phone.trim())) { setFieldError("เบอร์โทรต้องเป็นตัวเลข 10 หลัก"); return; }
+    if (!form.addressLine1.trim()) { setFieldError("กรุณากรอกที่อยู่"); return; }
+    if (form.postalCode && !/^\d{5}$/.test(form.postalCode.trim())) { setFieldError("รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก"); return; }
     if (!token) return;
 
     setIsSaving(true);
@@ -184,7 +172,7 @@ export function AddressFormScreen() {
 
       navigation.goBack();
     } catch (error) {
-      Alert.alert("บันทึกไม่สำเร็จ", error instanceof Error ? error.message : "กรุณาลองใหม่");
+      setErrorModal(error instanceof Error ? error.message : "กรุณาลองใหม่");
     } finally {
       setIsSaving(false);
     }
@@ -213,6 +201,14 @@ export function AddressFormScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
+      <AppModal
+        visible={errorModal !== null}
+        type="error"
+        title="เกิดข้อผิดพลาด"
+        message={errorModal ?? ""}
+        confirmLabel="ตกลง"
+        onConfirm={() => setErrorModal(null)}
+      />
       {appHeader}
       <View style={styles.card}>
         <Field
@@ -294,6 +290,7 @@ export function AddressFormScreen() {
         <Pressable style={styles.cancelBtn} onPress={() => navigation.goBack()}>
           <Text style={styles.cancelText}>ยกเลิก</Text>
         </Pressable>
+        {fieldError ? <Text style={styles.fieldError}>{fieldError}</Text> : null}
         <Pressable
           style={[styles.saveBtn, isSaving && styles.btnDisabled]}
           onPress={() => void handleSave()}
@@ -449,6 +446,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     ...typography.title,
   },
+  fieldError: { color: "#dc2626", fontSize: 12, marginBottom: 8, paddingHorizontal: 4 },
   saveBtn: {
     flex: 2,
     height: 52,

@@ -2,7 +2,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { AppModal } from "@/components/ui/AppModal";
 
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
@@ -23,43 +24,25 @@ export function RegisterScreen() {
   const [referralCode, setReferralCode] = useState("");
   const [salonCode, setSalonCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [errorModal, setErrorModal] = useState<string | null>(null);
 
   async function handleRegister() {
-    if (!fullName.trim()) {
-      Alert.alert("กรุณากรอกชื่อ-นามสกุล");
-      return;
-    }
-    if (!email.trim() && !phone.trim()) {
-      Alert.alert("กรุณากรอกอีเมลหรือเบอร์โทรอย่างน้อย 1 อย่าง");
-      return;
-    }
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      Alert.alert("รูปแบบอีเมลไม่ถูกต้อง");
-      return;
-    }
-    if (phone.trim() && !/^\d{10}$/.test(phone.trim())) {
-      Alert.alert("เบอร์โทรต้องเป็นตัวเลข 10 หลัก");
-      return;
-    }
-    if (!password) {
-      Alert.alert("กรุณากรอกรหัสผ่าน");
-      return;
-    }
-    if (password.length < 6) {
-      Alert.alert("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert("รหัสผ่านไม่ตรงกัน");
-      return;
-    }
+    setFieldError(null);
+    if (!fullName.trim()) { setFieldError("กรุณากรอกชื่อ-นามสกุล"); return; }
+    if (!email.trim() && !phone.trim()) { setFieldError("กรุณากรอกอีเมลหรือเบอร์โทรอย่างน้อย 1 อย่าง"); return; }
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setFieldError("รูปแบบอีเมลไม่ถูกต้อง"); return; }
+    if (phone.trim() && !/^\d{10}$/.test(phone.trim())) { setFieldError("เบอร์โทรต้องเป็นตัวเลข 10 หลัก"); return; }
+    if (!password) { setFieldError("กรุณากรอกรหัสผ่าน"); return; }
+    if (password.length < 6) { setFieldError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"); return; }
+    if (password !== confirmPassword) { setFieldError("รหัสผ่านไม่ตรงกัน"); return; }
     setIsLoading(true);
     try {
       const { token, member } = await mobileRegister(fullName, email, phone, password, referralCode || undefined, salonCode || undefined);
       signIn(token, member);
       navigation.popToTop();
     } catch (e) {
-      Alert.alert("สมัครสมาชิกไม่สำเร็จ", e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
+      setErrorModal(e instanceof Error ? e.message : "กรุณาลองใหม่อีกครั้ง");
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +50,14 @@ export function RegisterScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
+      <AppModal
+        visible={errorModal !== null}
+        type="error"
+        title="สมัครสมาชิกไม่สำเร็จ"
+        message={errorModal ?? ""}
+        confirmLabel="ตกลง"
+        onConfirm={() => setErrorModal(null)}
+      />
       <View style={styles.headerRow}>
         <Pressable accessibilityLabel="กลับไปหน้าเข้าสู่ระบบ" onPress={() => navigation.goBack()}>
           <MaterialIcons color={colors.primary} name="arrow-back" size={22} />
@@ -139,6 +130,7 @@ export function RegisterScreen() {
           value={salonCode}
         />
 
+        {fieldError ? <Text style={styles.fieldError}>{fieldError}</Text> : null}
         <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleRegister()} disabled={isLoading}>
           <Text style={styles.buttonText}>{isLoading ? "กำลังสมัครสมาชิก..." : "สมัครสมาชิก"}</Text>
         </Pressable>
@@ -201,6 +193,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     ...typography.body,
   },
+  fieldError: { color: "#dc2626", fontSize: 12, marginBottom: 8, paddingHorizontal: 4 },
   button: {
     height: 56,
     borderRadius: radius.pill,
