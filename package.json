@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "test:e2e": "playwright test --config=e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test --config=e2e/playwright.config.ts --ui"
   },
   "dependencies": {
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
@@ -45,6 +47,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
