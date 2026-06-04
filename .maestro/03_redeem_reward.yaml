@@ -1,0 +1,55 @@
+appId: com.beautyup.app
+---
+# Test: Redeem reward flow
+- launchApp
+- waitForAnimationToEnd
+
+# Go to Profile tab
+- tapOn:
+    id: "tab-profile"
+- waitForAnimationToEnd
+
+# Tap "แลกแต้ม"
+- tapOn:
+    text: "แลกแต้ม"
+- waitForAnimationToEnd
+
+# Verify rewards screen
+- assertVisible:
+    text: "แลกแต้ม"
+- assertVisible:
+    text: "แต้มสะสมของคุณ"
+- takeScreenshot: "03a_rewards_screen"
+
+# Tap "แลกเลย" on first available reward
+- tapOn:
+    text: "แลกเลย"
+- waitForAnimationToEnd
+- takeScreenshot: "03b_address_picker"
+
+# Verify address picker modal
+- assertVisible:
+    text: "เลือกที่อยู่จัดส่ง"
+
+# Tap "ใช้ที่อยู่นี้"
+- tapOn:
+    text: "ใช้ที่อยู่นี้"
+- waitForAnimationToEnd
+- takeScreenshot: "03c_confirm_modal"
+
+# Verify confirm dialog
+- assertVisible:
+    text: "ยืนยันการแลก"
+
+# Tap "ยืนยัน"
+- tapOn:
+    text: "ยืนยัน"
+- waitForAnimationToEnd
+- takeScreenshot: "03d_redeem_success"
+
+# Verify success
+- assertVisible:
+    text: "แลกแต้มสำเร็จ"
+
+- tapOn:
+    text: "ตกลง"

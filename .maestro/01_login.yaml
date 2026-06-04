@@ -1,0 +1,33 @@
+appId: com.beautyup.app
+---
+# Test: Login flow
+- launchApp
+- waitForAnimationToEnd
+
+# Navigate to Profile tab (Login screen)
+- tapOn:
+    id: "tab-profile"
+- waitForAnimationToEnd
+
+# Tap "เข้าสู่ระบบ" button
+- tapOn:
+    text: "เข้าสู่ระบบ"
+- waitForAnimationToEnd
+
+# Fill login form
+- tapOn:
+    text: "อีเมลหรือเบอร์โทร"
+- inputText: "${ADMIN_EMAIL}"
+
+- tapOn:
+    text: "รหัสผ่าน"
+- inputText: "${ADMIN_PASSWORD}"
+
+- tapOn:
+    text: "เข้าสู่ระบบ"
+- waitForAnimationToEnd
+
+# Verify logged in — should see profile screen
+- assertVisible:
+    text: "บัญชีของฉัน"
+- takeScreenshot: "01_login_success"

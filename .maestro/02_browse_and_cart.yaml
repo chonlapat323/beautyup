@@ -1,0 +1,51 @@
+appId: com.beautyup.app
+---
+# Test: Browse products and add to cart
+- launchApp
+- waitForAnimationToEnd
+
+# Go to Shop tab
+- tapOn:
+    id: "tab-shop"
+- waitForAnimationToEnd
+
+# Select first brand (Brand step)
+- assertVisible:
+    text: "เลือกแบรนด์"
+- tapOn:
+    index: 0
+    text: ".*"  # Tap first brand row
+- waitForAnimationToEnd
+
+# Select first category
+- assertVisible:
+    text: "เลือกหมวดหมู่"
+- tapOn:
+    index: 0
+    text: ".*"  # Tap first category or "ทุกหมวดหมู่"
+- waitForAnimationToEnd
+
+# On ProductList — verify products visible
+- assertVisible:
+    text: "สินค้าทั้งหมด"
+- takeScreenshot: "02a_product_list"
+
+# Tap first product
+- tapOn:
+    index: 0
+    id: "product-card"
+- waitForAnimationToEnd
+- takeScreenshot: "02b_product_detail"
+
+# Tap "เพิ่มลงตะกร้า"
+- tapOn:
+    text: "เพิ่มลงตะกร้า"
+- waitForAnimationToEnd
+
+# Go to Cart tab — verify item in cart
+- tapOn:
+    id: "tab-cart"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "ตะกร้าสินค้า"
+- takeScreenshot: "02c_cart_with_item"

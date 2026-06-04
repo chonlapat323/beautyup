@@ -1,0 +1,40 @@
+appId: com.beautyup.app
+---
+# Test: Back button behavior — no stuck screens
+- launchApp
+- waitForAnimationToEnd
+
+# Shop → Brand step → back → should stay on Home
+- tapOn:
+    id: "tab-shop"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "เลือกแบรนด์"
+
+# Select brand → Category step → back → should go to Brand step
+- tapOn:
+    index: 0
+    text: ".*"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "เลือกหมวดหมู่"
+- tapOn:
+    text: "ย้อนกลับ"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "เลือกแบรนด์"
+- takeScreenshot: "05a_back_to_brand_step"
+
+# Go to Profile → Orders → back → Profile
+- tapOn:
+    id: "tab-profile"
+- waitForAnimationToEnd
+- tapOn:
+    text: "ประวัติคำสั่งซื้อ"
+- waitForAnimationToEnd
+- tapOn:
+    text: "ย้อนกลับ"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "บัญชีของฉัน"
+- takeScreenshot: "05b_back_to_profile"

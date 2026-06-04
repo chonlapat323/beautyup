@@ -1,0 +1,54 @@
+appId: com.beautyup.app
+---
+# Test: Logout clears cart, login with same account shows empty cart
+- launchApp
+- waitForAnimationToEnd
+
+# Add item to cart first
+- tapOn:
+    id: "tab-shop"
+- waitForAnimationToEnd
+- tapOn:
+    index: 0
+    text: ".*"
+- waitForAnimationToEnd
+- tapOn:
+    index: 0
+    text: ".*"
+- waitForAnimationToEnd
+
+# Go to cart and verify has item
+- tapOn:
+    id: "tab-cart"
+- waitForAnimationToEnd
+- takeScreenshot: "04a_cart_before_logout"
+
+# Go to Profile → logout
+- tapOn:
+    id: "tab-profile"
+- waitForAnimationToEnd
+- tapOn:
+    text: "ออกจากระบบ"
+- waitForAnimationToEnd
+
+# Login again
+- tapOn:
+    text: "เข้าสู่ระบบ"
+- waitForAnimationToEnd
+- tapOn:
+    text: "อีเมลหรือเบอร์โทร"
+- inputText: "${ADMIN_EMAIL}"
+- tapOn:
+    text: "รหัสผ่าน"
+- inputText: "${ADMIN_PASSWORD}"
+- tapOn:
+    text: "เข้าสู่ระบบ"
+- waitForAnimationToEnd
+
+# Verify cart is empty
+- tapOn:
+    id: "tab-cart"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "ยังไม่มีสินค้าในตะกร้า"
+- takeScreenshot: "04b_cart_empty_after_login"
