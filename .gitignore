@@ -1,6 +1,10 @@
 # dependencies
 node_modules/
 
+# Playwright test output
+playwright-report/
+test-results/
+
 # Expo
 .expo/
 .expo-shared/
