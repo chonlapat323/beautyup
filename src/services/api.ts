@@ -303,6 +303,30 @@ export async function fetchMobileConfig(): Promise<MobileConfig> {
   return res.json() as Promise<MobileConfig>;
 }
 
+export type CarrierConfig = {
+  id: string;
+  name: string;
+  shortName: string;
+  color: string;
+  textColor: string;
+  logoUrl: string | null;
+  trackingUrl: string | null;
+  isActive: boolean;
+  sortOrder: number;
+};
+
+export async function fetchCarriers(): Promise<CarrierConfig[]> {
+  try {
+    const res = await fetch(`${API_BASE}/carriers?activeOnly=true`, {
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
 // ─── Mobile auth ──────────────────────────────────────────────────────────────
 
 type AuthResponse = {

@@ -35,7 +35,7 @@ import { colors, fonts, radius, spacing } from "@/theme";
 
 type RedemptionStatus = MyRedemptionDetail["status"];
 
-// ── Carrier map (carrierId → display info) ──────────────────
+// static fallback for old orders that stored shortName as carrierId
 const CARRIER_MAP: Record<string, { name: string; shortName: string; color: string; textColor: string }> = {
   "thpost":   { name: "ไปรษณีย์ไทย",  shortName: "ไปรษณีย์", color: "#C8102E", textColor: "#fff" },
   "kerry":    { name: "Kerry Express", shortName: "Kerry",    color: "#FF6B00", textColor: "#fff" },
@@ -44,23 +44,7 @@ const CARRIER_MAP: Record<string, { name: string; shortName: string; color: stri
   "dhl":      { name: "DHL Express",   shortName: "DHL",      color: "#FFCC00", textColor: "#CC0000" },
 };
 
-function getCarrier(carrierId: string | null) {
-  if (!carrierId) return null;
-  return CARRIER_MAP[carrierId.toLowerCase()] ?? {
-    name: carrierId,
-    shortName: carrierId.slice(0, 4).toUpperCase(),
-    color: colors.primary,
-    textColor: "#fff",
-  };
-}
-
 // ── Status badge for carrier ────────────────────────────────
-function getCarrierStatusLabel(status: RedemptionStatus): string | null {
-  if (status === "SHIPPED")   return "ระหว่างทาง";
-  if (status === "DELIVERED") return "ส่งถึงแล้ว";
-  return null;
-}
-
 // ── Timeline steps ──────────────────────────────────────────
 const TIMELINE_STEPS: { status: RedemptionStatus; label: string; icon: string }[] = [
   { status: "PENDING",   label: "รอดำเนินการ",      icon: "hourglass-empty"  },
@@ -81,9 +65,30 @@ export function RedemptionDetailScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const route = useRoute<RouteProp<ProfileStackParamList, "RedemptionDetail">>();
   const token = useAppStore((state) => state.token);
+  const storeCarriers = useAppStore((state) => state.carriers);
   const [detail, setDetail] = useState<MyRedemptionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  function getCarrier(carrierId: string | null) {
+    if (!carrierId) return null;
+    const byId = storeCarriers.find((c) => c.id === carrierId);
+    if (byId) return byId;
+    const byShort = storeCarriers.find((c) => c.shortName.toLowerCase() === carrierId.toLowerCase());
+    if (byShort) return byShort;
+    return CARRIER_MAP[carrierId.toLowerCase()] ?? {
+      name: carrierId,
+      shortName: carrierId.slice(0, 4).toUpperCase(),
+      color: colors.primary,
+      textColor: "#fff",
+    };
+  }
+
+  function getCarrierStatusLabel(status: RedemptionStatus): string | null {
+    if (status === "SHIPPED")   return "ระหว่างทาง";
+    if (status === "DELIVERED") return "ส่งถึงแล้ว";
+    return null;
+  }
 
   useEffect(() => {
     if (!token) return;

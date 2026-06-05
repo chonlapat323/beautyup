@@ -9,6 +9,7 @@ import { AppModal } from "@/components/ui/AppModal";
 import { CarrierBadge } from "@/components/ui/CarrierBadge";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { CARRIERS } from "@/config/carriers";
+import type { CarrierConfig } from "@/services/api";
 import { navigateToHome, navigateToOrderHistory } from "@/navigation/helpers";
 import type { OrderStackParamList } from "@/navigation/types";
 import { mobileGetOrderDocuments } from "@/services/api";
@@ -31,7 +32,18 @@ export function OrderDetailScreen() {
     state.orders.find((entry) => entry.id === route.params.orderId),
   );
   const products = useAppStore((state) => state.products);
+  const storeCarriers = useAppStore((state) => state.carriers);
   const token = useAppStore((state) => state.token);
+
+  function resolveCarrier(carrierId: string): CarrierConfig | undefined {
+    const byId = storeCarriers.find((c) => c.id === carrierId);
+    if (byId) return byId;
+    const byShort = storeCarriers.find((c) => c.shortName.toLowerCase() === carrierId.toLowerCase());
+    if (byShort) return byShort;
+    // fallback: static carriers list (id field is the shortName code)
+    const fallback = CARRIERS.find((c) => c.id.toLowerCase() === carrierId.toLowerCase());
+    return fallback ? { ...fallback, trackingUrl: fallback.trackingUrl ?? null, isActive: true, sortOrder: 0 } : undefined;
+  }
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorModal, setErrorModal] = useState<string | null>(null);
@@ -131,7 +143,7 @@ export function OrderDetailScreen() {
             <View style={styles.trackingCard}>
               {/* Carrier */}
               {order.carrierId ? (() => {
-                const carrier = CARRIERS.find((c) => c.id === order.carrierId);
+                const carrier = resolveCarrier(order.carrierId);
                 return carrier ? (
                   <View style={styles.carrierRow}>
                     <CarrierBadge carrier={carrier} size="sm" />

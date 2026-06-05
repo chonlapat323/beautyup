@@ -3,8 +3,8 @@ import { persist } from "zustand/middleware";
 
 import { storage } from "./storage";
 
-import { fetchBanners, fetchBrands, fetchBundles, fetchCollections, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders, mobileGetProfile } from "@/services/api";
-import type { MobileConfig, PointTier } from "@/services/api";
+import { fetchBanners, fetchBrands, fetchBundles, fetchCarriers, fetchCollections, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders, mobileGetProfile } from "@/services/api";
+import type { CarrierConfig, MobileConfig, PointTier } from "@/services/api";
 import type { Banner, Brand, Bundle, CartItem, Category, Collection, Order, Product } from "@/types/domain";
 
 type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; creditBalance: number; referralCode: string | null; bankName: string | null; bankAccountNumber: string | null; bankAccountName: string | null; profileImageUrl?: string | null };
@@ -21,6 +21,7 @@ type AppStore = {
   brands: Brand[];
   bundles: Bundle[];
   collections: Collection[];
+  carriers: CarrierConfig[];
   gatewayFee: number;
   pointTiers: PointTier[];
   freeShippingThreshold: number;
@@ -56,6 +57,7 @@ export const useAppStore = create<AppStore>()(
       brands: [],
       bundles: [],
       collections: [],
+      carriers: [],
       gatewayFee: 20,
       pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }],
       freeShippingThreshold: 1000,
@@ -86,15 +88,16 @@ export const useAppStore = create<AppStore>()(
         set({ isLoadingCatalog: true, catalogError: false });
         try {
           const defaultConfig: MobileConfig = { gatewayFee: 20, pointTiers: [{ minSpend: 3000, points: 300 }, { minSpend: 5000, points: 500 }, { minSpend: 10000, points: 1000 }], freeShippingThreshold: 1000, defaultShippingFee: 50, social: {} };
-          const [{ categories, products }, banners, brands, bundles, collections, config] = await Promise.all([
+          const [{ categories, products }, banners, brands, bundles, collections, config, carriers] = await Promise.all([
             loadCatalogFromApi(),
             fetchBanners().catch(() => [] as Banner[]),
             fetchBrands().catch(() => [] as Brand[]),
             fetchBundles().catch(() => [] as Bundle[]),
             fetchCollections().catch(() => [] as Collection[]),
             fetchMobileConfig().catch(() => defaultConfig),
+            fetchCarriers().catch(() => [] as CarrierConfig[]),
           ]);
-          set({ categories, products, banners, brands, bundles, collections, gatewayFee: config.gatewayFee, pointTiers: config.pointTiers ?? defaultConfig.pointTiers, freeShippingThreshold: config.freeShippingThreshold ?? 1000, defaultShippingFee: config.defaultShippingFee ?? 50, social: config.social ?? {}, catalogError: false });
+          set({ categories, products, banners, brands, bundles, collections, carriers, gatewayFee: config.gatewayFee, pointTiers: config.pointTiers ?? defaultConfig.pointTiers, freeShippingThreshold: config.freeShippingThreshold ?? 1000, defaultShippingFee: config.defaultShippingFee ?? 50, social: config.social ?? {}, catalogError: false });
         } catch {
           set({ catalogError: true });
         } finally {
