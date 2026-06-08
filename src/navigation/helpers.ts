@@ -27,6 +27,12 @@ export function navigateToCategories(navigation: NavigationLike) {
     return;
   }
 
+  // Called from Tab navigator directly (e.g. CartScreen)
+  if (routeNames.includes("Shop")) {
+    navigation.navigate("Shop", { screen: "BrowseHome" });
+    return;
+  }
+
   const parent = navigation.getParent?.();
   if (parent) {
     parent.navigate("Shop", { screen: "BrowseHome" });
