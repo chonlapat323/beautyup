@@ -49,7 +49,7 @@ export function RegisterScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content} backgroundColor={colors.surface}>
+    <Screen contentContainerStyle={styles.content}>
       <AppModal
         visible={errorModal !== null}
         type="error"
@@ -66,7 +66,7 @@ export function RegisterScreen() {
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
         >
-          <MaterialIcons color={colors.textPrimary} name="arrow-back" size={20} />
+          <MaterialIcons color={"#ffffff"} name="arrow-back" size={20} />
         </Pressable>
         <BrandLockup compact />
       </View>
@@ -201,7 +201,8 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
+    borderColor: "rgba(255,255,255,0.35)",
+    backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -213,13 +214,13 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   title: {
-    color: colors.textPrimary,
+    color: "#ffffff",
     fontSize: 28,
     lineHeight: 34,
     fontFamily: fonts.bold,
   },
   subtitle: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.75)",
     maxWidth: 280,
     ...typography.body,
     lineHeight: 22,
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.1)",
     paddingHorizontal: spacing.lg,
-    color: colors.textPrimary,
+    color: "#ffffff",
     ...typography.body,
   },
 

@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.1)",
     paddingHorizontal: spacing.lg,
-    color: colors.textPrimary,
+    color: "#ffffff",
     ...typography.body,
   },
   inputPlaceholder: {
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     paddingHorizontal: spacing.lg,
-    color: colors.textPrimary,
+    color: "#ffffff",
     ...typography.body,
   },
   eyeBtn: {
