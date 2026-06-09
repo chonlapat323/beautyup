@@ -58,25 +58,36 @@ export function RegisterScreen() {
         confirmLabel="ตกลง"
         onConfirm={() => setErrorModal(null)}
       />
+
+      {/* ── Header row ──────────────────────────────────── */}
       <View style={styles.headerRow}>
-        <Pressable accessibilityLabel="กลับไปหน้าเข้าสู่ระบบ" onPress={() => navigation.goBack()}>
-          <MaterialIcons color={colors.primary} name="arrow-back" size={22} />
+        <Pressable
+          accessibilityLabel="กลับไปหน้าเข้าสู่ระบบ"
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
+          <MaterialIcons color={colors.textPrimary} name="arrow-back" size={20} />
         </Pressable>
         <BrandLockup compact />
       </View>
 
+      {/* ── Copy block ──────────────────────────────────── */}
       <View style={styles.copyBlock}>
         <Text style={styles.title}>สร้างบัญชีของคุณ</Text>
         <Text style={styles.subtitle}>
-          เริ่มต้นประสบการณ์ดูแลเส้นผมแบบพรีเมียมด้วยการสมัครสมาชิกที่เรียบง่าย
+          เริ่มต้นประสบการณ์ดูแลเส้นผมแบบพรีเมียม{"\n"}
+          ด้วยการสมัครสมาชิกที่เรียบง่าย
         </Text>
       </View>
 
-      <View style={styles.formBlock}>
+      {/* ── Form card ───────────────────────────────────── */}
+      <View style={styles.card}>
+
+        {/* Required fields */}
         <TextInput
           onChangeText={setFullName}
           placeholder="ชื่อ-นามสกุล"
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={PLACEHOLDER}
           style={styles.input}
           value={fullName}
         />
@@ -85,7 +96,7 @@ export function RegisterScreen() {
           keyboardType="email-address"
           onChangeText={setEmail}
           placeholder="Email"
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={PLACEHOLDER}
           style={styles.input}
           value={email}
         />
@@ -93,14 +104,14 @@ export function RegisterScreen() {
           keyboardType="phone-pad"
           onChangeText={setPhone}
           placeholder="เบอร์โทรศัพท์"
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={PLACEHOLDER}
           style={styles.input}
           value={phone}
         />
         <TextInput
           onChangeText={setPassword}
           placeholder="รหัสผ่าน"
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={PLACEHOLDER}
           secureTextEntry
           style={styles.input}
           value={password}
@@ -108,48 +119,76 @@ export function RegisterScreen() {
         <TextInput
           onChangeText={setConfirmPassword}
           placeholder="ยืนยันรหัสผ่าน"
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={PLACEHOLDER}
           secureTextEntry
           style={styles.input}
           value={confirmPassword}
         />
-        <TextInput
-          autoCapitalize="none"
-          onChangeText={setReferralCode}
-          placeholder="รหัสแนะนำ (ถ้ามี)"
-          placeholderTextColor={colors.textMuted}
-          style={styles.input}
-          value={referralCode}
-        />
-        <TextInput
-          autoCapitalize="characters"
-          onChangeText={setSalonCode}
-          placeholder="รหัสซาลอน (ถ้ามี)"
-          placeholderTextColor={colors.textMuted}
-          style={styles.input}
-          value={salonCode}
-        />
 
-        {fieldError ? <Text style={styles.fieldError}>{fieldError}</Text> : null}
-        <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleRegister()} disabled={isLoading}>
-          <Text style={styles.buttonText}>{isLoading ? "กำลังสมัครสมาชิก..." : "สมัครสมาชิก"}</Text>
-        </Pressable>
-      </View>
+        {/* ── Optional divider ─────────────────────────── */}
+        <View style={styles.dividerRow}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>ไม่บังคับ</Text>
+          <View style={styles.dividerLine} />
+        </View>
 
-      <View style={styles.footerRow}>
-        <Text style={styles.footerText}>มีบัญชีอยู่แล้วใช่ไหม?</Text>
-        <Pressable onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.footerLink}>เข้าสู่ระบบ</Text>
+        {/* Optional fields — 2 col */}
+        <View style={styles.optionalRow}>
+          <TextInput
+            autoCapitalize="none"
+            onChangeText={setReferralCode}
+            placeholder="รหัสแนะนำ"
+            placeholderTextColor={PLACEHOLDER}
+            style={[styles.input, styles.inputOpt]}
+            value={referralCode}
+          />
+          <TextInput
+            autoCapitalize="characters"
+            onChangeText={setSalonCode}
+            placeholder="รหัสซาลอน"
+            placeholderTextColor={PLACEHOLDER}
+            style={[styles.input, styles.inputOpt]}
+            value={salonCode}
+          />
+        </View>
+
+        {/* Field error */}
+        {fieldError ? (
+          <Text style={styles.fieldError}>{fieldError}</Text>
+        ) : null}
+
+        {/* Gold CTA */}
+        <Pressable
+          disabled={isLoading}
+          onPress={() => void handleRegister()}
+          style={[styles.button, isLoading && styles.buttonDisabled]}
+        >
+          <Text style={styles.buttonText}>
+            {isLoading ? "กำลังสมัครสมาชิก..." : "สมัครสมาชิก"}
+          </Text>
         </Pressable>
+
+        {/* Login link */}
+        <View style={styles.footerRow}>
+          <Text style={styles.footerText}>มีบัญชีอยู่แล้วใช่ไหม?</Text>
+          <Pressable onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.footerLink}>เข้าสู่ระบบ</Text>
+          </Pressable>
+        </View>
       </View>
     </Screen>
   );
 }
 
+/** Placeholder color for jade-bg inputs */
+const PLACEHOLDER = "rgba(255,255,255,0.45)";
+
 const styles = StyleSheet.create({
   content: {
     paddingBottom: spacing["3xl"],
   },
+
+  /* Header row */
   headerRow: {
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing["3xl"],
@@ -157,6 +196,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  /* Copy block */
   copyBlock: {
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing["2xl"],
@@ -164,53 +214,106 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.textPrimary,
-    fontSize: 32,
-    lineHeight: 38,
-    fontWeight: "600",
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: "700",
   },
   subtitle: {
     color: colors.textSecondary,
     maxWidth: 280,
     ...typography.body,
+    lineHeight: 22,
   },
-  formBlock: {
+
+  /* Form card */
+  card: {
     marginHorizontal: spacing["2xl"],
     marginTop: spacing["2xl"],
     padding: spacing["2xl"],
     borderRadius: radius.xl,
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.borderSoft,
-    gap: spacing.lg,
+    borderColor: colors.goldMuted,
+    gap: spacing.md,
   },
+
+  /* Input */
   input: {
-    height: 56,
+    height: 52,
     borderRadius: radius.md,
     backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.borderSoft,
+    borderColor: "rgba(255,255,255,0.1)",
     paddingHorizontal: spacing.lg,
     color: colors.textPrimary,
     ...typography.body,
   },
-  fieldError: { color: "#dc2626", fontSize: 12, marginBottom: 8, paddingHorizontal: 4 },
+
+  /* Optional 2-col layout */
+  optionalRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  inputOpt: {
+    flex: 1,
+    borderStyle: "dashed",
+    borderColor: colors.goldMuted,
+  },
+
+  /* Section divider */
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginVertical: 2,
+  },
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.goldMuted,
+  },
+  dividerText: {
+    color: colors.goldDeep,
+    fontSize: 11,
+    fontWeight: "500",
+    letterSpacing: 0.5,
+  },
+
+  /* Field error */
+  fieldError: {
+    color: "#f87171",
+    fontSize: 12,
+    paddingHorizontal: 4,
+    marginTop: -4,
+  },
+
+  /* Gold CTA button */
   button: {
-    height: 56,
+    height: 52,
     borderRadius: radius.pill,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.gold,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
+    shadowColor: colors.gold,
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
   },
   buttonDisabled: {
     backgroundColor: colors.textMuted,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   buttonText: {
-    color: "#FFFFFF",
+    color: colors.goldDark,
     ...typography.title,
+    fontWeight: "700",
   },
+
+  /* Footer */
   footerRow: {
-    marginTop: spacing.xl,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -221,7 +324,8 @@ const styles = StyleSheet.create({
     ...typography.caption,
   },
   footerLink: {
-    color: colors.primaryStrong,
+    color: colors.goldDeep,
     ...typography.caption,
+    fontWeight: "600",
   },
 });

@@ -121,19 +121,42 @@ export function ProfileScreen() {
   // ── Guest screen ────────────────────────────────────────
   if (!isAuthenticated) {
     return (
-      <Screen contentContainerStyle={styles.content}>
-        <View style={styles.guestWrap}>
+      <Screen contentContainerStyle={styles.guestContent}>
+        {/* Brand section */}
+        <View style={styles.guestBrandWrap}>
           <BrandLockup size="hero" />
+
+          {/* Enterprise badge */}
+          <View style={styles.guestBadge}>
+            <MaterialIcons color={colors.goldDeep} name="auto-awesome" size={11} />
+            <Text style={styles.guestBadgeText}>Enterprise</Text>
+          </View>
+
           <Text style={styles.guestTitle}>ยินดีต้อนรับสู่ Beauty Up</Text>
-          <Text style={styles.guestSub}>เข้าสู่ระบบเพื่อติดตามออเดอร์ สะสมแต้ม และใช้งานบัญชีได้เต็มรูปแบบ</Text>
+          <Text style={styles.guestSub}>
+            เข้าสู่ระบบเพื่อติดตามออเดอร์ สะสมแต้ม{"\n"}
+            และใช้งานบัญชีได้เต็มรูปแบบ
+          </Text>
         </View>
+
+        {/* Spacer — push buttons to lower third */}
+        <View style={styles.guestSpacer} />
+
+        {/* Action buttons */}
         <View style={styles.guestActions}>
-          <Pressable style={styles.primaryBtn} onPress={() => navigation.navigate("Login")}>
+          <Pressable
+            onPress={() => navigation.navigate("Login")}
+            style={({ pressed }) => [styles.primaryBtn, pressed && styles.btnPressed]}
+          >
             <Text style={styles.primaryBtnText}>เข้าสู่ระบบ</Text>
           </Pressable>
-          <Pressable style={styles.outlineBtn} onPress={() => navigation.navigate("Register")}>
+          <Pressable
+            onPress={() => navigation.navigate("Register")}
+            style={({ pressed }) => [styles.outlineBtn, pressed && styles.btnPressed]}
+          >
             <Text style={styles.outlineBtnText}>สมัครสมาชิก</Text>
           </Pressable>
+          <Text style={styles.guestFinePrint}>สมัครสมาชิกฟรี ไม่มีค่าใช้จ่าย</Text>
         </View>
       </Screen>
     );
@@ -317,15 +340,21 @@ export function ProfileScreen() {
 const styles = StyleSheet.create({
   content: { paddingBottom: 48, backgroundColor: colors.background },
 
-  // Guest
-  guestWrap: { paddingHorizontal: 24, paddingTop: 40, alignItems: "center", gap: 10 },
-  guestTitle: { color: "#fff", fontSize: 20, fontFamily: fonts.bold, textAlign: "center", marginTop: 8 },
-  guestSub: { color: "rgba(255,255,255,0.65)", fontSize: 13, fontFamily: fonts.medium, textAlign: "center", lineHeight: 20, maxWidth: 280 },
-  guestActions: { paddingHorizontal: 24, marginTop: 32, gap: 12 },
-  primaryBtn: { height: 54, borderRadius: radius.pill, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" },
-  primaryBtnText: { color: colors.goldDark, fontSize: 16, fontFamily: fonts.bold },
-  outlineBtn: { height: 54, borderRadius: radius.pill, borderWidth: 1.5, borderColor: "rgba(255,255,255,0.3)", alignItems: "center", justifyContent: "center" },
-  outlineBtnText: { color: "#fff", fontSize: 16, fontFamily: fonts.semiBold },
+  // Guest v2
+  guestContent: { flex: 1 },
+  guestBrandWrap: { paddingHorizontal: spacing["2xl"], paddingTop: spacing["3xl"], alignItems: "center", gap: spacing.md },
+  guestBadge: { flexDirection: "row", alignItems: "center", gap: spacing.xs, backgroundColor: "rgba(212,175,55,0.1)", borderWidth: 1, borderColor: colors.goldMuted, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: 4, marginTop: 2 },
+  guestBadgeText: { color: colors.goldDeep, fontSize: 11, fontWeight: "600", letterSpacing: 0.5 },
+  guestTitle: { color: colors.textPrimary, fontSize: 22, lineHeight: 30, fontWeight: "700", textAlign: "center", marginTop: spacing.xs },
+  guestSub: { color: colors.textSecondary, textAlign: "center", fontSize: 14, lineHeight: 22 },
+  guestSpacer: { flex: 1, minHeight: spacing["3xl"] },
+  guestActions: { paddingHorizontal: spacing["2xl"], paddingBottom: spacing["2xl"], gap: spacing.md },
+  guestFinePrint: { color: colors.textMuted, fontSize: 11, textAlign: "center", marginTop: -4 },
+  primaryBtn: { height: 54, borderRadius: radius.pill, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center", shadowColor: colors.gold, shadowOpacity: 0.35, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 6 },
+  primaryBtnText: { color: colors.goldDark, fontSize: 16, fontFamily: fonts.bold, fontWeight: "700" },
+  outlineBtn: { height: 54, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.gold, alignItems: "center", justifyContent: "center", backgroundColor: "transparent" },
+  outlineBtnText: { color: colors.gold, fontSize: 16, fontFamily: fonts.semiBold, fontWeight: "600" },
+  btnPressed: { opacity: 0.78 },
 
   // Hero
   hero: { alignItems: "center", paddingTop: 20, paddingBottom: 18, gap: 4 },

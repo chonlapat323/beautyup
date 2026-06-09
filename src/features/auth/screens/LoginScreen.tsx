@@ -1,8 +1,8 @@
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppModal } from "@/components/ui/AppModal";
@@ -22,6 +22,16 @@ export function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorModal, setErrorModal] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   async function handleLogin() {
     setFieldError(null);
@@ -50,52 +60,76 @@ export function LoginScreen() {
         confirmLabel="ตกลง"
         onConfirm={() => setErrorModal(null)}
       />
-      <View style={styles.brandBlock}>
-        <BrandLockup size="hero" />
 
-        <Text style={styles.title}>เริ่มต้นความงามไปกับ Beauty Up</Text>
-        <Text style={styles.subtitle}>
-          ประสบการณ์ดูแลเส้นผมแบบพรีเมียมสำหรับทุกวันของคุณ
-        </Text>
-      </View>
+      {/* ── Brand block — hidden when keyboard is visible ── */}
+      {!keyboardVisible && (
+        <View style={styles.brandBlock}>
+          <BrandLockup size="hero" />
+          <Text style={styles.title}>เริ่มต้นความงามไปกับ Beauty Up</Text>
+          <Text style={styles.subtitle}>
+            ประสบการณ์ดูแลเส้นผมแบบพรีเมียมสำหรับทุกวันของคุณ
+          </Text>
+        </View>
+      )}
 
+      {/* ── Form card ───────────────────────────────────── */}
       <View style={styles.card}>
+        {/* Identifier */}
         <TextInput
           autoCapitalize="none"
           keyboardType="email-address"
           onChangeText={setIdentifier}
           placeholder="อีเมลหรือเบอร์โทร"
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={styles.inputPlaceholder.color}
           style={styles.input}
           value={identifier}
         />
+
+        {/* Password */}
         <View style={styles.passwordRow}>
           <TextInput
             onChangeText={setPassword}
             placeholder="รหัสผ่าน"
-            placeholderTextColor={colors.textMuted}
+            placeholderTextColor={styles.inputPlaceholder.color}
             secureTextEntry={!showPassword}
             style={styles.passwordInput}
             value={password}
           />
-          <Pressable onPress={() => setShowPassword((v) => !v)} style={styles.eyeBtn} hitSlop={8}>
-            <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"}
-              size={20}
+          <Pressable
+            hitSlop={10}
+            onPress={() => setShowPassword((v) => !v)}
+            style={styles.eyeBtn}
+          >
+            <MaterialIcons
               color={colors.textMuted}
+              name={showPassword ? "visibility-off" : "visibility"}
+              size={20}
             />
           </Pressable>
         </View>
 
-        {fieldError ? <Text style={styles.fieldError}>{fieldError}</Text> : null}
-        <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={() => void handleLogin()} disabled={isLoading}>
-          <Text style={styles.buttonText}>{isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}</Text>
+        {/* Field error */}
+        {fieldError ? (
+          <Text style={styles.fieldError}>{fieldError}</Text>
+        ) : null}
+
+        {/* CTA */}
+        <Pressable
+          disabled={isLoading}
+          onPress={() => void handleLogin()}
+          style={[styles.button, isLoading && styles.buttonDisabled]}
+        >
+          <Text style={styles.buttonText}>
+            {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+          </Text>
         </Pressable>
 
-        <Pressable style={styles.linkRow}>
-          <Text style={styles.linkText}>ลืมรหัสผ่าน</Text>
+        {/* Forgot password */}
+        <Pressable style={styles.forgotRow}>
+          <Text style={styles.forgotText}>ลืมรหัสผ่าน</Text>
         </Pressable>
 
+        {/* Register link */}
         <View style={styles.footerRow}>
           <Text style={styles.footerText}>ยังไม่มีบัญชีใช่ไหม?</Text>
           <Pressable onPress={() => navigation.navigate("Register")}>
@@ -111,6 +145,8 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: spacing["3xl"],
   },
+
+  /* Brand block */
   brandBlock: {
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing["3xl"],
@@ -119,18 +155,20 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.textPrimary,
-    maxWidth: 300,
     fontSize: 18,
-    lineHeight: 40,
+    lineHeight: 26,
     fontWeight: "600",
     textAlign: "center",
+    maxWidth: 280,
   },
   subtitle: {
     color: colors.textSecondary,
-    maxWidth: 300,
+    maxWidth: 280,
     textAlign: "center",
     ...typography.body,
   },
+
+  /* Form card — white surface + subtle gold border */
   card: {
     marginHorizontal: spacing["2xl"],
     marginTop: spacing["2xl"],
@@ -138,27 +176,34 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.borderSoft,
+    borderColor: colors.goldMuted,
     gap: spacing.lg,
   },
+
+  /* Input */
   input: {
-    height: 56,
+    height: 52,
     borderRadius: radius.md,
     backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.borderSoft,
+    borderColor: "rgba(255,255,255,0.1)",
     paddingHorizontal: spacing.lg,
     color: colors.textPrimary,
     ...typography.body,
   },
+  inputPlaceholder: {
+    color: "rgba(255,255,255,0.45)" as unknown as string,
+  },
+
+  /* Password row */
   passwordRow: {
     flexDirection: "row",
     alignItems: "center",
-    height: 56,
+    height: 52,
     borderRadius: radius.md,
     backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.borderSoft,
+    borderColor: "rgba(255,255,255,0.1)",
   },
   passwordInput: {
     flex: 1,
@@ -172,38 +217,45 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
+  /* Field error */
   fieldError: {
-    color: "#dc2626",
+    color: "#f87171",
     fontSize: 12,
-    marginBottom: 8,
     paddingHorizontal: 4,
+    marginTop: -4,
   },
+
+  /* Gold CTA button */
   button: {
-    height: 56,
+    height: 52,
     borderRadius: radius.pill,
-    // ปุ่มหลัก — ทองคำแท้ เป็นจุดโฟกัสของหน้า Login
     backgroundColor: colors.gold,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: colors.gold,
-    shadowOpacity: 0.40,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 5,
   },
   buttonDisabled: {
     backgroundColor: colors.textMuted,
     shadowOpacity: 0,
+    elevation: 0,
   },
   buttonText: {
     color: colors.goldDark,
     ...typography.title,
     fontWeight: "700",
   },
-  linkRow: {
+
+  /* Forgot / footer */
+  forgotRow: {
     alignSelf: "center",
+    marginTop: -4,
   },
-  linkText: {
+  forgotText: {
     color: colors.goldDeep,
     ...typography.caption,
   },
