@@ -349,7 +349,7 @@ function Field({
       <TextInput
         style={styles.input}
         placeholder={placeholder}
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor="rgba(255,255,255,0.45)"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType ?? "default"}
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderSoft,
     paddingHorizontal: spacing.md,
-    color: colors.textPrimary,
+    color: "#ffffff",
     ...typography.body,
   },
   pickerBtn: {
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   pickerValue: {
-    color: colors.textPrimary,
+    color: "#ffffff",
     ...typography.body,
   },
   pickerPlaceholder: {

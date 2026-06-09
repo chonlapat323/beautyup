@@ -134,7 +134,7 @@ export function BankAccountScreen() {
               onChangeText={(v) => { setBankAccountNumber(v); setError(null); }}
               keyboardType="numeric"
               placeholder="เช่น 0001234567"
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor="rgba(255,255,255,0.45)"
             />
 
             {/* Account name */}
@@ -144,7 +144,7 @@ export function BankAccountScreen() {
               value={bankAccountName}
               onChangeText={(v) => { setBankAccountName(v); setError(null); }}
               placeholder="ชื่อ นามสกุล ตามบัญชีธนาคาร"
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor="rgba(255,255,255,0.45)"
             />
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -231,11 +231,11 @@ const styles = StyleSheet.create({
     borderColor: colors.borderSoft,
     backgroundColor: colors.background,
     paddingHorizontal: spacing.md,
-    color: colors.textPrimary,
+    color: "#ffffff",
     fontSize: 16,
   },
   pickerBtn: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  pickerText: { color: colors.textPrimary, fontSize: 16 },
+  pickerText: { color: "#ffffff", fontSize: 16 },
   pickerPlaceholder: { color: colors.textMuted, fontSize: 16 },
   pickerChevron: { color: colors.textMuted, fontSize: 11 },
   errorText: { color: "#c84b44", ...typography.caption },
