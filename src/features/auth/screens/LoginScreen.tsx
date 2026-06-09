@@ -1,8 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Screen } from "@/components/layout/Screen";
 import { AppModal } from "@/components/ui/AppModal";
@@ -22,6 +22,24 @@ export function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorModal, setErrorModal] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", () => {
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+      setKeyboardVisible(true);
+    });
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      // debounce 150ms เผื่อ keyboard type switch (email→password) ยิง hide+show ซ้อน
+      hideTimer.current = setTimeout(() => setKeyboardVisible(false), 150);
+    });
+    return () => {
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   async function handleLogin() {
     setFieldError(null);
@@ -51,16 +69,18 @@ export function LoginScreen() {
         onConfirm={() => setErrorModal(null)}
       />
 
-      {/* ── Brand block ─────────────────────────────────── */}
-      <View style={styles.brandBlock}>
-        <View style={styles.logoWrap}>
-          <BrandLockup />
+      {/* ── Brand block — ซ่อนเมื่อ keyboard ขึ้น เพื่อป้องกัน layout overflow ── */}
+      {!keyboardVisible && (
+        <View style={styles.brandBlock}>
+          <View style={styles.logoWrap}>
+            <BrandLockup />
+          </View>
+          <Text style={styles.title}>เริ่มต้นความงามไปกับ Beauty Up</Text>
+          <Text style={styles.subtitle}>
+            ประสบการณ์ดูแลเส้นผมแบบพรีเมียมสำหรับทุกวันของคุณ
+          </Text>
         </View>
-        <Text style={styles.title}>เริ่มต้นความงามไปกับ Beauty Up</Text>
-        <Text style={styles.subtitle}>
-          ประสบการณ์ดูแลเส้นผมแบบพรีเมียมสำหรับทุกวันของคุณ
-        </Text>
-      </View>
+      )}
 
       {/* ── Form card ───────────────────────────────────── */}
       <View style={styles.card}>
