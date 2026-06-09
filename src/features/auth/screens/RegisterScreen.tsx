@@ -68,7 +68,9 @@ export function RegisterScreen() {
         >
           <MaterialIcons color={"#ffffff"} name="arrow-back" size={20} />
         </Pressable>
-        <BrandLockup compact />
+        <View style={styles.logoWrap}>
+          <BrandLockup compact />
+        </View>
       </View>
 
       {/* ── Copy block ──────────────────────────────────── */}
@@ -205,6 +207,11 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",
+  },
+  logoWrap: {
+    borderRadius: 999,
+    backgroundColor: colors.surface,
+    padding: 8,
   },
 
   /* Copy block */
