@@ -1,10 +1,10 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect, useRef, useState } from "react";
-import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Screen } from "@/components/layout/Screen";
 import { AppModal } from "@/components/ui/AppModal";
 import { BrandLockup } from "@/components/ui/BrandLockup";
 import type { ProfileStackParamList } from "@/navigation/types";
@@ -22,24 +22,6 @@ export function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorModal, setErrorModal] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardDidShow", () => {
-      if (hideTimer.current) clearTimeout(hideTimer.current);
-      setKeyboardVisible(true);
-    });
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
-      // debounce 150ms เผื่อ keyboard type switch (email→password) ยิง hide+show ซ้อน
-      hideTimer.current = setTimeout(() => setKeyboardVisible(false), 150);
-    });
-    return () => {
-      if (hideTimer.current) clearTimeout(hideTimer.current);
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
 
   async function handleLogin() {
     setFieldError(null);
@@ -59,7 +41,7 @@ export function LoginScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content} noTabOffset>
+    <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
       <AppModal
         visible={errorModal !== null}
         type="error"
@@ -69,97 +51,94 @@ export function LoginScreen() {
         onConfirm={() => setErrorModal(null)}
       />
 
-      {/* ── Brand block — ซ่อนเมื่อ keyboard ขึ้น เพื่อป้องกัน layout overflow ── */}
-      {!keyboardVisible && (
-        <View style={styles.brandBlock}>
-          <View style={styles.logoWrap}>
-            <BrandLockup />
-          </View>
-          <Text style={styles.title}>เริ่มต้นความงามไปกับ Beauty Up</Text>
-          <Text style={styles.subtitle}>
-            ประสบการณ์ดูแลเส้นผมแบบพรีเมียมสำหรับทุกวันของคุณ
-          </Text>
+      {/* ── Brand block — fixed ไม่อยู่ใน ScrollView ── */}
+      <View style={styles.brandBlock}>
+        <View style={styles.logoWrap}>
+          <BrandLockup />
         </View>
-      )}
-
-      {/* ── Form card ───────────────────────────────────── */}
-      <View style={styles.card}>
-        {/* Identifier */}
-        <TextInput
-          autoCapitalize="none"
-          keyboardType="email-address"
-          onChangeText={setIdentifier}
-          placeholder="อีเมลหรือเบอร์โทร"
-          placeholderTextColor={styles.inputPlaceholder.color}
-          style={styles.input}
-          value={identifier}
-        />
-
-        {/* Password */}
-        <View style={styles.passwordRow}>
-          <TextInput
-            onChangeText={setPassword}
-            placeholder="รหัสผ่าน"
-            placeholderTextColor={styles.inputPlaceholder.color}
-            secureTextEntry={!showPassword}
-            style={styles.passwordInput}
-            value={password}
-          />
-          <Pressable
-            hitSlop={10}
-            onPress={() => setShowPassword((v) => !v)}
-            style={styles.eyeBtn}
-          >
-            <MaterialIcons
-              color={colors.textMuted}
-              name={showPassword ? "visibility-off" : "visibility"}
-              size={20}
-            />
-          </Pressable>
-        </View>
-
-        {/* Field error */}
-        {fieldError ? (
-          <Text style={styles.fieldError}>{fieldError}</Text>
-        ) : null}
-
-        {/* CTA */}
-        <Pressable
-          disabled={isLoading}
-          onPress={() => void handleLogin()}
-          style={[styles.button, isLoading && styles.buttonDisabled]}
-        >
-          <Text style={styles.buttonText}>
-            {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
-          </Text>
-        </Pressable>
-
-        {/* Forgot password */}
-        <Pressable style={styles.forgotRow}>
-          <Text style={styles.forgotText}>ลืมรหัสผ่าน</Text>
-        </Pressable>
-
-        {/* Register link */}
-        <View style={styles.footerRow}>
-          <Text style={styles.footerText}>ยังไม่มีบัญชีใช่ไหม?</Text>
-          <Pressable onPress={() => navigation.navigate("Register")}>
-            <Text style={styles.footerLink}>สมัครสมาชิก</Text>
-          </Pressable>
-        </View>
+        <Text style={styles.title}>เริ่มต้นความงามไปกับ Beauty Up</Text>
+        <Text style={styles.subtitle}>
+          ประสบการณ์ดูแลเส้นผมแบบพรีเมียมสำหรับทุกวันของคุณ
+        </Text>
       </View>
-    </Screen>
+
+      {/* ── Form — scrollable เมื่อ keyboard ขึ้น ── */}
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.card}>
+          <TextInput
+            autoCapitalize="none"
+            keyboardType="email-address"
+            onChangeText={setIdentifier}
+            placeholder="อีเมลหรือเบอร์โทร"
+            placeholderTextColor={PLACEHOLDER}
+            style={styles.input}
+            value={identifier}
+          />
+
+          <View style={styles.passwordRow}>
+            <TextInput
+              onChangeText={setPassword}
+              placeholder="รหัสผ่าน"
+              placeholderTextColor={PLACEHOLDER}
+              secureTextEntry={!showPassword}
+              style={styles.passwordInput}
+              value={password}
+            />
+            <Pressable hitSlop={10} onPress={() => setShowPassword((v) => !v)} style={styles.eyeBtn}>
+              <MaterialIcons
+                color={colors.textMuted}
+                name={showPassword ? "visibility-off" : "visibility"}
+                size={20}
+              />
+            </Pressable>
+          </View>
+
+          {fieldError ? <Text style={styles.fieldError}>{fieldError}</Text> : null}
+
+          <Pressable
+            disabled={isLoading}
+            onPress={() => void handleLogin()}
+            style={[styles.button, isLoading && styles.buttonDisabled]}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+            </Text>
+          </Pressable>
+
+          <Pressable style={styles.forgotRow}>
+            <Text style={styles.forgotText}>ลืมรหัสผ่าน</Text>
+          </Pressable>
+
+          <View style={styles.footerRow}>
+            <Text style={styles.footerText}>ยังไม่มีบัญชีใช่ไหม?</Text>
+            <Pressable onPress={() => navigation.navigate("Register")}>
+              <Text style={styles.footerLink}>สมัครสมาชิก</Text>
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
+const PLACEHOLDER = "rgba(255,255,255,0.45)";
+
 const styles = StyleSheet.create({
-  content: {
-    paddingBottom: spacing["3xl"],
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
 
-  /* Brand block */
+  /* Brand block — fixed above form, shrinks naturally when window resizes */
   brandBlock: {
     paddingHorizontal: spacing["2xl"],
     paddingTop: spacing["2xl"],
+    paddingBottom: spacing.lg,
     alignItems: "center",
     gap: spacing.sm,
   },
@@ -183,10 +162,17 @@ const styles = StyleSheet.create({
     ...typography.body,
   },
 
-  /* Form card — white surface + subtle gold border */
+  /* Scrollable form area */
+  scrollArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: spacing["2xl"],
+  },
+
+  /* Form card */
   card: {
     marginHorizontal: spacing["2xl"],
-    marginTop: spacing["2xl"],
     padding: spacing["2xl"],
     borderRadius: radius.xl,
     backgroundColor: colors.surface,
@@ -195,7 +181,7 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
 
-  /* Input */
+  /* Inputs */
   input: {
     height: 52,
     borderRadius: radius.md,
@@ -206,11 +192,6 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     ...typography.body,
   },
-  inputPlaceholder: {
-    color: "rgba(255,255,255,0.45)" as unknown as string,
-  },
-
-  /* Password row */
   passwordRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -241,7 +222,7 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
 
-  /* Gold CTA button */
+  /* Gold CTA */
   button: {
     height: 52,
     borderRadius: radius.pill,
@@ -265,7 +246,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
-  /* Forgot / footer */
+  /* Footer */
   forgotRow: {
     alignSelf: "center",
     marginTop: -4,
