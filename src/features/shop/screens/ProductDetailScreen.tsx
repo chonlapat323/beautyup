@@ -209,7 +209,7 @@ export function ProductDetailScreen() {
       </Screen>
 
       {/* ✦ CHANGED: Compact bottom bar — icon btn + gold pill */}
-      <View style={[styles.bottomBar, { bottom: tabOffset }]}>
+      <View style={[styles.bottomBar, { bottom: tabOffset + 10 }]}>
 
         {/* ไปที่ตะกร้า — icon circle button */}
         <Pressable
