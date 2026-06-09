@@ -12,6 +12,7 @@ type ScreenProps = PropsWithChildren<{
   onRefresh?: () => Promise<void> | void;
   header?: ReactNode;
   backgroundColor?: string;
+  noTabOffset?: boolean;
 }>;
 
 export function Screen({
@@ -21,6 +22,7 @@ export function Screen({
   onRefresh,
   header,
   backgroundColor,
+  noTabOffset = false,
 }: ScreenProps) {
   const [refreshing, setRefreshing] = useState(false);
   const { bottom } = useSafeAreaInsets();
@@ -31,7 +33,7 @@ export function Screen({
   // Merge: take the max of screen's own paddingBottom vs tabBarOffset
   const passedStyle = StyleSheet.flatten(contentContainerStyle) as Record<string, unknown> | undefined;
   const passedPaddingBottom = typeof passedStyle?.paddingBottom === "number" ? passedStyle.paddingBottom : 0;
-  const safePaddingBottom = Math.max(passedPaddingBottom, tabBarOffset);
+  const safePaddingBottom = noTabOffset ? passedPaddingBottom : Math.max(passedPaddingBottom, tabBarOffset);
 
   async function handleRefresh() {
     if (!onRefresh) return;

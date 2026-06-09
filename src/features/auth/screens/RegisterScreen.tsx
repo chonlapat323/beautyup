@@ -49,7 +49,7 @@ export function RegisterScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content}>
+    <Screen contentContainerStyle={styles.content} noTabOffset>
       <AppModal
         visible={errorModal !== null}
         type="error"
