@@ -68,6 +68,7 @@ export function AppTabs() {
   const cartCount = useAppStore((state) =>
     state.cart.reduce((sum, item) => sum + item.quantity, 0),
   );
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
   const { bottom } = useSafeAreaInsets();
 
   // ✦ Tab bar style — floating
@@ -149,7 +150,7 @@ export function AppTabs() {
         })}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "ProfileHome";
-          const hideTabBar = routeName === "Login" || routeName === "Register";
+          const hideTabBar = routeName === "Login" || routeName === "Register" || (routeName === "ProfileHome" && !isAuthenticated);
           return {
             title: "บัญชี",
             tabBarIcon: ({ focused }) => (

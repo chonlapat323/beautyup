@@ -49,7 +49,7 @@ export function RegisterScreen() {
   }
 
   return (
-    <Screen contentContainerStyle={styles.content}>
+    <Screen contentContainerStyle={styles.content} backgroundColor={colors.surface}>
       <AppModal
         visible={errorModal !== null}
         type="error"

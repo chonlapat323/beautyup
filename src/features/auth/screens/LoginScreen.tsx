@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   title: {
-    color: colors.textPrimary,
+    color: "#ffffff",
     fontSize: 18,
     lineHeight: 26,
     fontFamily: fonts.semiBold,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     maxWidth: 280,
   },
   subtitle: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.75)",
     maxWidth: 280,
     textAlign: "center",
     ...typography.body,

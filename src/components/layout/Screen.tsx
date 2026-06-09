@@ -11,6 +11,7 @@ type ScreenProps = PropsWithChildren<{
   contentContainerStyle?: ScrollViewProps["contentContainerStyle"];
   onRefresh?: () => Promise<void> | void;
   header?: ReactNode;
+  backgroundColor?: string;
 }>;
 
 export function Screen({
@@ -19,6 +20,7 @@ export function Screen({
   contentContainerStyle,
   onRefresh,
   header,
+  backgroundColor,
 }: ScreenProps) {
   const [refreshing, setRefreshing] = useState(false);
   const { bottom } = useSafeAreaInsets();
@@ -39,7 +41,7 @@ export function Screen({
 
   if (!scrollable) {
     return (
-      <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
+      <SafeAreaView edges={["top", "left", "right"]} style={[styles.safeArea, backgroundColor ? { backgroundColor } : null]}>
         {header}
         <View style={[styles.fixed, contentContainerStyle]}>{children}</View>
       </SafeAreaView>
@@ -48,15 +50,15 @@ export function Screen({
 
   return (
     <KeyboardAvoidingView
-      style={styles.flex}
+      style={[styles.flex, backgroundColor ? { backgroundColor } : null]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={0}
     >
-      <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
+      <SafeAreaView edges={["top", "left", "right"]} style={[styles.safeArea, backgroundColor ? { backgroundColor } : null]}>
         {header}
         <ScrollView
           style={styles.scrollArea}
-          contentContainerStyle={[styles.content, contentContainerStyle, { paddingBottom: safePaddingBottom }]}
+          contentContainerStyle={[styles.content, backgroundColor ? { backgroundColor } : null, contentContainerStyle, { paddingBottom: safePaddingBottom }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           refreshControl={
