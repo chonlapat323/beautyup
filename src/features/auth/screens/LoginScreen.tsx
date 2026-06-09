@@ -10,7 +10,7 @@ import { BrandLockup } from "@/components/ui/BrandLockup";
 import type { ProfileStackParamList } from "@/navigation/types";
 import { mobileLogin } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
-import { colors, radius, spacing, typography } from "@/theme";
+import { colors, fonts, radius, spacing, typography } from "@/theme";
 
 export function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 18,
     lineHeight: 26,
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     textAlign: "center",
     maxWidth: 280,
   },
@@ -246,8 +246,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: colors.goldDark,
-    ...typography.title,
-    fontWeight: "700",
+    fontSize: 18,
+    fontFamily: fonts.bold,
   },
 
   /* Forgot / footer */
@@ -271,7 +271,8 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     color: colors.goldDeep,
-    ...typography.caption,
-    fontWeight: "600",
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: fonts.semiBold,
   },
 });

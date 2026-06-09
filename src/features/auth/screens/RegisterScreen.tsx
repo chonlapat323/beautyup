@@ -10,7 +10,7 @@ import { BrandLockup } from "@/components/ui/BrandLockup";
 import type { ProfileStackParamList } from "@/navigation/types";
 import { mobileRegister } from "@/services/api";
 import { useAppStore } from "@/store/useAppStore";
-import { colors, radius, spacing, typography } from "@/theme";
+import { colors, fonts, radius, spacing, typography } from "@/theme";
 
 export function RegisterScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 28,
     lineHeight: 34,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
   },
   subtitle: {
     color: colors.textSecondary,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   dividerText: {
     color: colors.goldDeep,
     fontSize: 11,
-    fontWeight: "500",
+    fontFamily: fonts.medium,
     letterSpacing: 0.5,
   },
 
@@ -308,8 +308,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: colors.goldDark,
-    ...typography.title,
-    fontWeight: "700",
+    fontSize: 18,
+    fontFamily: fonts.bold,
   },
 
   /* Footer */
@@ -325,7 +325,8 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     color: colors.goldDeep,
-    ...typography.caption,
-    fontWeight: "600",
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: fonts.semiBold,
   },
 });
