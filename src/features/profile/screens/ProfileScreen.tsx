@@ -124,7 +124,9 @@ export function ProfileScreen() {
       <Screen contentContainerStyle={styles.guestContent}>
         {/* Brand section */}
         <View style={styles.guestBrandWrap}>
-          <BrandLockup size="hero" />
+          <View style={styles.guestLogoWrap}>
+            <BrandLockup size="hero" />
+          </View>
 
           {/* Enterprise badge */}
           <View style={styles.guestBadge}>
@@ -343,6 +345,7 @@ const styles = StyleSheet.create({
   // Guest v2
   guestContent: { flex: 1 },
   guestBrandWrap: { paddingHorizontal: spacing["2xl"], paddingTop: spacing["3xl"], alignItems: "center", gap: spacing.md },
+  guestLogoWrap: { borderRadius: 999, backgroundColor: "rgba(255,255,255,0.22)", padding: 16 },
   guestBadge: { flexDirection: "row", alignItems: "center", gap: spacing.xs, backgroundColor: "rgba(212,175,55,0.1)", borderWidth: 1, borderColor: colors.goldMuted, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: 4, marginTop: 2 },
   guestBadgeText: { color: colors.goldDeep, fontSize: 11, fontFamily: fonts.semiBold, letterSpacing: 0.5 },
   guestTitle: { color: "#ffffff", fontSize: 22, lineHeight: 30, fontFamily: fonts.bold, textAlign: "center", marginTop: spacing.xs },

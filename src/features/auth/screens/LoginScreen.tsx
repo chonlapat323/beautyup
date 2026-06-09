@@ -64,7 +64,9 @@ export function LoginScreen() {
       {/* ── Brand block — hidden when keyboard is visible ── */}
       {!keyboardVisible && (
         <View style={styles.brandBlock}>
-          <BrandLockup size="hero" />
+          <View style={styles.logoWrap}>
+            <BrandLockup size="hero" />
+          </View>
           <Text style={styles.title}>เริ่มต้นความงามไปกับ Beauty Up</Text>
           <Text style={styles.subtitle}>
             ประสบการณ์ดูแลเส้นผมแบบพรีเมียมสำหรับทุกวันของคุณ
@@ -152,6 +154,11 @@ const styles = StyleSheet.create({
     paddingTop: spacing["3xl"],
     alignItems: "center",
     gap: spacing.md,
+  },
+  logoWrap: {
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.22)",
+    padding: 16,
   },
   title: {
     color: "#ffffff",
