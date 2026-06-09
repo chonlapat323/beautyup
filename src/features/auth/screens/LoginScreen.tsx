@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   },
   logoWrap: {
     borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.22)",
+    backgroundColor: "rgba(255,255,255,0.13)",
     padding: 16,
   },
   title: {
