@@ -5,21 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { CommerceImage } from "@/components/ui/CommerceImage";
 import { colors, fonts, spacing } from "@/theme";
 import type { Banner } from "@/types/domain";
-
-function stripHtml(html: string): string {
-  return html
-    .replace(/<\/p>/gi, "\n")
-    .replace(/<p[^>]*>/gi, "")
-    .replace(/<\/li>/gi, "\n")
-    .replace(/<li[^>]*>/gi, "• ")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .trim();
-}
+import { HtmlText } from "@/utils/htmlText";
 
 type HomeHeroSliderSectionProps = {
   banners: Banner[];
@@ -92,7 +78,7 @@ export function HomeHeroSliderSection({
               <Text style={styles.eyebrow}>{banner.eyebrow || "ดูแลเส้นผมทุกวัน"}</Text>
               <Text numberOfLines={2} style={styles.title}>{banner.title}</Text>
               {banner.body ? (
-                <Text numberOfLines={2} style={styles.body}>{stripHtml(banner.body)}</Text>
+                <HtmlText html={banner.body} numberOfLines={2} style={styles.body} />
               ) : null}
               <Pressable style={styles.ctaButton} onPress={() => onPressBanner(banner.linkType, banner.linkId)}>
                 <Text style={styles.ctaText}>{banner.buttonLabel || "ช้อปเลย"}</Text>
