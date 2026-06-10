@@ -273,17 +273,21 @@ type CardProps = {
 };
 
 function GridCard({ product, isFavorite, onPress, onAddToCart, onToggleFavorite }: CardProps) {
-  const isLowStock = product.sellableStock != null && product.sellableStock > 0
+  const isOutOfStock = (product.sellableStock ?? 1) === 0;
+  const isLowStock = !isOutOfStock && product.sellableStock != null && product.sellableStock > 0
     && product.sellableStock <= (product.totalStock ?? product.sellableStock) * 0.5;
 
   return (
-    <Pressable onPress={onPress} style={styles.card}>
+    <Pressable onPress={onPress} style={[styles.card, isOutOfStock && styles.cardOutOfStock]}>
       <View style={styles.imageWrap}>
         <CommerceImage style={styles.preview} uri={product.imageUrl} contentFit="cover" />
 
         {/* ✦ Sale badge — pill */}
-        {product.originalPrice != null && (
+        {product.originalPrice != null && !isOutOfStock && (
           <View style={styles.saleBadge}><Text style={styles.saleBadgeText}>ลดราคา</Text></View>
+        )}
+        {isOutOfStock && (
+          <View style={styles.outOfStockBadge}><Text style={styles.outOfStockText}>สินค้าหมด</Text></View>
         )}
         {isLowStock && (
           <View style={styles.lowStockBadge}><Text style={styles.lowStockText}>ใกล้หมด</Text></View>
@@ -294,9 +298,9 @@ function GridCard({ product, isFavorite, onPress, onAddToCart, onToggleFavorite 
           <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={14} color={isFavorite ? "#E85C7A" : "#fff"} />
         </Pressable>
 
-        {/* ✦ Gold cart button */}
-        <Pressable style={styles.cartBtn} onPress={(e) => { e.stopPropagation(); onAddToCart(); }} hitSlop={4}>
-          <MaterialIcons name="add-shopping-cart" size={15} color={colors.goldDark} />
+        {/* ✦ Gold cart button — disabled when out of stock */}
+        <Pressable style={[styles.cartBtn, isOutOfStock && styles.cartBtnDisabled]} onPress={(e) => { e.stopPropagation(); if (!isOutOfStock) onAddToCart(); }} hitSlop={4} disabled={isOutOfStock}>
+          <MaterialIcons name="add-shopping-cart" size={15} color={isOutOfStock ? colors.textMuted : colors.goldDark} />
         </Pressable>
       </View>
 
@@ -315,8 +319,9 @@ function GridCard({ product, isFavorite, onPress, onAddToCart, onToggleFavorite 
 }
 
 function ListCard({ product, isFavorite, onPress, onAddToCart, onToggleFavorite }: CardProps) {
+  const isOutOfStock = (product.sellableStock ?? 1) === 0;
   return (
-    <Pressable onPress={onPress} style={styles.listCard}>
+    <Pressable onPress={onPress} style={[styles.listCard, isOutOfStock && styles.cardOutOfStock]}>
       <View style={styles.listImgWrap}>
         <CommerceImage style={styles.listImg} uri={product.imageUrl} contentFit="cover" />
       </View>
@@ -325,16 +330,17 @@ function ListCard({ product, isFavorite, onPress, onAddToCart, onToggleFavorite 
         <Text style={styles.cardName} numberOfLines={2}>{product.name}</Text>
         <View style={styles.priceRow}>
           <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
-          {product.originalPrice != null && <Text style={styles.origPrice}>฿{product.originalPrice.toFixed(0)}</Text>}
+          {product.originalPrice != null && !isOutOfStock && <Text style={styles.origPrice}>฿{product.originalPrice.toFixed(0)}</Text>}
+          {isOutOfStock && <Text style={styles.outOfStockInline}>สินค้าหมด</Text>}
         </View>
       </View>
       <View style={styles.listActions}>
         <Pressable onPress={(e) => { e.stopPropagation(); onToggleFavorite(); }} style={styles.listActionBtn} hitSlop={6}>
           <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={17} color={isFavorite ? "#E85C7A" : colors.textMuted} />
         </Pressable>
-        {/* ✦ Gold cart button */}
-        <Pressable onPress={(e) => { e.stopPropagation(); onAddToCart(); }} style={[styles.listActionBtn, styles.listCartBtn]} hitSlop={6}>
-          <MaterialIcons name="add-shopping-cart" size={17} color={colors.goldDark} />
+        {/* ✦ Gold cart button — disabled when out of stock */}
+        <Pressable onPress={(e) => { e.stopPropagation(); if (!isOutOfStock) onAddToCart(); }} style={[styles.listActionBtn, isOutOfStock ? styles.listCartBtnDisabled : styles.listCartBtn]} hitSlop={6} disabled={isOutOfStock}>
+          <MaterialIcons name="add-shopping-cart" size={17} color={isOutOfStock ? colors.textMuted : colors.goldDark} />
         </Pressable>
       </View>
     </Pressable>
@@ -396,6 +402,12 @@ const styles = StyleSheet.create({
   saleBadgeText: { color: "#fff", fontSize: 9, fontFamily: fonts.bold },
   lowStockBadge: { position: "absolute", bottom: 7, left: 7, backgroundColor: "#3a3a3a", borderRadius: radius.pill, paddingHorizontal: 7, paddingVertical: 3 },
   lowStockText: { color: "#e0e0e0", fontSize: 9, fontFamily: fonts.bold },
+  outOfStockBadge: { position: "absolute", bottom: 7, left: 7, backgroundColor: "rgba(220,38,38,0.85)", borderRadius: radius.pill, paddingHorizontal: 7, paddingVertical: 3 },
+  outOfStockText: { color: "#fff", fontSize: 9, fontFamily: fonts.bold },
+  outOfStockInline: { color: "#DC2626", fontSize: 11, fontFamily: fonts.bold },
+  cardOutOfStock: { opacity: 0.65 },
+  cartBtnDisabled: { backgroundColor: colors.surfaceMuted, shadowOpacity: 0, elevation: 0 },
+  listCartBtnDisabled: { backgroundColor: colors.surfaceMuted },
   heartBtn: { position: "absolute", top: 7, right: 7, width: 27, height: 27, borderRadius: 14, backgroundColor: "rgba(255,255,255,0.8)", alignItems: "center", justifyContent: "center" },
   // ✦ Gold cart button
   cartBtn: { position: "absolute", bottom: 7, right: 7, width: 32, height: 32, borderRadius: 16, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center", shadowColor: colors.gold, shadowOpacity: 0.3, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 3 },

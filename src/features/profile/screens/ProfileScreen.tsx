@@ -124,9 +124,9 @@ export function ProfileScreen() {
       <Screen contentContainerStyle={styles.guestContent}>
         {/* Brand section */}
         <View style={styles.guestBrandWrap}>
-          <View style={styles.guestLogoWrap}>
+          <Pressable style={styles.guestLogoWrap} onPress={() => navigateToHome(navigation)}>
             <BrandLockup size="hero" />
-          </View>
+          </Pressable>
 
           {/* Enterprise badge */}
           <View style={styles.guestBadge}>
@@ -140,9 +140,6 @@ export function ProfileScreen() {
             และใช้งานบัญชีได้เต็มรูปแบบ
           </Text>
         </View>
-
-        {/* Spacer — push buttons to lower third */}
-        <View style={styles.guestSpacer} />
 
         {/* Action buttons */}
         <View style={styles.guestActions}>
@@ -323,6 +320,7 @@ export function ProfileScreen() {
 
       {/* ✦ Menu items */}
       <View style={styles.menuCard}>
+        <MenuItem icon="favorite" label="สินค้าที่ถูกใจ" onPress={() => navigation.navigate("Favorites")} />
         <MenuItem icon="card-giftcard" label="ของรางวัลของฉัน" onPress={() => navigation.navigate("MyRedemptions")} />
         <MenuItem icon="receipt-long" label="ประวัติคำสั่งซื้อ" onPress={() => navigation.navigate("OrderHistory")} />
         <MenuItem icon="location-on" label="ที่อยู่ของฉัน" onPress={() => navigation.navigate("Addresses")} />
@@ -343,15 +341,14 @@ const styles = StyleSheet.create({
   content: { paddingBottom: 48, backgroundColor: colors.background },
 
   // Guest v2
-  guestContent: { flex: 1 },
+  guestContent: { paddingBottom: spacing["2xl"] },
   guestBrandWrap: { paddingHorizontal: spacing["2xl"], paddingTop: spacing["3xl"], alignItems: "center", gap: spacing.md },
   guestLogoWrap: { borderRadius: 999, backgroundColor: colors.surface, padding: 16 },
   guestBadge: { flexDirection: "row", alignItems: "center", gap: spacing.xs, backgroundColor: "rgba(212,175,55,0.1)", borderWidth: 1, borderColor: colors.goldMuted, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: 4, marginTop: 2 },
   guestBadgeText: { color: colors.goldDeep, fontSize: 11, fontFamily: fonts.semiBold, letterSpacing: 0.5 },
   guestTitle: { color: "#ffffff", fontSize: 22, lineHeight: 30, fontFamily: fonts.bold, textAlign: "center", marginTop: spacing.xs },
   guestSub: { color: "rgba(255,255,255,0.75)", textAlign: "center", fontSize: 14, lineHeight: 22, fontFamily: fonts.regular },
-  guestSpacer: { flex: 1, minHeight: spacing["3xl"] },
-  guestActions: { paddingHorizontal: spacing["2xl"], paddingBottom: spacing["2xl"], gap: spacing.md },
+  guestActions: { paddingHorizontal: spacing["2xl"], paddingTop: spacing["2xl"], gap: spacing.md },
   guestFinePrint: { color: "rgba(255,255,255,0.55)", fontSize: 11, textAlign: "center", marginTop: -4, fontFamily: fonts.regular },
   primaryBtn: { height: 54, borderRadius: radius.pill, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center", shadowColor: colors.gold, shadowOpacity: 0.35, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 6 },
   primaryBtnText: { color: colors.goldDark, fontSize: 16, fontFamily: fonts.bold },

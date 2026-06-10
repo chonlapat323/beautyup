@@ -19,6 +19,8 @@ export type ProfileStackParamList = {
   Withdrawal: undefined;
   CreditHistory: undefined;
   BankAccount: undefined;
+  Favorites: undefined;
+  ProductDetail: { productId: string; shadeName?: string };
 };
 
 export type ShopStackParamList = {

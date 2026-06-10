@@ -1,7 +1,57 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CommerceImageBackground } from "@/components/ui/CommerceImage";
-import { colors, radius, spacing, typography } from "@/theme";
+import { colors, fonts, radius, spacing, typography } from "@/theme";
+
+type HtmlPart = { text: string; bold?: boolean; italic?: boolean };
+
+function parseSimpleHtml(html: string): HtmlPart[] {
+  const parts: HtmlPart[] = [];
+  const regex = /<(\/?)(?:b|strong|i|em)>/gi;
+  let bold = false;
+  let italic = false;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(html)) !== null) {
+    if (match.index > lastIndex) {
+      const chunk = html.slice(lastIndex, match.index).replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "");
+      if (chunk) parts.push({ text: chunk, bold, italic });
+    }
+    const closing = match[1] === "/";
+    const tag = match[0].replace(/<\/?/g, "").replace(/>/, "").toLowerCase();
+    if (tag === "b" || tag === "strong") bold = !closing;
+    if (tag === "i" || tag === "em") italic = !closing;
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < html.length) {
+    const tail = html.slice(lastIndex).replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "");
+    if (tail) parts.push({ text: tail, bold, italic });
+  }
+
+  return parts;
+}
+
+function HtmlText({ html, style }: { html: string; style: object }) {
+  const parts = parseSimpleHtml(html);
+  if (parts.length === 0) return null;
+  return (
+    <Text style={style}>
+      {parts.map((p, i) => (
+        <Text
+          key={i}
+          style={[
+            p.bold ? { fontFamily: fonts.bold } : undefined,
+            p.italic ? { fontStyle: "italic" as const } : undefined,
+          ]}
+        >
+          {p.text}
+        </Text>
+      ))}
+    </Text>
+  );
+}
 
 type HeroSlideProps = {
   eyebrow: string;
@@ -33,7 +83,7 @@ export function HeroSlide({
       <View style={styles.copy}>
         <Text style={styles.eyebrow}>{eyebrow}</Text>
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.body}>{body}</Text>
+        <HtmlText html={body} style={styles.body} />
 
         <Pressable style={styles.button} onPress={onPress}>
           <Text style={styles.buttonText}>{buttonLabel}</Text>

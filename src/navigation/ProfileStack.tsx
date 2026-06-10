@@ -13,6 +13,8 @@ import { RedemptionDetailScreen } from "@/features/profile/screens/RedemptionDet
 import { WithdrawalScreen } from "@/features/profile/screens/WithdrawalScreen";
 import { CreditHistoryScreen } from "@/features/profile/screens/CreditHistoryScreen";
 import { BankAccountScreen } from "@/features/profile/screens/BankAccountScreen";
+import { FavoritesScreen } from "@/features/profile/screens/FavoritesScreen";
+import { ProductDetailScreen } from "@/features/shop/screens/ProductDetailScreen";
 import type { ProfileStackParamList } from "@/navigation/types";
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -33,6 +35,8 @@ export function ProfileStack() {
       <Stack.Screen name="Withdrawal" component={WithdrawalScreen} />
       <Stack.Screen name="CreditHistory" component={CreditHistoryScreen} />
       <Stack.Screen name="BankAccount" component={BankAccountScreen} />
+      <Stack.Screen name="Favorites" component={FavoritesScreen} />
+      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
     </Stack.Navigator>
   );
 }

@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 import { storage } from "./storage";
 
-import { fetchBanners, fetchBrands, fetchBundles, fetchCarriers, fetchCollections, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetOrders, mobileGetProfile } from "@/services/api";
+import { fetchBanners, fetchBrands, fetchBundles, fetchCarriers, fetchCollections, fetchMobileConfig, loadCatalogFromApi, mapApiOrder, mobileGetFavorites, mobileGetOrders, mobileGetProfile, mobileToggleFavorite } from "@/services/api";
 import type { CarrierConfig, MobileConfig, PointTier } from "@/services/api";
 import type { Banner, Brand, Bundle, CartItem, Category, Collection, Order, Product } from "@/types/domain";
 
@@ -37,7 +37,7 @@ type AppStore = {
   loadCatalog: () => Promise<void>;
   loadOrders: () => Promise<void>;
   favoriteIds: string[];
-  toggleFavorite: (productId: string) => void;
+  toggleFavorite: (productId: string) => Promise<void>;
   addToCart: (productId: string, quantity?: number) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -78,8 +78,11 @@ export const useAppStore = create<AppStore>()(
         const { token } = get();
         if (!token) return;
         try {
-          const fresh = await mobileGetProfile(token);
-          set((state) => ({ member: state.member ? { ...state.member, ...fresh } : null }));
+          const [fresh, favoriteIds] = await Promise.all([
+            mobileGetProfile(token),
+            mobileGetFavorites(token).catch(() => get().favoriteIds),
+          ]);
+          set((state) => ({ member: state.member ? { ...state.member, ...fresh } : null, favoriteIds }));
         } catch {
           // keep existing member data on error
         }
@@ -119,12 +122,25 @@ export const useAppStore = create<AppStore>()(
         }
       },
 
-      toggleFavorite: (productId) =>
+      toggleFavorite: async (productId) => {
+        const { token } = get();
+        const wasIncluded = get().favoriteIds.includes(productId);
         set((state) => ({
-          favoriteIds: state.favoriteIds.includes(productId)
+          favoriteIds: wasIncluded
             ? state.favoriteIds.filter((id) => id !== productId)
             : [...state.favoriteIds, productId],
-        })),
+        }));
+        if (!token) return;
+        try {
+          await mobileToggleFavorite(token, productId);
+        } catch {
+          set((state) => ({
+            favoriteIds: wasIncluded
+              ? [...state.favoriteIds, productId]
+              : state.favoriteIds.filter((id) => id !== productId),
+          }));
+        }
+      },
 
       addToCart: (productId, quantity = 1) =>
         set((state) => {

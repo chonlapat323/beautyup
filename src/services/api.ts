@@ -658,6 +658,23 @@ export async function mobileInitiateTrueMoney(
   return res.json() as Promise<{ chargeId: string; authorizeUri: string }>;
 }
 
+export async function mobileGetFavorites(token: string): Promise<string[]> {
+  const res = await fetch(`${API_BASE}/mobile/me/favorites`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("โหลดรายการถูกใจไม่สำเร็จ");
+  return res.json() as Promise<string[]>;
+}
+
+export async function mobileToggleFavorite(token: string, productId: string): Promise<{ favorited: boolean }> {
+  const res = await fetch(`${API_BASE}/mobile/me/favorites/${productId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("อัปเดตรายการถูกใจไม่สำเร็จ");
+  return res.json() as Promise<{ favorited: boolean }>;
+}
+
 export async function mobileGetCommissionSummary(token: string): Promise<{
   pendingAmount: number;
   pendingCount: number;
