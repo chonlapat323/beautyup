@@ -6,6 +6,21 @@ import { CommerceImage } from "@/components/ui/CommerceImage";
 import { colors, fonts, spacing } from "@/theme";
 import type { Banner } from "@/types/domain";
 
+function stripHtml(html: string): string {
+  return html
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<p[^>]*>/gi, "")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "• ")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+}
+
 type HomeHeroSliderSectionProps = {
   banners: Banner[];
   horizontalPadding: number;
@@ -77,7 +92,7 @@ export function HomeHeroSliderSection({
               <Text style={styles.eyebrow}>{banner.eyebrow || "ดูแลเส้นผมทุกวัน"}</Text>
               <Text numberOfLines={2} style={styles.title}>{banner.title}</Text>
               {banner.body ? (
-                <Text numberOfLines={2} style={styles.body}>{banner.body}</Text>
+                <Text numberOfLines={2} style={styles.body}>{stripHtml(banner.body)}</Text>
               ) : null}
               <Pressable style={styles.ctaButton} onPress={() => onPressBanner(banner.linkType, banner.linkId)}>
                 <Text style={styles.ctaText}>{banner.buttonLabel || "ช้อปเลย"}</Text>
