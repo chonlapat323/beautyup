@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     paddingLeft: 24,
     paddingRight: 12,
     paddingVertical: 20,
+    gap: 16,
     shadowColor: "#000",
     shadowOpacity: 0.12,
     shadowRadius: 18,
