@@ -12,44 +12,62 @@ import { useAppStore } from "@/store/useAppStore";
 import { colors, fonts, radius, spacing } from "@/theme";
 import type { Product } from "@/types/domain";
 
-const CARD_GAP = 10;
-const CARD_PADDING = 14;
-
 function FavCard({
   product,
   onPress,
-  onUnfavorite,
+  onAddToCart,
+  onToggleFavorite,
 }: {
   product: Product;
   onPress: () => void;
-  onUnfavorite: () => void;
+  onAddToCart: () => void;
+  onToggleFavorite: () => void;
 }) {
   const isOutOfStock = (product.sellableStock ?? 1) === 0;
-  const price = product.specialPrice ?? product.price;
+  const isLowStock =
+    !isOutOfStock &&
+    product.sellableStock != null &&
+    product.sellableStock > 0 &&
+    product.sellableStock <= (product.totalStock ?? product.sellableStock) * 0.5;
 
   return (
-    <Pressable
-      style={[styles.card, isOutOfStock && styles.cardDim]}
-      onPress={onPress}
-    >
+    <Pressable onPress={onPress} style={[styles.card, isOutOfStock && styles.cardOutOfStock]}>
       <View style={styles.imageWrap}>
-        <CommerceImage uri={product.images?.[0]?.url} style={styles.image} />
-        {isOutOfStock && (
-          <View style={styles.outBadge}>
-            <Text style={styles.outBadgeText}>สินค้าหมด</Text>
-          </View>
+        <CommerceImage style={styles.preview} uri={product.imageUrl} contentFit="cover" />
+
+        {product.originalPrice != null && !isOutOfStock && (
+          <View style={styles.saleBadge}><Text style={styles.saleBadgeText}>ลดราคา</Text></View>
         )}
-        <Pressable style={styles.heartBtn} onPress={onUnfavorite} hitSlop={6}>
-          <MaterialIcons name="favorite" size={16} color={colors.gold} />
+        {isOutOfStock && (
+          <View style={styles.outOfStockBadge}><Text style={styles.outOfStockText}>สินค้าหมด</Text></View>
+        )}
+        {isLowStock && (
+          <View style={styles.lowStockBadge}><Text style={styles.lowStockText}>ใกล้หมด</Text></View>
+        )}
+
+        <Pressable style={styles.heartBtn} onPress={(e) => { e.stopPropagation(); onToggleFavorite(); }} hitSlop={6}>
+          <MaterialIcons name="favorite" size={14} color="#E85C7A" />
+        </Pressable>
+
+        <Pressable
+          style={[styles.cartBtn, isOutOfStock && styles.cartBtnDisabled]}
+          onPress={(e) => { e.stopPropagation(); if (!isOutOfStock) onAddToCart(); }}
+          hitSlop={4}
+          disabled={isOutOfStock}
+        >
+          <MaterialIcons name="add-shopping-cart" size={15} color={isOutOfStock ? colors.textMuted : colors.goldDark} />
         </Pressable>
       </View>
+
       <View style={styles.cardBody}>
-        <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
-        {isOutOfStock ? (
-          <Text style={styles.outText}>สินค้าหมด</Text>
-        ) : (
-          <Text style={styles.price}>฿{Number(price).toLocaleString()}</Text>
-        )}
+        <Text style={styles.cardMeta} numberOfLines={1}>{product.subtitle}</Text>
+        <Text style={styles.cardName} numberOfLines={2}>{product.name}</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.price}>฿{product.price.toFixed(0)}</Text>
+          {product.originalPrice != null && (
+            <Text style={styles.origPrice}>฿{product.originalPrice.toFixed(0)}</Text>
+          )}
+        </View>
       </View>
     </Pressable>
   );
@@ -60,6 +78,7 @@ export function FavoritesScreen() {
   const favoriteIds = useAppStore((s) => s.favoriteIds);
   const products = useAppStore((s) => s.products);
   const toggleFavorite = useAppStore((s) => s.toggleFavorite);
+  const addToCart = useAppStore((s) => s.addToCart);
 
   const favorited = products.filter((p) => favoriteIds.includes(p.id));
 
@@ -100,7 +119,8 @@ export function FavoritesScreen() {
             <FavCard
               product={item}
               onPress={() => navigation.navigate("ProductDetail", { productId: item.id })}
-              onUnfavorite={() => void toggleFavorite(item.id)}
+              onToggleFavorite={() => void toggleFavorite(item.id)}
+              onAddToCart={() => addToCart(item.id)}
             />
           )}
         />
@@ -109,84 +129,141 @@ export function FavoritesScreen() {
   );
 }
 
-const CARD_WIDTH = `${(100 - CARD_PADDING * 2 - CARD_GAP) / 2}%` as unknown as number;
-
 const styles = StyleSheet.create({
   grid: {
-    paddingHorizontal: CARD_PADDING,
+    paddingHorizontal: 16,
     paddingBottom: spacing["2xl"],
     paddingTop: spacing.sm,
-    gap: CARD_GAP,
+    gap: 12,
   },
   row: {
-    gap: CARD_GAP,
+    gap: 12,
   },
   card: {
-    flex: 1,
+    width: "47.5%",
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: 18,
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: colors.goldMuted,
-    overflow: "hidden",
   },
-  cardDim: {
+  cardOutOfStock: {
     opacity: 0.65,
   },
   imageWrap: {
-    aspectRatio: 1,
-    backgroundColor: colors.surfaceMuted,
     position: "relative",
   },
-  image: {
+  preview: {
     width: "100%",
-    height: "100%",
+    aspectRatio: 0.85,
+    backgroundColor: colors.surfaceMuted,
   },
-  outBadge: {
+  saleBadge: {
     position: "absolute",
-    top: 6,
-    left: 6,
-    backgroundColor: "#DC2626",
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    top: 7,
+    left: 7,
+    backgroundColor: colors.primaryDark,
+    borderRadius: radius.pill,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
-  outBadgeText: {
+  saleBadgeText: {
     color: "#fff",
-    fontSize: 10,
-    fontFamily: fonts.semiBold,
+    fontSize: 9,
+    fontFamily: fonts.bold,
+  },
+  lowStockBadge: {
+    position: "absolute",
+    bottom: 7,
+    left: 7,
+    backgroundColor: "#3a3a3a",
+    borderRadius: radius.pill,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  lowStockText: {
+    color: "#e0e0e0",
+    fontSize: 9,
+    fontFamily: fonts.bold,
+  },
+  outOfStockBadge: {
+    position: "absolute",
+    bottom: 7,
+    left: 7,
+    backgroundColor: "rgba(220,38,38,0.85)",
+    borderRadius: radius.pill,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  outOfStockText: {
+    color: "#fff",
+    fontSize: 9,
+    fontFamily: fonts.bold,
   },
   heartBtn: {
     position: "absolute",
-    top: 6,
-    right: 6,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.surface,
+    top: 7,
+    right: 7,
+    width: 27,
+    height: 27,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.8)",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.goldMuted,
+  },
+  cartBtn: {
+    position: "absolute",
+    bottom: 7,
+    right: 7,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.gold,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: colors.gold,
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  cartBtnDisabled: {
+    backgroundColor: colors.surfaceMuted,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   cardBody: {
-    padding: 8,
-    gap: 2,
+    padding: 10,
+    gap: 3,
   },
-  name: {
-    fontSize: 12,
+  cardMeta: {
+    color: colors.textMuted,
+    fontSize: 10,
     fontFamily: fonts.medium,
+  },
+  cardName: {
     color: colors.textPrimary,
-    lineHeight: 16,
+    fontSize: 12,
+    fontFamily: fonts.semiBold,
+    lineHeight: 17,
+    minHeight: 34,
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 6,
+    marginTop: 2,
   },
   price: {
-    fontSize: 13,
-    fontFamily: fonts.bold,
-    color: colors.gold,
+    color: colors.goldDeep,
+    fontSize: 15,
+    fontFamily: fonts.extraBold,
   },
-  outText: {
-    fontSize: 12,
+  origPrice: {
+    color: colors.textMuted,
+    fontSize: 11,
+    textDecorationLine: "line-through",
     fontFamily: fonts.medium,
-    color: "#DC2626",
   },
   empty: {
     flex: 1,
