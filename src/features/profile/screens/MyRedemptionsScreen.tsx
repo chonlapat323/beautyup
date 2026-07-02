@@ -88,6 +88,7 @@ export function MyRedemptionsScreen() {
             >
               <CommerceImage
                 uri={item.rewardProduct.imageUrl ?? undefined}
+                thumbnailUri={item.rewardProduct.thumbnailUrl ?? undefined}
                 style={styles.image}
               />
               <View style={styles.cardContent}>

@@ -10,6 +10,7 @@ type ApiCategory = {
   eyebrow?: string | null;
   description?: string | null;
   imageUrl?: string | null;
+  thumbnailUrl?: string | null;
   requiresShadeSelection: boolean;
   isActive: boolean;
 };
@@ -30,7 +31,7 @@ type ApiProduct = {
   shadeId?: string | null;
   brand?: { id: string; name: string } | null;
   collection?: { id: string; name: string } | null;
-  images?: { id: string; url: string; sortOrder: number }[];
+  images?: { id: string; url: string; thumbnailUrl?: string | null; sortOrder: number }[];
 };
 
 type ApiShadeGroup = {
@@ -42,6 +43,7 @@ type ApiShadeGroup = {
     id: string;
     name: string;
     imageUrl?: string | null;
+    thumbnailUrl?: string | null;
     isActive: boolean;
     sortOrder: number;
   }[];
@@ -86,13 +88,15 @@ function mapCategory(c: ApiCategory): Category {
     requiresShadeSelection: c.requiresShadeSelection,
     slug: c.slug,
     imageUrl: c.imageUrl ?? undefined,
+    thumbnailUrl: c.thumbnailUrl ?? undefined,
   };
 }
 
 function mapProduct(p: ApiProduct): Product {
   const basePrice = parseFloat(p.price) || 0;
   const specialPrice = p.specialPrice ? parseFloat(p.specialPrice) : null;
-  const images = (p.images ?? []).map((img) => img.url);
+  const sortedImages = p.images ?? [];
+  const images = sortedImages.map((img) => img.url);
   return {
     id: p.id,
     categoryId: p.categoryId,
@@ -108,6 +112,7 @@ function mapProduct(p: ApiProduct): Product {
     description: p.description ?? "",
     accentColor: "#2f7a4f",
     imageUrl: images[0],
+    thumbnailUrl: sortedImages[0]?.thumbnailUrl ?? undefined,
     images,
     isFeatured: p.isFeatured ?? false,
     tag: p.tag ?? undefined,
@@ -150,6 +155,7 @@ export async function fetchShades(categoryId: string): Promise<Shade[]> {
         name: shade.name,
         groupName: group.name,
         imageUrl: shade.imageUrl ?? undefined,
+        thumbnailUrl: shade.thumbnailUrl ?? undefined,
       });
     }
   }
@@ -164,6 +170,7 @@ type ApiBanner = {
   tag?: string | null;
   buttonLabel: string;
   imageUrl?: string | null;
+  thumbnailUrl?: string | null;
   linkType: string;
   linkId?: string | null;
   sortOrder: number;
@@ -184,6 +191,7 @@ export async function fetchBanners(): Promise<Banner[]> {
     tag: b.tag ?? undefined,
     buttonLabel: translateBannerButton(b.buttonLabel),
     imageUrl: b.imageUrl ?? undefined,
+    thumbnailUrl: b.thumbnailUrl ?? undefined,
     linkType: (b.linkType as Banner["linkType"]) ?? "none",
     linkId: b.linkId ?? undefined,
     sortOrder: b.sortOrder,
@@ -205,6 +213,7 @@ type ApiBrandItem = {
   id: string;
   name: string;
   imageUrl?: string | null;
+  thumbnailUrl?: string | null;
   isActive: boolean;
 };
 
@@ -214,7 +223,9 @@ export async function fetchBrands(): Promise<Brand[]> {
   });
   if (!res.ok) throw new Error(`Brands fetch failed: ${res.status}`);
   const data = (await res.json()) as ApiBrandItem[];
-  return data.filter((b) => b.isActive).map((b) => ({ id: b.id, name: b.name, imageUrl: b.imageUrl ?? null }));
+  return data
+    .filter((b) => b.isActive)
+    .map((b) => ({ id: b.id, name: b.name, imageUrl: b.imageUrl ?? null, thumbnailUrl: b.thumbnailUrl ?? null }));
 }
 
 // ─── Collections ──────────────────────────────────────────────────────────────
@@ -241,6 +252,7 @@ type ApiBundle = {
   name: string;
   description?: string | null;
   imageUrl?: string | null;
+  thumbnailUrl?: string | null;
   isActive: boolean;
   sortOrder: number;
   items: {
@@ -251,7 +263,7 @@ type ApiBundle = {
       id: string;
       name: string;
       sku: string;
-      images: { url: string }[];
+      images: { url: string; thumbnailUrl?: string | null }[];
     };
   }[];
 };
@@ -262,6 +274,7 @@ function mapBundle(b: ApiBundle): Bundle {
     name: b.name,
     description: b.description ?? undefined,
     imageUrl: b.imageUrl ?? undefined,
+    thumbnailUrl: b.thumbnailUrl ?? undefined,
     items: b.items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
@@ -752,7 +765,8 @@ export type RewardProduct = {
   name: string;
   description?: string | null;
   imageUrl?: string | null;
-  images?: { id: string; url: string; sortOrder: number }[];
+  thumbnailUrl?: string | null;
+  images?: { id: string; url: string; thumbnailUrl?: string | null; sortOrder: number }[];
   pointCost: number;
   stock: number;
 };
@@ -770,7 +784,9 @@ export async function mobileGetProfile(token: string): Promise<{
   bankAccountNumber: string | null;
   bankAccountName: string | null;
   profileImageUrl?: string | null;
+  profileThumbnailUrl?: string | null;
   bannerImageUrl?: string | null;
+  bannerThumbnailUrl?: string | null;
 }> {
   const res = await fetch(`${API_BASE}/mobile/profile`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -817,7 +833,7 @@ export type MyRedemption = {
   id: string;
   pointsSpent: number;
   status: "PENDING" | "PREPARING" | "SHIPPED" | "DELIVERED";
-  rewardProduct: { id: string; name: string; imageUrl: string | null };
+  rewardProduct: { id: string; name: string; imageUrl: string | null; thumbnailUrl?: string | null };
   createdAt: string;
 };
 
@@ -868,7 +884,7 @@ export async function mobileUploadProfileImage(token: string, imageUri: string):
     const err = (await res.json().catch(() => ({}))) as { message?: string };
     throw new Error(err.message ?? "อัปโหลดรูปโปรไฟล์ไม่สำเร็จ");
   }
-  return res.json() as Promise<{ profileImageUrl: string }>;
+  return res.json() as Promise<{ profileImageUrl: string; profileThumbnailUrl: string | null }>;
 }
 
 export async function mobileRegisterPushToken(token: string, expoPushToken: string): Promise<void> {

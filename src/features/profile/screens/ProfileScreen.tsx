@@ -21,12 +21,13 @@ import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
-import { Image, Pressable, Share, StyleSheet, Text, View } from "react-native";
+import { Pressable, Share, StyleSheet, Text, View } from "react-native";
 import { AppModal } from "@/components/ui/AppModal";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { Screen } from "@/components/layout/Screen";
 import { BrandLockup } from "@/components/ui/BrandLockup";
+import { CommerceImage } from "@/components/ui/CommerceImage";
 import { navigateToHome } from "@/navigation/helpers";
 import type { ProfileStackParamList } from "@/navigation/types";
 import { mobileGetCommissionSummary, mobileUploadProfileImage } from "@/services/api";
@@ -178,7 +179,7 @@ export function ProfileScreen() {
       <View style={styles.hero}>
         <Pressable style={styles.avatarShell} onPress={handlePickProfileImage} disabled={uploadingPhoto}>
           {member?.profileImageUrl ? (
-            <Image source={{ uri: member.profileImageUrl }} style={{ width: 56, height: 56, borderRadius: 28 }} />
+            <CommerceImage uri={member.profileImageUrl} thumbnailUri={member.profileThumbnailUrl ?? undefined} style={{ width: 56, height: 56, borderRadius: 28 }} contentFit="cover" />
           ) : (
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>{initials}</Text>

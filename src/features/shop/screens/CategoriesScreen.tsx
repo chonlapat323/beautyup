@@ -65,7 +65,7 @@ export function CategoriesScreen() {
               </View>
 
               <View style={styles.previewWrapper}>
-                <CommerceImage style={styles.preview} uri={category.imageUrl} />
+                <CommerceImage style={styles.preview} uri={category.imageUrl} thumbnailUri={category.thumbnailUrl} />
               </View>
 
             </Pressable>

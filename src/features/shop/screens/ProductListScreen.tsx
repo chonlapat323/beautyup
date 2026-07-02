@@ -280,7 +280,7 @@ function GridCard({ product, isFavorite, onPress, onAddToCart, onToggleFavorite 
   return (
     <Pressable onPress={onPress} style={[styles.card, isOutOfStock && styles.cardOutOfStock]}>
       <View style={styles.imageWrap}>
-        <CommerceImage style={styles.preview} uri={product.imageUrl} contentFit="cover" />
+        <CommerceImage style={styles.preview} uri={product.imageUrl} thumbnailUri={product.thumbnailUrl} contentFit="cover" />
 
         {/* ✦ Sale badge — pill */}
         {product.originalPrice != null && !isOutOfStock && (
@@ -323,7 +323,7 @@ function ListCard({ product, isFavorite, onPress, onAddToCart, onToggleFavorite 
   return (
     <Pressable onPress={onPress} style={[styles.listCard, isOutOfStock && styles.cardOutOfStock]}>
       <View style={styles.listImgWrap}>
-        <CommerceImage style={styles.listImg} uri={product.imageUrl} contentFit="cover" />
+        <CommerceImage style={styles.listImg} uri={product.imageUrl} thumbnailUri={product.thumbnailUrl} contentFit="cover" />
       </View>
       <View style={styles.listInfo}>
         <Text style={styles.cardMeta} numberOfLines={1}>{product.brandName ?? product.subtitle}</Text>

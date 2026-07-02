@@ -73,6 +73,7 @@ export function HomeBundleSection({ bundles, horizontalPadding, onViewAll }: Pro
               <CommerceImage
                 style={styles.cardImage}
                 uri={bundle.imageUrl}
+                thumbnailUri={bundle.thumbnailUrl}
                 contentFit="cover"
               />
               {/* ✦ NEW: Gold item count badge บนรูป */}

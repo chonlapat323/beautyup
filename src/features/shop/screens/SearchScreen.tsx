@@ -73,7 +73,7 @@ export function SearchScreen() {
         onPress={() => navigation.navigate("ProductDetail", { productId: item.id })}
       >
         <View style={styles.imageWrap}>
-          <CommerceImage style={styles.image} uri={item.imageUrl} contentFit="cover" />
+          <CommerceImage style={styles.image} uri={item.imageUrl} thumbnailUri={item.thumbnailUrl} contentFit="cover" />
 
           {/* Heart */}
           <Pressable

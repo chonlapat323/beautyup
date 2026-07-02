@@ -202,7 +202,7 @@ export function RewardsScreen() {
                 <View key={item.id} style={[styles.card, outOfStock && styles.cardDimmed]}>
                   {/* Image */}
                   <View style={styles.imageWrap}>
-                    <CommerceImage uri={item.imageUrl ?? undefined} style={styles.image} contentFit="cover" />
+                    <CommerceImage uri={item.imageUrl ?? undefined} thumbnailUri={item.thumbnailUrl ?? undefined} style={styles.image} contentFit="cover" />
 
                     {/* ✦ Points badge */}
                     <View style={[styles.pointsBadge, !canRedeem && styles.pointsBadgeDim]}>

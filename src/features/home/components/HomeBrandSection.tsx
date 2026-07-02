@@ -90,6 +90,7 @@ export function HomeBrandSection({ horizontalPadding, onSelectBrand, onViewAll }
                         contentFit="cover"
                         style={styles.circleImg}
                         uri={brand.imageUrl}
+                        thumbnailUri={brand.thumbnailUrl ?? undefined}
                       />
                     ) : (
                       <MaterialIcons name="storefront" size={26} color={colors.sage} />

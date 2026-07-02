@@ -8,6 +8,7 @@ export type Category = {
   requiresShadeSelection: boolean;
   slug: string;
   imageUrl?: string;
+  thumbnailUrl?: string;
 };
 
 export type Shade = {
@@ -15,6 +16,7 @@ export type Shade = {
   name: string;
   groupName: string;
   imageUrl?: string;
+  thumbnailUrl?: string;
 };
 
 export type Product = {
@@ -32,6 +34,7 @@ export type Product = {
   description: string;
   accentColor: string;
   imageUrl?: string;
+  thumbnailUrl?: string;
   images?: string[];
   isFeatured?: boolean;
   tag?: string;
@@ -47,6 +50,7 @@ export type Banner = {
   tag?: string;
   buttonLabel: string;
   imageUrl?: string;
+  thumbnailUrl?: string;
   linkType: "none" | "product" | "category";
   linkId?: string;
   sortOrder: number;
@@ -62,6 +66,7 @@ export type Brand = {
   id: string;
   name: string;
   imageUrl?: string | null;
+  thumbnailUrl?: string | null;
 };
 
 export type BundleProduct = {
@@ -81,6 +86,7 @@ export type Bundle = {
   name: string;
   description?: string;
   imageUrl?: string;
+  thumbnailUrl?: string;
   items: BundleItem[];
 };
 

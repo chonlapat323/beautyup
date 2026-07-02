@@ -100,6 +100,7 @@ export function HomeHeroSliderSection({
                 <CommerceImage
                   style={styles.productImage}
                   uri={banner.imageUrl}
+                  thumbnailUri={banner.thumbnailUrl}
                   contentFit="cover"
                 />
               ) : (

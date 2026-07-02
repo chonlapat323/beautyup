@@ -43,7 +43,7 @@ export function HomeBrandGridSection({ horizontalPadding, onSelectBrand, onViewA
             >
               <View style={styles.visual}>
                 {brand.imageUrl ? (
-                  <CommerceImage contentFit="cover" style={styles.visualImage} uri={brand.imageUrl} />
+                  <CommerceImage contentFit="cover" style={styles.visualImage} uri={brand.imageUrl} thumbnailUri={brand.thumbnailUrl ?? undefined} />
                 ) : (
                   <View style={styles.iconPlaceholder}>
                     <Text style={styles.iconInitial}>{brand.name.charAt(0).toUpperCase()}</Text>

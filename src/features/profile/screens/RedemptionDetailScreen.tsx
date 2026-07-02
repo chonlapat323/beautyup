@@ -156,7 +156,7 @@ export function RedemptionDetailScreen() {
           {/* Product card */}
           <View style={styles.productCard}>
             <View style={styles.productImgWrap}>
-              <CommerceImage uri={detail.rewardProduct.imageUrl ?? undefined} style={styles.productImg} contentFit="cover" />
+              <CommerceImage uri={detail.rewardProduct.imageUrl ?? undefined} thumbnailUri={detail.rewardProduct.thumbnailUrl ?? undefined} style={styles.productImg} contentFit="cover" />
               <View style={styles.productImgAccent} />
             </View>
             <View style={styles.productInfo}>

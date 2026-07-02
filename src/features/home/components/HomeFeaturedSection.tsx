@@ -96,7 +96,7 @@ export function HomeFeaturedSection({
                     {/* Image */}
                     <View style={styles.imageShell}>
                       <View style={styles.imageGlow} />
-                      <CommerceImage contentFit="cover" style={styles.image} uri={product.imageUrl} />
+                      <CommerceImage contentFit="cover" style={styles.image} uri={product.imageUrl} thumbnailUri={product.thumbnailUrl} />
 
                       {/* ✦ NEW: Wishlist heart button */}
                       <Pressable

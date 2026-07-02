@@ -164,7 +164,7 @@ export function OrderDetailScreen() {
           const product = products.find((entry) => entry.id === item.productId);
           return (
             <View key={`${order.id}-${item.productId}`} style={styles.itemCard}>
-              <CommerceImage style={styles.itemArtwork} uri={product?.imageUrl} />
+              <CommerceImage style={styles.itemArtwork} uri={product?.imageUrl} thumbnailUri={product?.thumbnailUrl} />
               <View style={styles.itemCopy}>
                 <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
                 <Text style={styles.itemMeta}>จำนวน {item.quantity}</Text>

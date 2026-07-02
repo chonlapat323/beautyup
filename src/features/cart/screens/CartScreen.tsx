@@ -85,7 +85,7 @@ export function CartScreen() {
               <View key={item.productId} style={styles.itemCard}>
                 {/* Product image */}
                 <View style={styles.swatchWrap}>
-                  <CommerceImage style={styles.swatch} uri={product.imageUrl} contentFit="cover" />
+                  <CommerceImage style={styles.swatch} uri={product.imageUrl} thumbnailUri={product.thumbnailUrl} contentFit="cover" />
                 </View>
 
                 {/* Name + Price */}

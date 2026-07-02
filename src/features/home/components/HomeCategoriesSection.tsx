@@ -48,7 +48,7 @@ export function HomeCategoriesSection({
             >
               <View style={styles.visual}>
                 <View style={styles.iconWrap}>
-                  <CommerceImage contentFit="cover" style={styles.icon} uri={category.imageUrl} />
+                  <CommerceImage contentFit="cover" style={styles.icon} uri={category.imageUrl} thumbnailUri={category.thumbnailUrl} />
                 </View>
               </View>
 

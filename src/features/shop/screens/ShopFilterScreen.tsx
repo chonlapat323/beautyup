@@ -174,7 +174,7 @@ export function ShopFilterScreen() {
                 {/* Brand image */}
                 <View style={styles.brandImgWrap}>
                   {brand.imageUrl ? (
-                    <CommerceImage style={styles.brandImg} uri={brand.imageUrl} contentFit="cover" />
+                    <CommerceImage style={styles.brandImg} uri={brand.imageUrl} thumbnailUri={brand.thumbnailUrl ?? undefined} contentFit="cover" />
                   ) : (
                     <View style={styles.brandImgPlaceholder}>
                       <MaterialIcons name="storefront" size={28} color={colors.sage} />
@@ -224,6 +224,7 @@ export function ShopFilterScreen() {
               key={cat.id}
               icon={(CAT_ICONS[cat.slug] ?? "label") as any}
               imageUrl={cat.imageUrl}
+              thumbnailUrl={cat.thumbnailUrl}
               title={cat.title}
               note={cat.subtitle}
               accentVariant="jade"
@@ -238,9 +239,9 @@ export function ShopFilterScreen() {
 
 // ✦ Category card component
 function CategoryCard({
-  icon, imageUrl, title, note, accentVariant, onPress,
+  icon, imageUrl, thumbnailUrl, title, note, accentVariant, onPress,
 }: {
-  icon: string; imageUrl?: string; title: string; note?: string;
+  icon: string; imageUrl?: string; thumbnailUrl?: string; title: string; note?: string;
   accentVariant: "all" | "jade";
   onPress: () => void;
 }) {
@@ -258,7 +259,7 @@ function CategoryCard({
       {/* Image or Icon */}
       {imageUrl ? (
         <View style={styles.catImgWrap}>
-          <CommerceImage style={styles.catImg} uri={imageUrl} contentFit="cover" />
+          <CommerceImage style={styles.catImg} uri={imageUrl} thumbnailUri={thumbnailUrl} contentFit="cover" />
         </View>
       ) : (
         <View style={[

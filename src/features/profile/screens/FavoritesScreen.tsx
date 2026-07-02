@@ -33,7 +33,7 @@ function FavCard({
   return (
     <Pressable onPress={onPress} style={[styles.card, isOutOfStock && styles.cardOutOfStock]}>
       <View style={styles.imageWrap}>
-        <CommerceImage style={styles.preview} uri={product.imageUrl} contentFit="cover" />
+        <CommerceImage style={styles.preview} uri={product.imageUrl} thumbnailUri={product.thumbnailUrl} contentFit="cover" />
 
         {product.originalPrice != null && !isOutOfStock && (
           <View style={styles.saleBadge}><Text style={styles.saleBadgeText}>ลดราคา</Text></View>

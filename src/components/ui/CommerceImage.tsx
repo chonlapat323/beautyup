@@ -7,12 +7,14 @@ import { colors } from "@/theme";
 
 type CommerceImageProps = {
   uri?: string;
+  thumbnailUri?: string;
   style?: StyleProp<ImageStyle>;
   contentFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
 };
 
 type CommerceImageBackgroundProps = {
   uri?: string;
+  thumbnailUri?: string;
   style?: StyleProp<ViewStyle>;
   imageStyle?: StyleProp<ImageStyle>;
   contentFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
@@ -21,6 +23,7 @@ type CommerceImageBackgroundProps = {
 
 export function CommerceImage({
   uri,
+  thumbnailUri,
   style,
   contentFit = "cover",
 }: CommerceImageProps) {
@@ -31,16 +34,18 @@ export function CommerceImage({
   return (
     <Image
       source={{ uri }}
+      placeholder={thumbnailUri ? { uri: thumbnailUri } : undefined}
       style={style}
       contentFit={contentFit}
       cachePolicy="disk"
-      transition={150}
+      transition={200}
     />
   );
 }
 
 export function CommerceImageBackground({
   uri,
+  thumbnailUri,
   style,
   imageStyle,
   contentFit = "cover",
@@ -53,10 +58,12 @@ export function CommerceImageBackground({
   return (
     <ImageBackground
       source={{ uri }}
+      placeholder={thumbnailUri ? { uri: thumbnailUri } : undefined}
       style={style}
       imageStyle={imageStyle}
       contentFit={contentFit}
       cachePolicy="disk"
+      transition={200}
     >
       {children}
     </ImageBackground>
