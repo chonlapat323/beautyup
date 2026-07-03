@@ -322,6 +322,7 @@ export function ProfileScreen() {
       {/* ✦ Menu items */}
       <View style={styles.menuCard}>
         <MenuItem icon="favorite" label="สินค้าที่ถูกใจ" onPress={() => navigation.navigate("Favorites")} />
+        <MenuItem icon="share" label="ช่องทางติดต่อ" onPress={() => navigation.navigate("EditSocialLinks")} />
         <MenuItem icon="card-giftcard" label="ของรางวัลของฉัน" onPress={() => navigation.navigate("MyRedemptions")} />
         <MenuItem icon="receipt-long" label="ประวัติคำสั่งซื้อ" onPress={() => navigation.navigate("OrderHistory")} />
         <MenuItem icon="location-on" label="ที่อยู่ของฉัน" onPress={() => navigation.navigate("Addresses")} />

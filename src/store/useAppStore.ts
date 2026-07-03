@@ -7,7 +7,7 @@ import { fetchBanners, fetchBrands, fetchBundles, fetchCarriers, fetchCollection
 import type { CarrierConfig, MobileConfig, PointTier } from "@/services/api";
 import type { Banner, Brand, Bundle, CartItem, Category, Collection, Order, Product } from "@/types/domain";
 
-type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; creditBalance: number; referralCode: string | null; bankName: string | null; bankAccountNumber: string | null; bankAccountName: string | null; profileImageUrl?: string | null; profileThumbnailUrl?: string | null; bannerThumbnailUrl?: string | null };
+type MemberInfo = { id: string; fullName: string; email: string | null; phone: string | null; memberType: string; pointBalance: number; creditBalance: number; referralCode: string | null; bankName: string | null; bankAccountNumber: string | null; bankAccountName: string | null; profileImageUrl?: string | null; profileThumbnailUrl?: string | null; bannerThumbnailUrl?: string | null; facebook?: string | null; tiktok?: string | null; shopee?: string | null; lazada?: string | null };
 
 type AppStore = {
   isAuthenticated: boolean;

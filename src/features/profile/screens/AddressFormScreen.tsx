@@ -80,6 +80,10 @@ export function AddressFormScreen() {
   const [subdistrictOptions, setSubdistrictOptions] = useState<string[]>([]);
   const [pickerVisible, setPickerVisible] = useState(false);
 
+  // Amphoe picker state
+  const [amphoeOptions, setAmphoeOptions] = useState<string[]>([]);
+  const [amphoePickerVisible, setAmphoePickerVisible] = useState(false);
+
   const pageTitle = addressId ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่";
 
   // Ref to track whether we should suppress the postalCode auto-fill
@@ -124,21 +128,36 @@ export function AddressFormScreen() {
       return;
     }
 
+    update({ district: "", province: "", subdistrict: "" });
+    setSubdistrictOptions([]);
+    setAmphoeOptions([]);
+
     if (value.length === 5) {
       const matches = queryByZipcode(value);
       if (matches.length > 0) {
-        const first = matches[0];
-        const subdistricts = [...new Set(matches.map((e) => e.district))];
-        update({
-          district: first.amphoe,
-          province: first.province,
-          subdistrict: subdistricts[0] ?? "",
-        });
-        setSubdistrictOptions(subdistricts);
+        const uniqueAmphoe = [...new Set(matches.map((e) => e.amphoe))];
+        if (uniqueAmphoe.length === 1) {
+          const amphoe = uniqueAmphoe[0];
+          const province = matches[0].province;
+          const subdistricts = [...new Set(matches.map((e) => e.district))];
+          update({ district: amphoe, province, subdistrict: subdistricts[0] ?? "" });
+          setSubdistrictOptions(subdistricts);
+        } else {
+          setAmphoeOptions(uniqueAmphoe);
+        }
       }
-    } else {
-      setSubdistrictOptions([]);
     }
+  }
+
+  function handleAmphoeSelect(amphoe: string) {
+    const matches = queryByZipcode(form.postalCode);
+    const filtered = matches.filter((e) => e.amphoe === amphoe);
+    const province = filtered[0]?.province ?? "";
+    const subdistricts = [...new Set(filtered.map((e) => e.district))];
+    update({ district: amphoe, province, subdistrict: subdistricts[0] ?? "" });
+    setSubdistrictOptions(subdistricts);
+    setAmphoeOptions([]);
+    setAmphoePickerVisible(false);
   }
 
   async function handleSave() {
@@ -159,6 +178,7 @@ export function AddressFormScreen() {
         phone: form.phone,
         addressLine1: form.addressLine1,
         addressLine2: form.addressLine2 || undefined,
+        subdistrict: form.subdistrict || undefined,
         district: form.district || undefined,
         province: form.province || undefined,
         postalCode: form.postalCode || undefined,
@@ -266,24 +286,26 @@ export function AddressFormScreen() {
           </View>
         )}
 
-        <View style={styles.row2}>
-          <View style={styles.flexField}>
-            <Field
-              label="อำเภอ/เขต"
-              placeholder="คลองเตย"
-              value={form.district}
-              onChangeText={(value) => update({ district: value })}
-            />
+        {amphoeOptions.length > 0 && (
+          <View style={styles.field}>
+            <Text style={styles.label}>อำเภอ/เขต</Text>
+            <Pressable style={styles.pickerBtn} onPress={() => setAmphoePickerVisible(true)}>
+              <Text style={styles.pickerPlaceholder}>เลือกอำเภอ/เขต</Text>
+              <Text style={styles.chevron}>›</Text>
+            </Pressable>
           </View>
-          <View style={styles.flexField}>
-            <Field
-              label="จังหวัด"
-              placeholder="กรุงเทพฯ"
-              value={form.province}
-              onChangeText={(value) => update({ province: value })}
-            />
+        )}
+
+        {form.district ? (
+          <View style={styles.row2}>
+            <View style={styles.flexField}>
+              <ReadOnlyField label="อำเภอ/เขต" value={form.district} />
+            </View>
+            <View style={styles.flexField}>
+              <ReadOnlyField label="จังหวัด" value={form.province} />
+            </View>
           </View>
-        </View>
+        ) : null}
       </View>
 
       <View style={styles.actions}>
@@ -324,6 +346,28 @@ export function AddressFormScreen() {
           </ScrollView>
         </View>
       </Modal>
+
+      {/* Amphoe picker modal */}
+      <Modal visible={amphoePickerVisible} animationType="slide" transparent onRequestClose={() => setAmphoePickerVisible(false)}>
+        <Pressable style={styles.backdrop} onPress={() => setAmphoePickerVisible(false)} />
+        <View style={styles.sheet}>
+          <View style={styles.sheetHandle} />
+          <Text style={styles.sheetTitle}>เลือกอำเภอ/เขต</Text>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {amphoeOptions.map((name) => (
+              <Pressable
+                key={name}
+                style={[styles.sheetItem, form.district === name && styles.sheetItemActive]}
+                onPress={() => handleAmphoeSelect(name)}
+              >
+                <Text style={[styles.sheetItemText, form.district === name && styles.sheetItemTextActive]}>
+                  {name}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      </Modal>
     </Screen>
   );
 }
@@ -355,6 +399,19 @@ function Field({
         keyboardType={keyboardType ?? "default"}
         maxLength={maxLength}
       />
+    </View>
+  );
+}
+
+function ReadOnlyField({ label, value, placeholder }: { label: string; value: string; placeholder?: string }) {
+  return (
+    <View style={styles.field}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={[styles.input, { justifyContent: "center" }]}>
+        <Text style={value ? styles.pickerValue : styles.pickerPlaceholder}>
+          {value || placeholder || ""}
+        </Text>
+      </View>
     </View>
   );
 }

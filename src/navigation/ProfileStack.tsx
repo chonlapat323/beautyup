@@ -14,6 +14,7 @@ import { WithdrawalScreen } from "@/features/profile/screens/WithdrawalScreen";
 import { CreditHistoryScreen } from "@/features/profile/screens/CreditHistoryScreen";
 import { BankAccountScreen } from "@/features/profile/screens/BankAccountScreen";
 import { FavoritesScreen } from "@/features/profile/screens/FavoritesScreen";
+import { EditSocialLinksScreen } from "@/features/profile/screens/EditSocialLinksScreen";
 import { ProductDetailScreen } from "@/features/shop/screens/ProductDetailScreen";
 import type { ProfileStackParamList } from "@/navigation/types";
 
@@ -36,6 +37,7 @@ export function ProfileStack() {
       <Stack.Screen name="CreditHistory" component={CreditHistoryScreen} />
       <Stack.Screen name="BankAccount" component={BankAccountScreen} />
       <Stack.Screen name="Favorites" component={FavoritesScreen} />
+      <Stack.Screen name="EditSocialLinks" component={EditSocialLinksScreen} />
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
     </Stack.Navigator>
   );

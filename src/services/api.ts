@@ -787,6 +787,10 @@ export async function mobileGetProfile(token: string): Promise<{
   profileThumbnailUrl?: string | null;
   bannerImageUrl?: string | null;
   bannerThumbnailUrl?: string | null;
+  facebook?: string | null;
+  tiktok?: string | null;
+  shopee?: string | null;
+  lazada?: string | null;
 }> {
   const res = await fetch(`${API_BASE}/mobile/profile`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -885,6 +889,21 @@ export async function mobileUploadProfileImage(token: string, imageUri: string):
     throw new Error(err.message ?? "อัปโหลดรูปโปรไฟล์ไม่สำเร็จ");
   }
   return res.json() as Promise<{ profileImageUrl: string; profileThumbnailUrl: string | null }>;
+}
+
+export async function mobileUpdateSocialLinks(
+  token: string,
+  data: { facebook?: string | null; tiktok?: string | null; shopee?: string | null; lazada?: string | null },
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/mobile/me/social-links`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(err.message ?? "บันทึกช่องทางติดต่อไม่สำเร็จ");
+  }
 }
 
 export async function mobileRegisterPushToken(token: string, expoPushToken: string): Promise<void> {

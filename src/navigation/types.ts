@@ -20,6 +20,7 @@ export type ProfileStackParamList = {
   CreditHistory: undefined;
   BankAccount: undefined;
   Favorites: undefined;
+  EditSocialLinks: undefined;
   ProductDetail: { productId: string; shadeName?: string };
 };
 
