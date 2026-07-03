@@ -2,7 +2,9 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
 import {
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -333,40 +335,42 @@ export function AddressFormScreen() {
         onRequestClose={() => setPickerField(null)}
       >
         <Pressable style={styles.backdrop} onPress={() => setPickerField(null)} />
-        <View style={styles.sheet}>
-          <View style={styles.sheetHandle} />
-          <Text style={styles.sheetTitle}>{pickerField ? pickerTitle(pickerField) : ""}</Text>
-          <View style={styles.searchBox}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="ค้นหา..."
-              placeholderTextColor="rgba(255,255,255,0.35)"
-              value={pickerSearch}
-              onChangeText={setPickerSearch}
-              autoCorrect={false}
-            />
-          </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {pickerOptions
-              .filter((name) => !pickerSearch || name.includes(pickerSearch))
-              .map((name) => (
-                <Pressable
-                  key={name}
-                  style={[styles.sheetItem, currentValue(pickerField ?? "province") === name && styles.sheetItemActive]}
-                  onPress={() => handlePickerSelect(name)}
-                >
-                  <Text
-                    style={[
-                      styles.sheetItemText,
-                      currentValue(pickerField ?? "province") === name && styles.sheetItemTextActive,
-                    ]}
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+          <View style={styles.sheet}>
+            <View style={styles.sheetHandle} />
+            <Text style={styles.sheetTitle}>{pickerField ? pickerTitle(pickerField) : ""}</Text>
+            <View style={styles.searchBox}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="ค้นหา..."
+                placeholderTextColor="rgba(255,255,255,0.35)"
+                value={pickerSearch}
+                onChangeText={setPickerSearch}
+                autoCorrect={false}
+              />
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+              {pickerOptions
+                .filter((name) => !pickerSearch || name.includes(pickerSearch))
+                .map((name) => (
+                  <Pressable
+                    key={name}
+                    style={[styles.sheetItem, currentValue(pickerField ?? "province") === name && styles.sheetItemActive]}
+                    onPress={() => handlePickerSelect(name)}
                   >
-                    {name}
-                  </Text>
-                </Pressable>
-              ))}
-          </ScrollView>
-        </View>
+                    <Text
+                      style={[
+                        styles.sheetItemText,
+                        currentValue(pickerField ?? "province") === name && styles.sheetItemTextActive,
+                      ]}
+                    >
+                      {name}
+                    </Text>
+                  </Pressable>
+                ))}
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
     </Screen>
   );
