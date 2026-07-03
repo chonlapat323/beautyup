@@ -334,43 +334,45 @@ export function AddressFormScreen() {
         transparent
         onRequestClose={() => setPickerField(null)}
       >
-        <Pressable style={styles.backdrop} onPress={() => setPickerField(null)} />
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-          <View style={styles.sheet}>
-            <View style={styles.sheetHandle} />
-            <Text style={styles.sheetTitle}>{pickerField ? pickerTitle(pickerField) : ""}</Text>
-            <View style={styles.searchBox}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="ค้นหา..."
-                placeholderTextColor="rgba(255,255,255,0.35)"
-                value={pickerSearch}
-                onChangeText={setPickerSearch}
-                autoCorrect={false}
-              />
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-              {pickerOptions
-                .filter((name) => !pickerSearch || name.includes(pickerSearch))
-                .map((name) => (
-                  <Pressable
-                    key={name}
-                    style={[styles.sheetItem, currentValue(pickerField ?? "province") === name && styles.sheetItemActive]}
-                    onPress={() => handlePickerSelect(name)}
-                  >
-                    <Text
-                      style={[
-                        styles.sheetItemText,
-                        currentValue(pickerField ?? "province") === name && styles.sheetItemTextActive,
-                      ]}
+        <View style={styles.modalRoot}>
+          <Pressable style={styles.backdrop} onPress={() => setPickerField(null)} />
+          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <View style={styles.sheet}>
+              <View style={styles.sheetHandle} />
+              <Text style={styles.sheetTitle}>{pickerField ? pickerTitle(pickerField) : ""}</Text>
+              <View style={styles.searchBox}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="ค้นหา..."
+                  placeholderTextColor="rgba(255,255,255,0.35)"
+                  value={pickerSearch}
+                  onChangeText={setPickerSearch}
+                  autoCorrect={false}
+                />
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                {pickerOptions
+                  .filter((name) => !pickerSearch || name.includes(pickerSearch))
+                  .map((name) => (
+                    <Pressable
+                      key={name}
+                      style={[styles.sheetItem, currentValue(pickerField ?? "province") === name && styles.sheetItemActive]}
+                      onPress={() => handlePickerSelect(name)}
                     >
-                      {name}
-                    </Text>
-                  </Pressable>
-                ))}
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
+                      <Text
+                        style={[
+                          styles.sheetItemText,
+                          currentValue(pickerField ?? "province") === name && styles.sheetItemTextActive,
+                        ]}
+                      >
+                        {name}
+                      </Text>
+                    </Pressable>
+                  ))}
+              </ScrollView>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
       </Modal>
     </Screen>
   );
@@ -525,16 +527,20 @@ const styles = StyleSheet.create({
     color: "#FFF",
     ...typography.title,
   },
-  backdrop: {
+  modalRoot: {
     flex: 1,
+    justifyContent: "flex-end",
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.4)",
   },
   sheet: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
+    height: 480,
     paddingBottom: spacing["3xl"],
-    maxHeight: "60%",
   },
   sheetHandle: {
     width: 40,
